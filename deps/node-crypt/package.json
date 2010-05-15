@@ -1,0 +1,11 @@
+{
+	"name": "crypt",
+	"author": "Ben Trask <bentrask@comcast.net>",
+	"version": "0.0.1",
+	"scripts": {
+		"preinstall": "node-waf configure",
+		"install": "node-waf build"
+	},
+	"main": "build/default/crypt",
+	"engines": ["node"],
+}

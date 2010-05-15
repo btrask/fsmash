@@ -1,0 +1,75 @@
+/* Copyright (C) 2010 Ben Trask
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Affero General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>. */
+#main > .account > .profile {
+	height: 83px;
+	left: 0;
+	right: 0;
+	top: 0;
+	border-bottom: 1px solid #aaa;
+}
+#main > .account > .profile > .content  {
+	width: 320px;
+	top: 0;
+	bottom: 0;
+	left: 50%;
+	margin-left: -160px;
+}
+#main > .account > .profile > .content > .text.brawlName {
+	left: 2px;
+	width: 100px;
+	top: 2px;
+}
+#main > .account > .profile > .content > .text.friendCode {
+	left: 122px;
+	width: 178px;
+	top: 2px;
+}
+#main > .account > .profile > .content > .wrapper.bio {
+	left: 2px;
+	right: 2px;
+	top: 29px;
+	height: 25px;
+}
+#main > .account > .profile > .content > .style {
+	left: 2px;
+	top: 56px;
+	width: 157px;
+}
+#main > .account > .profile > .content > .sound {
+	left: 161px;
+	top: 56px;
+	width: 157px;
+}
+
+#main > .account > .channels {
+	left: 0;
+	right: 0;
+	top: 84px;
+	bottom: 30px;
+}
+
+#main > .account > .signout {
+	left: 0;
+	right: 0;
+	bottom: 0;
+	height: 29px;
+	border-top: 1px solid #aaa;
+}
+#main > .account > .signout > .button {
+	top: 2px;
+	width: 320px;
+	left: 50%;
+	margin-left: -160px;
+}

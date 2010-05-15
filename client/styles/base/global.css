@@ -1,0 +1,249 @@
+/* Copyright (C) 2010 Ben Trask
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Affero General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>. */
+* {
+	margin: 0;
+	padding: 0;
+	cursor: default;
+}
+
+body, input, select {
+	font-size: 13px;
+	font-family: "Lucida Grande", sans-serif;
+}
+select {
+	outline: none;
+}
+div {
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+table {
+	table-layout: fixed;
+	width: 100%;
+}
+a {
+	color: #333;
+}
+a:active {
+	color: #666;
+}
+a, a *, .link, .link * {
+	cursor: pointer;
+}
+noscript {
+	left: 0;
+	right: 0;
+	height: 1em;
+	top: 50%;
+	margin-top: -0.5em;
+	color: #666;
+}
+
+#main {
+	left: 151px;
+	top: 0;
+	bottom: 0;
+	right: 0;
+}
+
+#resizer {
+	left: 147px;
+	top: 0;
+	height: 100%;
+	width: 8px;
+	cursor: col-resize;
+}
+#resizer > .line {
+	background: #aaa;
+	left: 3px;
+	top: 0;
+	height: 100%;
+	width: 1px;
+	cursor: col-resize;
+}
+#connectionError {
+	left: 4px;
+	bottom: 4px;
+	background: #fff;
+	border: 1px solid #aaa;
+}
+
+.text {
+	border: 1px solid #aaa;
+	cursor: text;
+	height: 19px;
+	background: #fff;
+}
+.text.placeholder {
+	color: gray;
+}
+.text.disabled {
+	cursor: default;
+}
+
+.button {
+	background: #ddd;
+	background: -moz-linear-gradient(#fff, #ddd);
+	background: -webkit-gradient(linear, left top, left bottom, from(#fff), to(#ddd));
+	border: 1px solid #aaa;
+	height: 25px;
+	text-shadow: #fff 0 1px 1px;
+}
+.button:active {
+	background: #fff;
+	background: -moz-linear-gradient(#ddd, #fff);
+	background: -webkit-gradient(linear, left top, left bottom, from(#ddd), to(#fff));
+}
+.button.selected {
+	background: #8996b8;
+	background: -moz-linear-gradient(#8996b8, #b3bdd7);
+	background: -webkit-gradient(linear, left top, left bottom, from(#8996b8), to(#b3bdd7));
+	font-weight: bold;
+	color: #fff;
+	text-shadow: #434f65 0 1px 1px;
+}
+.button.confirm {
+	background: #f77;
+	background: -moz-linear-gradient(#f77, #f33);
+	background: -webkit-gradient(linear, left top, left bottom, from(#f77), to(#f33));
+	border-color: #f33;
+	font-weight: bold;
+	color: #fff;
+	text-shadow: #900 0 1px 1px;
+}
+.button.confirm:active {
+	background: #f33;
+	background: -moz-linear-gradient(#f33, #f77);
+	background: -webkit-gradient(linear, left top, left bottom, from(#f33), to(#f77));
+}
+.disabled, .disabled:active {
+	background: #eee;
+	color: #555;
+}
+.button.notice:active {
+	background: #fff;
+	background: -moz-linear-gradient(#fd9, #fff);
+	background: -webkit-gradient(linear, left top, left bottom, from(#fd9), to(#fff));
+}
+td > .button {
+	width: 100%;
+}
+
+.text, .button {
+	-webkit-border-radius: 3px;
+	-moz-border-radius: 3px;
+	border-radius: 3px;
+}
+.text.padding, .button.padding {
+	padding: 2px 8px;
+}
+
+.wrapper {
+	overflow: visible;
+}
+.wrapper > input {
+	width: 100%;
+	height: 100%;
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	-ms-box-sizing: border-box;
+	box-sizing: border-box;
+}
+
+.invisible {
+	display: none;
+}
+.absolute {
+	position: absolute;
+}
+.full {
+	left: 0;
+	right: 0;
+	top: 0;
+	bottom: 0;
+}
+.padding {
+	padding: 4px;
+}
+.center {
+	text-align: center;
+}
+.floatRight {
+	float: right;
+}
+.floatLeft {
+	float: left;
+}
+.light {
+	color: #777;
+}
+.scroll {
+	overflow: auto;
+}
+.notice {
+	background: #fd9;
+	background: -moz-linear-gradient(#fff, #fd9);
+	background: -webkit-gradient(linear, left top, left bottom, from(#fff), to(#fd9));
+	border: solid #fc6;
+	border-width: 1px;
+	color: #804000;
+	text-shadow: #fff 0 1px 1px;
+}
+.active {
+	background: #bafebf;
+	background: -moz-linear-gradient(#bafebf, #2ed035);
+	background: -webkit-gradient(linear, left top, left bottom, from(#bafebf), to(#2ed035));
+	border: solid #2ed035;
+	border-width: 1px;
+	color: #006100;
+}
+.clear {
+	clear: both;
+}
+.panel {
+	background: #fff;
+}
+.right {
+	text-align: right;
+}
+.overflow * {
+	overflow: visible;
+}
+.commands.floatRight > .button {
+	width: 70px;
+	margin-left: 2px;
+}
+.nowrap {
+	white-space: nowrap;
+}
+.background {
+	background: #eee;
+}
+.bold {
+	font-weight: bold;
+}
+.signature {
+	font-style: italic;
+}
+.header {
+	background: #ddd;
+	background: -moz-linear-gradient(#ddd, #ccc);
+	background: -webkit-gradient(linear, left top, left bottom, from(#ddd), to(#ccc));
+	border: solid #ccc;
+	border-width: 1px 0;
+	font-weight: bold;
+	text-align: center;
+	text-shadow: #fff 0 1px 1px;
+}
