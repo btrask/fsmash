@@ -33,10 +33,7 @@ var Game = require("./classes/Game").Game;
 
 var db = mysql.connect(JSON.parse(fs.readFileSync(__dirname+"/db.json")));
 var config = {
-	server: {
-		port: 8001,
-		host: null,
-	},
+	server: JSON.parse(fs.readFileSync(__dirname+"/config.json")),
 	signin: {
 		throttleMinutes: 15,
 		throttleAttempts: 50,
@@ -52,7 +49,7 @@ var config = {
 	},
 	rankings: {
 		interval: 1000 * 60 * 60 * 24 * 1,
-	}
+	},
 };
 
 var fileHandler = bt.memoize(function(path, callback) {
