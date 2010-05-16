@@ -126,7 +126,7 @@ var User = function(session, userID) {
 			return link.title && link.getAttribute("data-style-id");
 		};
 		var setStyleID = function(styleID) {
-			for(var i = 0; i < links.length; ++i) if(isCSSStyleElement(links[i])) links[i].disabled = links[i].getAttribute("data-style-id") !== styleID;
+			for(var i = 0; i < links.length; ++i) if(isCSSStyleElement(links[i])) links[i].disabled = links[i].getAttribute("data-style-id") != styleID;
 		};
 		user.setStyleID = function(styleID) {
 			setStyleID(styleID);
