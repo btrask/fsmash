@@ -281,7 +281,7 @@ var Channel = function(session, user, channelID, parentID) {
 			DOM.fill(channel.sidebarItem.counter, counter);
 		};
 		channel.incoming = function(type) {
-			user.playSound(type);
+			if("message" != type || channel.game || channel.sidebarItem.selected) user.playSound(type);
 			if(!pane.hasOwnProperty(type)) return;
 			if(channel.sidebarItem.selected && pane[type].parentNode) return;
 			if(count.hasOwnProperty(type)) count[type]++;
