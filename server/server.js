@@ -48,7 +48,7 @@ var config = {
 		timeout: 1000 * 60 * 5,
 	},
 	rankings: {
-		interval: 1000 * 60 * 60 * 24 * 1,
+		interval: 1000 * 60 * 60 * 1,
 	},
 };
 
@@ -123,9 +123,11 @@ var updateRankings = function() {
 		"INSERT INTO rankings (userID, directPoints, indirectPoints, totalPoints)"+
 		" SELECT u.userID, COUNT(DISTINCT r1.fromUserID), COUNT(r2.fromUserID), COUNT(DISTINCT r1.fromUserID) + COUNT(r2.fromUserID)"+
 		" FROM ratings r1"+
-		" LEFT JOIN ratings r2 ON (r1.fromUserID = r2.toUserID AND r2.ratingType = -1 AND r2.isConfirmed = 1 AND r2.ratingTime > DATE_SUB(NOW(), INTERVAL 6 MONTH))"+
+		" LEFT JOIN ratings r2 ON (r1.fromUserID = r2.toUserID AND"+
+			" r2.ratingType = -1 AND r2.isConfirmed = 1 AND r2.ratingTime < DATE_SUB(NOW(), INTERVAL 1 DAY) AND r2.ratingTime > DATE_SUB(NOW(), INTERVAL 6 MONTH))"+
 		" LEFT JOIN users u ON (r1.toUserID = u.userID)"+
-		" WHERE u.userName IS NOT NULL AND r1.ratingType = -1 AND r1.isConfirmed = 1 AND r1.ratingTime > DATE_SUB(NOW(), INTERVAL 6 MONTH)"+
+		" WHERE u.userName IS NOT NULL AND"+
+			" r1.ratingType = -1 AND r1.isConfirmed = 1 AND r1.ratingTime < DATE_SUB(NOW(), INTERVAL 1 DAY) AND r1.ratingTime > DATE_SUB(NOW(), INTERVAL 6 MONTH)"+
 		" GROUP BY r1.toUserID"
 	);
 	db.query("UNLOCK TABLES");
