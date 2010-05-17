@@ -102,7 +102,7 @@ a:active {
 	text-shadow: #000 0 1px 1px;
 }
 #sidebar, #sidebar > ul {
-	background: #222;
+	background: #222 url("resources/sidebar-background.png") no-repeat; /* Define this on both elements because the <ul> scrolls but isn't full height */
 }
 #sidebar .row.selected {
 	background: #bb0;

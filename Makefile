@@ -14,7 +14,7 @@ CLIENT_SCRIPTS = client/external/json2.js \
 
 STYLE_BASE_COMPONENTS = global.css sidebar.css modal.css authenticate.css account.css channel.css about.css videos.css
 STYLES += public/styles/base/index.css public/styles/base/resources
-STYLES += public/styles/dark/index.css
+STYLES += public/styles/dark/index.css public/styles/dark/resources
 
 all: gzip
 
