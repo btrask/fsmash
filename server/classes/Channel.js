@@ -52,7 +52,7 @@ var Channel = function(parentID, channelID) {
 		};
 		channel.privateGroup.sendEvent("/user/channel/message/", body, ticket);
 		channel.history.push(body);
-		while(channel.history.length > config.maxHistoryLength) channel.history.unshift();
+		while(channel.history.length > config.maxHistoryLength) channel.history.shift();
 	};
 	channel.addUser = function(user, ticket) {
 		user.channelByID[channel.info.channelID] = channel;
