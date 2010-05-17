@@ -225,13 +225,13 @@ CREATE TABLE `ratings` (
   `fromUserID` int(11) NOT NULL,
   `toUserID` int(11) NOT NULL,
   `ratingType` int(11) NOT NULL,
-  `ratingTime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  `isConfirmed` tinyint(4) NOT NULL DEFAULT '0',
+  `ratingTime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `isContradicted` tinyint(4) NOT NULL DEFAULT '0',
   PRIMARY KEY (`ratingID`),
   UNIQUE KEY `fromUserID` (`fromUserID`,`toUserID`),
   KEY `ratingType` (`ratingType`),
   KEY `ratingTime` (`ratingTime`),
-  KEY `isConfirmed` (`isConfirmed`)
+  KEY `isContradicted` (`isContradicted`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 -- --------------------------------------------------------

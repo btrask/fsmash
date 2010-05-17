@@ -124,10 +124,10 @@ var updateRankings = function() {
 		" SELECT u.userID, COUNT(DISTINCT r1.fromUserID), COUNT(r2.fromUserID), COUNT(DISTINCT r1.fromUserID) + COUNT(r2.fromUserID)"+
 		" FROM ratings r1"+
 		" LEFT JOIN ratings r2 ON (r1.fromUserID = r2.toUserID AND"+
-			" r2.ratingType = -1 AND r2.isConfirmed = 1 AND r2.ratingTime < DATE_SUB(NOW(), INTERVAL 1 DAY) AND r2.ratingTime > DATE_SUB(NOW(), INTERVAL 6 MONTH))"+
+			" r2.ratingType = -1 AND r2.isContradicted = 0 AND r2.ratingTime < DATE_SUB(NOW(), INTERVAL 1 DAY) AND r2.ratingTime > DATE_SUB(NOW(), INTERVAL 6 MONTH))"+
 		" LEFT JOIN users u ON (r1.toUserID = u.userID)"+
 		" WHERE u.userName IS NOT NULL AND"+
-			" r1.ratingType = -1 AND r1.isConfirmed = 1 AND r1.ratingTime < DATE_SUB(NOW(), INTERVAL 1 DAY) AND r1.ratingTime > DATE_SUB(NOW(), INTERVAL 6 MONTH)"+
+			" r1.ratingType = -1 AND r1.isContradicted = 0 AND r1.ratingTime < DATE_SUB(NOW(), INTERVAL 1 DAY) AND r1.ratingTime > DATE_SUB(NOW(), INTERVAL 6 MONTH)"+
 		" GROUP BY r1.toUserID"
 	);
 	db.query("UNLOCK TABLES");
@@ -455,19 +455,19 @@ root.api.session.user.person.rate = bt.dispatch(function(query, session, user, p
 	if(Number(rating) !== rating) return {error: "Invalid rating"};
 	if(query.rating < -1 || query.rating > 1) return {error: "Invalid rating"};
 	db.query(mysql.format(
-		"UPDATE ratings SET isConfirmed = 0"+
+		"UPDATE ratings SET isContradicted = 0"+
 		" WHERE fromUserID = $ AND toUserID = $",
 		personUserID, user.info.userID),
 		function() {
 			db.query(mysql.format(
-				"UPDATE ratings SET isConfirmed = 1"+
-				" WHERE fromUserID = $ AND toUserID = $ AND ratingType = $",
+				"UPDATE ratings SET isContradicted = 1"+
+				" WHERE fromUserID = $ AND toUserID = $ AND ratingType != $",
 				personUserID, user.info.userID, -rating),
-				function(confirmationResult) {
+				function(contradictedResult) {
 					db.query(mysql.format(
-						"REPLACE ratings (fromUserID, toUserID, ratingType, isConfirmed)"+
+						"REPLACE ratings (fromUserID, toUserID, ratingType, isContradicted)"+
 						" VALUES ($, $, $, $)",
-						user.info.userID, personUserID, rating, (confirmationResult.affected_rows ? 1 : 0)
+						user.info.userID, personUserID, rating, (contradictedResult.affected_rows ? 1 : 0)
 					));
 				}
 			);
