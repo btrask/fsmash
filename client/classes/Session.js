@@ -236,7 +236,7 @@ Session.request = function(path, properties, callback) {
 		var success = (200 === req.status);
 		DOM.changeClass(DOM.id("connectionError"), "invisible", success);
 		if(success) callback(JSON.parse(req.responseText));
-		else setTimeout(bt.curry(Session.request, path, properties, callback), 1000 * 1);
+		else setTimeout(bt.curry(Session.request, path, properties, callback), 1000 * 5);
 	};
 	req.setRequestHeader("Content-Type", "text/json");
 	req.send(JSON.stringify(properties || {}));
