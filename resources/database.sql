@@ -91,7 +91,7 @@ CREATE TABLE `games` (
   `ruleID` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`gameID`),
   UNIQUE KEY `channelID` (`channelID`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 -- --------------------------------------------------------
 
@@ -261,10 +261,13 @@ CREATE TABLE `reports` (
   `reportID` int(11) NOT NULL AUTO_INCREMENT,
   `channelID` int(11) NOT NULL,
   `userID` int(11) NOT NULL,
+  `isResolved` tinyint(4) NOT NULL DEFAULT '0',
   `reportTime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`reportID`),
   KEY `userID` (`userID`),
-  KEY `channelID` (`channelID`)
+  KEY `channelID` (`channelID`),
+  KEY `isResolved` (`isResolved`),
+  KEY `reportTime` (`reportTime`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 -- --------------------------------------------------------

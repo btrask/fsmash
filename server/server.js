@@ -345,7 +345,7 @@ root.api.session.user = bt.dispatch(function(query, session) {
 						" FROM reports r"+
 						" LEFT JOIN users u ON (r.userID = u.userID)"+
 						" LEFT JOIN channels c ON (r.channelID = c.channelID)"+
-						" WHERE r.reportTime > DATE_SUB(NOW(), INTERVAL 7 DAY)"+
+						" WHERE r.reportTime > DATE_SUB(NOW(), INTERVAL 7 DAY) AND r.isResolved = 0"+
 						" ORDER BY r.reportTime DESC"),
 						function(reportResults) {
 							session.user.sendEvent("/user/admin/reports/", mysql.rows(reportResults));
