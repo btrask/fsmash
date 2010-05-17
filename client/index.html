@@ -9,7 +9,7 @@
 		<meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0; minimum-scale=1.0; user-scalable=0;">
 
 		<link rel="stylesheet" href="styles/base/index.css" type="text/css" charset="utf-8">
-		<!--<link title="Dark" data-style-id="2" rel="alternate stylesheet" href="styles/dark/index.css" type="text/css" charset="utf-8">-->
+		<link title="Dark" data-style-id="2" rel="alternate stylesheet" href="styles/dark/index.css" type="text/css" charset="utf-8">
 	</head>
 	<body class="background">
 		<div id="audio"></div>
@@ -21,7 +21,7 @@
 				<div class="line absolute"></div>
 			</div>
 			<div id="modal"></div>
-			<div id="connectionError" class="absolute padding invisible"><a href=".">Connection error</a></div>
+			<div id="connectionError" class="panel absolute padding invisible"><a href=".">Connection error</a></div>
 		</div>
 		<noscript class="absolute center"><a href="http://www.google.com/search?q=enable+javascript" rel="nofollow" target="_blank">This site requires JavaScript</a></noscript>
 		<div class="storage invisible">
@@ -131,8 +131,8 @@
 						<input type="text" class="brawlName text padding absolute" maxlength="5" title="Brawl Name" data-id="brawlName">
 						<input type="text" class="friendCode text padding absolute" maxlength="14" title="Friend Code" data-id="friendCode">
 						<div class="bio wrapper absolute"><input type="text" class="text padding" maxlength="141" title="Player Bio" data-id="bio"></div>
-						<select class="style button absolute" title="Style"><optgroup label="Style" data-id="styles"><option>Default</option></optgroup></select>
-						<select class="sound button absolute" title="Soundset"><optgroup label="Soundset" data-id="soundsets"><option>Default</option></optgroup></select>
+						<select class="style absolute" title="Style"><optgroup label="Style" data-id="styles"><option>Default</option></optgroup></select>
+						<select class="sound absolute" title="Soundset"><optgroup label="Soundset" data-id="soundsets"><option>Default</option></optgroup></select>
 					</div>
 				</div>
 				<div class="channels absolute padding scroll" data-id="publicChannels"></div>
@@ -177,9 +177,9 @@
 				<table border="0" cellspacing="2" class="settings">
 					<tbody>
 						<tr>
-							<td><select class="button" title="Match Type"><optgroup label="Match Type" data-id="matchType"></optgroup></select></td>
-							<td><select class="button" title="Rules"><optgroup label="Rules" data-id="rule"></optgroup></select></td>
-							<td><select class="button" title="Players needed"><optgroup label="Players needed" data-id="playersNeeded"></optgroup></select></td>
+							<td><select title="Match Type"><optgroup label="Match Type" data-id="matchType"></optgroup></select></td>
+							<td><select title="Rules"><optgroup label="Rules" data-id="rule"></optgroup></select></td>
+							<td><select title="Players needed"><optgroup label="Players needed" data-id="playersNeeded"></optgroup></select></td>
 						</tr>
 					</tbody>
 				</table>

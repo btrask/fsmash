@@ -14,6 +14,7 @@ CLIENT_SCRIPTS = client/external/json2.js \
 
 STYLE_BASE_COMPONENTS = global.css sidebar.css modal.css authenticate.css account.css channel.css about.css videos.css
 STYLES += public/styles/base/index.css public/styles/base/resources
+STYLES += public/styles/dark/index.css
 
 all: gzip
 
@@ -27,6 +28,10 @@ public/compiled.js: $(CLIENT_SCRIPTS)
 	java -jar deps/compiler-latest/compiler.jar $(addprefix --js=,$+) --js_output_file=$@
 
 public/styles/base/index.css: $(addprefix client/styles/base/,$(STYLE_BASE_COMPONENTS))
+	-mkdir -p $(dir $@)
+	cat $+ | java -jar deps/yuicompressor-2.4.2/build/yuicompressor-2.4.2.jar --type css -o $@
+
+public/styles/dark/index.css: client/styles/dark/index.css
 	-mkdir -p $(dir $@)
 	cat $+ | java -jar deps/yuicompressor-2.4.2/build/yuicompressor-2.4.2.jar --type css -o $@
 

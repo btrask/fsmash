@@ -1,0 +1,165 @@
+/* Copyright (C) 2010 Ben Trask
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Affero General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>. */
+
+/* Global */
+#resizer > .line {
+	background: #555;
+}
+.background {
+	background: #333;
+	color: #bbb;
+}
+a {
+	color: #cc5;
+}
+a:active {
+	color: #aa4;
+}
+.selected {
+	color: #000;
+}
+.panel {
+	background: #000;
+}
+
+.text {
+	background: #222;
+	color: #fff;
+	border-color: #555;
+}
+.text:focus {
+	outline: 2px solid #bb3;
+}
+.button, select {
+	background: #444;
+	color: #fff;
+	border: 1px solid #555;
+}
+.button {
+	background: -moz-linear-gradient(#444, #222);
+	background: -webkit-gradient(linear, left top, left bottom, from(#444), to(#222));
+	text-shadow: #000 0 1px 1px;
+}
+.button:active {
+	background: #222;
+	background: -moz-linear-gradient(#222, #444);
+	background: -webkit-gradient(linear, left top, left bottom, from(#222), to(#444));
+	color: #bbb;
+}
+.button.selected {
+	background: #bb0;
+	background: -moz-linear-gradient(#880, #bb0);
+	background: -webkit-gradient(linear, left top, left bottom, from(#880), to(#bb0));
+	border-color: #880;
+	color: #000;
+	text-shadow: #ee6 0 1px 1px;
+}
+.button.notice:active {
+	background: #080;
+	background: -moz-linear-gradient(#080, #0b0);
+	background: -webkit-gradient(linear, left top, left bottom, from(#080), to(#0b0));
+}
+.disabled, .disabled:active {
+	background: #222;
+	color: #888;
+}
+
+.header {
+	background: #111;
+	background: -moz-linear-gradient(#111, #333);
+	background: -webkit-gradient(linear, left top, left bottom, from(#111), to(#333));
+	border: none;
+	color: #aa0;
+	text-shadow: #000 0 1px 1px;
+}
+.notice {
+	background: #0b0;
+	background: -moz-linear-gradient(#0b0, #080);
+	background: -webkit-gradient(linear, left top, left bottom, from(#0b0), to(#080));
+	border-color: #080;
+	color: #fff;
+	text-shadow: #060 0 1px 1px;
+}
+
+/* Sidebar */
+
+#sidebar > ul > li > .row > .title {
+	color: #aa0;
+	font-variant: normal;
+	font-weight: bold;
+	text-shadow: #000 0 1px 1px;
+}
+#sidebar, #sidebar > ul {
+	background: #222;
+}
+#sidebar .row.selected {
+	background: #bb0;
+	background: -moz-linear-gradient(#bb0, #880);
+	background: -webkit-gradient(linear, left top, left bottom, from(#bb0), to(#880));
+	border-color: #880;
+	color: #000;
+}
+#sidebar .row.selected > .title {
+	text-shadow: #ee6 0 1px 1px;
+}
+#sidebar .counter {
+	background: #a00;
+}
+
+/* Authenticate */
+
+#main > .authenticate > .step > .label {
+	background: #666;
+}
+#main > .authenticate > .step + .step {
+	border-color: #666;
+}
+
+/* Account */
+
+#main > .account > .profile {
+	border-color: #666;
+}
+#main > .account > .signout {
+	border-color: #666;
+}
+
+/* Channel */
+
+#main > .channel > .content {
+	background: #000;
+}
+#main > .channel > .content > .info {
+	border-color: #666;
+}
+#main > .channel > .content > .info > .settings > .game {
+	border-color: #666;
+}
+#main > .channel > .content > .chat > .input {
+	background: #222;
+	border-color: #666;
+}
+
+/* Videos */
+
+#main > .videos > .submit {
+	border-color: #666;
+}
+
+/* Modal */
+
+#modal > .shield > .content {
+	background: #444;
+}

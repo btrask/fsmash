@@ -76,7 +76,6 @@ noscript {
 #connectionError {
 	left: 4px;
 	bottom: 4px;
-	background: #fff;
 	border: 1px solid #aaa;
 }
 
@@ -93,12 +92,14 @@ noscript {
 	cursor: default;
 }
 
-.button {
+.button, select {
+	height: 25px;
 	background: #ddd;
+	border: 1px solid #aaa;
+}
+.button {
 	background: -moz-linear-gradient(#fff, #ddd);
 	background: -webkit-gradient(linear, left top, left bottom, from(#fff), to(#ddd));
-	border: 1px solid #aaa;
-	height: 25px;
 	text-shadow: #fff 0 1px 1px;
 }
 .button:active {
@@ -137,7 +138,7 @@ noscript {
 	background: -moz-linear-gradient(#fd9, #fff);
 	background: -webkit-gradient(linear, left top, left bottom, from(#fd9), to(#fff));
 }
-td > .button {
+td > .button, td > select {
 	width: 100%;
 }
 

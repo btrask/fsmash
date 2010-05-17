@@ -24,7 +24,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
 #sidebar > ul > li > .row > .title {
 	color: #567;
-	font-variant:small-caps;
+	font-variant: small-caps;
 	text-shadow: #fff 0 1px 1px;
 }
 
