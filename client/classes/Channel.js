@@ -41,9 +41,7 @@ var Channel = function(session, user, channelID, parentID) {
 	var chnlElems = {}, infoElems = {}, chatElems = {};
 	var infoPane = DOM.clone("info", infoElems), chatPane = DOM.clone("chat", chatElems);
 	var focusMessageInput = function() {
-		if(/iPhone/i.test(navigator.userAgent)) return; // Shows the keyboard.
-		if(/Opera/i.test(navigator.userAgent)) return; // Scrolls off the top of the screen.
-		chatElems.input.focus();
+		DOM.field.focus(chatElems.input);
 	};
 
 	channel.info = {channelID: channelID, parentID: parentID};
@@ -334,7 +332,7 @@ var Channel = function(session, user, channelID, parentID) {
 				DOM.scroll.toBottom(channel.scrollBox);
 				channel.request("/message/", {text: text});
 			}
-			chatElems.input.focus();
+			DOM.field.focus(chatElems.input);
 		};
 		chatElems.send.onclick = sendMessage;
 		chatElems.input.onkeypress = function(event) {
@@ -375,7 +373,7 @@ var Channel = function(session, user, channelID, parentID) {
 			elems.topic.onkeyup();
 			elems.confirm.onclick = confirm;
 			session.showModal(discussionPanel);
-			elems.topic.focus();
+			DOM.field.focus(elems.topic);
 		};
 	})();
 

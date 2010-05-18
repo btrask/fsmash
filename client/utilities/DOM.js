@@ -104,6 +104,11 @@ DOM.event.isReturn = function(event) {
 };
 
 DOM.field = {};
+DOM.field.focus = function(field) {
+	if(/iPhone|iPad/i.test(navigator.userAgent)) return; // Shows the keyboard.
+	if(/Opera/i.test(navigator.userAgent)) return; // Scrolls off the top of the screen.
+	field.focus();
+};
 DOM.field.onChange = function(elem1, elem2, etc, callback) {
 	var callback = arguments[arguments.length - 1], i;
 	for(var i = 0; i < arguments.length - 1; ++i) {

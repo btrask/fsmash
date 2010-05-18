@@ -184,13 +184,13 @@ var Session = function() {
 		};
 		accountItem.setContent(DOM.clone("authenticate", authElems));
 		accountItem.onshow = function() {
-			authElems.userNameField.focus();
+			DOM.field.focus(authElems.userNameField);
 		};
 		accountItem.onshow();
 		authElems.signinButton.onclick = bt.curry(signin, false);
 		authElems.signupButton.onclick = bt.curry(signin, true);
 		authElems.userNameField.onkeypress = function(event) {
-			if(DOM.event.isReturn(event)) authElems.passwordField.focus();
+			if(DOM.event.isReturn(event)) DOM.field.focus(authElems.passwordField);
 		};
 		authElems.passwordField.onkeypress = function(event) {
 			if(DOM.event.isReturn(event)) signin(false);
