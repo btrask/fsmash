@@ -8,8 +8,8 @@
 		<meta name="apple-mobile-web-app-status-bar-style" content="default">
 		<meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0; minimum-scale=1.0; user-scalable=0;">
 
-		<link rel="stylesheet" href="styles/base/index.css" type="text/css" charset="utf-8">
-		<link title="Dark" data-style-id="2" rel="alternate stylesheet" href="styles/dark/index.css" type="text/css" charset="utf-8">
+		<link rel="stylesheet" href="styles/base/index.css" type="text/css">
+		<link title="Dark" data-style-id="2" rel="alternate stylesheet" href="styles/dark/index.css" type="text/css">
 	</head>
 	<body class="background">
 		<div id="audio"></div>
@@ -53,7 +53,7 @@
 				</div>
 			</div>
 			<div id="video" class="video padding">
-				<img width="120" class="floatLeft" border="0" data-id="thumbnail">
+				<img src="" alt="Thumbnail" width="120" class="floatLeft" data-id="thumbnail">
 				<div class="padding">
 					<div class="title nowrap"><a target="_blank" data-id="anchor">Loading video…</a></div>
 					<div class="nowrap"><b>Submitted by:</b> <span data-id="submitterName"></span></div>
@@ -87,8 +87,8 @@
 					<form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_blank">
 						<input type="hidden" name="cmd" value="_s-xclick">
 						<input type="hidden" name="hosted_button_id" value="7218103">
-						<input type="image" src="https://www.paypal.com/en_US/i/btn/btn_donate_LG.gif" border="0" name="submit" alt="PayPal - The safer, easier way to pay online!" class="link">
-						<img alt="" border="0" src="https://www.paypal.com/en_US/i/scr/pixel.gif" width="1" height="1">
+						<input type="image" src="https://www.paypal.com/en_US/i/btn/btn_donate_LG.gif" name="submit" alt="PayPal - The safer, easier way to pay online!" class="link">
+						<img alt="" src="https://www.paypal.com/en_US/i/scr/pixel.gif" width="1" height="1">
 					</form>
 				</div>
 				<p>Thanks to everyone who donates. <span class="signature nowrap">--Ben</span></p>
@@ -147,7 +147,7 @@
 
 			<div id="channel" class="channel">
 				<div class="commands panel absolute">
-					<table border="0" cellspacing="2">
+					<table>
 						<tbody>
 							<tr>
 								<td><input type="button" class="button" value="New Game" data-id="newGame"></td>
@@ -156,7 +156,7 @@
 							</tr>
 						</tbody>
 					</table>
-					<table border="0" cellspacing="0" class="tabs">
+					<table class="tabs">
 						<tbody>
 							<tr>
 								<td><input type="button" class="button" value="Info" data-id="info"></td>
@@ -173,7 +173,7 @@
 				<div class="groups absolute scroll full" data-id="groups"></div>
 			</div>
 			<div id="game" class="game panel absolute">
-				<table border="0" cellspacing="2" class="settings">
+				<table class="settings">
 					<tbody>
 						<tr>
 							<td><select title="Match Type"><optgroup label="Match Type" data-id="matchType"></optgroup></select></td>
@@ -182,7 +182,7 @@
 						</tr>
 					</tbody>
 				</table>
-				<table border="0" cellspacing="2" class="commands">
+				<table class="commands">
 					<tbody>
 						<tr>
 							<td><input type="button" class="button padding" value="" data-id="action"></td>

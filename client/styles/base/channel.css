@@ -18,6 +18,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 	top: 0;
 	height: 54px;
 }
+#main > .channel > .commands > .tabs {
+	border-spacing: 0;
+	border-collapse: collapse;
+}
 #main > .channel > .commands > .tabs .button {
 	-webkit-border-radius: 0;
 	-moz-border-radius: 0;
