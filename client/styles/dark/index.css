@@ -138,9 +138,6 @@ a:active {
 
 /* Channel */
 
-#main > .channel > .content {
-	background: #000;
-}
 #main > .channel > .content > .info > .game {
 	border-color: #666;
 }
