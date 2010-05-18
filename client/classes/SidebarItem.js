@@ -35,7 +35,7 @@ var SidebarItem = function(title) {
 		if(item.selected) DOM.fill(DOM.id("main"), content);
 	};
 	item.row.onclick = function() {
-		if(item.content) item.select(!item.selected);
+		if(item.content && !item.selected) item.select(true);
 	};
 };
 SidebarItem.deselect = function() {
