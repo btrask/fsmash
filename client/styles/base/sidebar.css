@@ -16,7 +16,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 	top: 0;
 	bottom: 0;
 	left: 0;
-	width: 150px;
+	width: 125px;
 }
 #sidebar, #sidebar > ul {
 	background: #dbdfe8 url("resources/sidebar-background.png") no-repeat; /* Define this on both elements because the <ul> scrolls but isn't full height */
