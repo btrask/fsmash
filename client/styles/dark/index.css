@@ -17,7 +17,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 #resizer > .line {
 	background: #555;
 }
-.background {
+body {
 	background: #333;
 	color: #bbb;
 }
@@ -141,13 +141,10 @@ a:active {
 #main > .channel > .content {
 	background: #000;
 }
-#main > .channel > .content > .info {
+#main > .channel > .content > .info > .game {
 	border-color: #666;
 }
-#main > .channel > .content > .info > .settings > .game {
-	border-color: #666;
-}
-#main > .channel > .content > .info > .groups > .group > .children > .person.idle {
+#main > .channel > .content > .info > .group > .children > .person.idle {
 	background: #555;
 }
 #main > .channel > .content > .chat > .input {

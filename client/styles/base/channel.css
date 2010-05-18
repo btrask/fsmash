@@ -40,40 +40,25 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 	background: #ddd;
 }
 
-#main > .channel > .content > .info {
-	left: 4px;
-	right: 4px;
-	top: 4px;
-	bottom: 4px;
-	border: 1px solid #aaa;
-}
-#main > .channel > .content > .info > .settings > .game {
-	left: 0;
-	right: 0;
-	top: 0;
-	height: 56px;
+#main > .channel > .content > .info > .game {
 	border-bottom: 1px solid #aaa;
 }
-#main > .channel > .content > .info > .settings > .game > .commands {
-	position: relative;
-	top: -2px;
-}
-#main > .channel.game > .content > .info > .groups {
-	top: 57px;
+#main > .channel > .content > .info > .game > .commands {
+	/* FIXME: This table appears to have an extra 2px padding on top. */
 }
 
-#main > .channel > .content > .info > .groups > .group > .children > .person.idle {
+#main > .channel > .content > .info > .group > .children > .person.idle {
 	background: #ddd;
 	color: #777;
 }
 
-#main > .channel > .content > .info > .groups > .group > .children > .person.teamRed > .title {
+#main > .channel > .content > .info > .group > .children > .person.teamRed > .title {
 	color: #f00;
 }
-#main > .channel > .content > .info > .groups > .group > .children > .person.teamGreen > .title {
+#main > .channel > .content > .info > .group > .children > .person.teamGreen > .title {
 	color: #0f0;
 }
-#main > .channel > .content > .info > .groups > .group > .children > .person.teamBlue > .title {
+#main > .channel > .content > .info > .group > .children > .person.teamBlue > .title {
 	color: #00f;
 }
 

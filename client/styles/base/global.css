@@ -18,6 +18,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 	cursor: default;
 }
 
+body {
+	background: #eee;
+}
 body, input, select {
 	font-size: 13px;
 	font-family: "Lucida Grande", sans-serif;
@@ -228,9 +231,6 @@ td > .button, td > select {
 }
 .nowrap {
 	white-space: nowrap;
-}
-.background {
-	background: #eee;
 }
 .bold {
 	font-weight: bold;

@@ -38,8 +38,8 @@ var Channel = function(session, user, channelID, parentID) {
 		return elem;
 	};
 
-	var chnlElems = {}, infoElems = {}, chatElems = {};
-	var infoPane = DOM.clone("info", infoElems), chatPane = DOM.clone("chat", chatElems);
+	var chnlElems = {}, chatElems = {};
+	var infoPane = DOM.clone("info"), chatPane = DOM.clone("chat", chatElems);
 	var focusMessageInput = function() {
 		DOM.field.focus(chatElems.input);
 	};
@@ -139,7 +139,7 @@ var Channel = function(session, user, channelID, parentID) {
 		};
 	})();
 
-	DOM.fill(infoElems.groups, channel.groups.members.element, channel.groups.formerMembers.element, channel.groups.nonMembers.element);
+	DOM.fill(infoPane, channel.groups.members.element, channel.groups.formerMembers.element, channel.groups.nonMembers.element);
 	DOM.changeClass(channel.groups.formerMembers.element, "invisible");
 
 	channel.request = function(path, properties, callback) {
@@ -249,8 +249,8 @@ var Channel = function(session, user, channelID, parentID) {
 	channel.event.game = bt.dispatch(function(body) {
 		if(!channel.game) {
 			channel.game = new Game(session, user, channel);
-			DOM.fill(infoElems.settings, channel.game.element);
-			infoElems.groups.insertBefore(channel.game.groups.applicants.element, infoElems.groups.firstChild);
+			infoPane.insertBefore(channel.game.groups.applicants.element, infoPane.firstChild);
+			infoPane.insertBefore(channel.game.element, infoPane.firstChild);
 			DOM.changeClass(channel.groups.formerMembers.element, "invisible", false);
 			DOM.input.enable(chnlElems.newGame, chnlElems.newDiscussion, false);
 		}
