@@ -147,6 +147,9 @@ a:active {
 #main > .channel > .content > .info > .settings > .game {
 	border-color: #666;
 }
+#main > .channel > .content > .info > .groups > .group > .children > .person.idle {
+	background: #555;
+}
 #main > .channel > .content > .chat > .input {
 	background: #222;
 	border-color: #666;
