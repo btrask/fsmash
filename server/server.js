@@ -50,6 +50,7 @@ var config = {
 	rankings: {
 		interval: 1000 * 60 * 60 * 1,
 	},
+	startTime: new Date().getTime(),
 };
 
 var fileHandler = bt.memoize(function(path, callback) {
@@ -438,6 +439,7 @@ root.api.session.user.admin.statistics = bt.dispatch(function(query, session, us
 		platform: process.platform,
 		sessions: Group.sessions.objects.length,
 		users: Group.users.objects.length,
+		uptime: (new Date().getTime() - config.startTime) / (1000 * 60 * 60 * 24),
 	});
 });
 
