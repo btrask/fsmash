@@ -31,7 +31,15 @@ server.create = function(dispatcher, unknownHandler/* (path, callback (status, h
 			var token = {};
 			var path = url.parse(req.url).pathname;
 			var query = bt.union((data ? JSON.parse(data) : {}), {remoteAddress: req.remoteAddress || null});
-			var result = dispatcher(token, bt.components(path), query);
+			var result;
+			try {
+				result = dispatcher(token, bt.components(path), query);
+			} catch(err) {
+				res.writeHead(500, {});
+				res.end();
+				sys.log(err);
+				return;
+			}
 			if(result === token) return unknownHandler(path, function(status, header, data, encoding) {
 				res.writeHead(status, header);
 				res.end(data, encoding);

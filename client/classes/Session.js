@@ -234,9 +234,8 @@ Session.request = function(path, properties, callback) {
 	req.open("POST", "/api" + path + "?r=" + new Date().getTime(), true);
 	req.onreadystatechange = function() {
 		if(4 !== req.readyState) return;
-		var success = (200 === req.status);
-		DOM.changeClass(DOM.id("connectionError"), "invisible", success);
-		if(success) callback(JSON.parse(req.responseText));
+		DOM.changeClass(DOM.id("connectionError"), "invisible", 200 === req.status);
+		if(200 === req.status || 500 === req.status) callback(req.responseText ? JSON.parse(req.responseText) : false);
 		else setTimeout(bt.curry(Session.request, path, properties, callback), 1000 * 5);
 	};
 	req.setRequestHeader("Content-Type", "text/json");

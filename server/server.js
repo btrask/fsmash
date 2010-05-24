@@ -53,6 +53,10 @@ var config = {
 	startTime: new Date().getTime(),
 };
 
+process.addListener("uncaughtException", function(err) {
+	sys.log(err);
+});
+
 var fileHandler = bt.memoize(function(path, callback) {
 	if(/\.\./.test(path)) return callback(403, {});
 	if(/\/$/.test(path)) path += "index.html";
