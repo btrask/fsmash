@@ -125,20 +125,12 @@
 				<div class="error center" data-id="error"></div>
 			</div>
 
-			<div id="account" class="account">
-				<div class="profile panel absolute">
-					<div class="content absolute">
-						<input type="text" class="brawlName text padding absolute" maxlength="5" title="Brawl Name" data-id="brawlName">
-						<input type="text" class="friendCode text padding absolute" maxlength="14" title="Friend Code" data-id="friendCode">
-						<div class="bio wrapper absolute"><input type="text" class="text padding" maxlength="141" title="Player Bio" data-id="bio"></div>
-						<select class="style absolute" title="Style"><optgroup label="Style" data-id="styles"><option>Default</option></optgroup></select>
-						<select class="sound absolute" title="Soundset"><optgroup label="Soundset" data-id="soundsets"><option>Default</option></optgroup></select>
-					</div>
+			<div id="account" class="account absolute full scroll">
+				<div class="profile panel">
+					<div class="wrap overflow"><input type="text" class="brawlName text padding" maxlength="5" title="Brawl Name" data-id="brawlName"><input type="text" class="friendCode text padding" maxlength="14" title="Friend Code" data-id="friendCode"><select class="style" title="Style"><optgroup label="Style" data-id="styles"><option>Default</option></optgroup></select><select class="sound" title="Soundset"><optgroup label="Soundset" data-id="soundsets"><option>Default</option></optgroup></select><input type="button" class="button padding signout" value="Sign Out…" data-id="signout"></div>
+					<div class="bio wrapper"><input type="text" class="text padding" maxlength="141" title="Player Bio" data-id="bio"></div>
 				</div>
-				<div class="channels absolute padding scroll" data-id="publicChannels"></div>
-				<div class="signout panel absolute">
-					<input type="button" class="button absolute" value="Sign Out…" data-id="signout">
-				</div>
+				<div class="channels padding" data-id="publicChannels"></div>
 			</div>
 			<div id="publicChannel" class="channel overflow">
 				<div class="commands floatRight"><input type="button" class="padding button" value="Join" data-id="join"></div>

@@ -222,7 +222,7 @@ td > .button, td > select {
 .right {
 	text-align: right;
 }
-.overflow * {
+.overflow, .overflow * {
 	overflow: visible;
 }
 .commands.floatRight > .button {

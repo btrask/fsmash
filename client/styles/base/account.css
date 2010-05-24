@@ -13,63 +13,32 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 #main > .account > .profile {
-	height: 83px;
-	left: 0;
-	right: 0;
-	top: 0;
+	padding-top: 2px;
 	border-bottom: 1px solid #aaa;
 }
-#main > .account > .profile > .content  {
-	width: 320px;
-	top: 0;
-	bottom: 0;
-	left: 50%;
-	margin-left: -160px;
+#main > .account > .profile > .wrap {
+	padding: 0 2px;
 }
-#main > .account > .profile > .content > .text.brawlName {
-	left: 2px;
-	width: 100px;
-	top: 2px;
+#main > .account > .profile > .wrap > * {
+	margin-right: 2px;
+	margin-bottom: 2px;
 }
-#main > .account > .profile > .content > .text.friendCode {
-	left: 122px;
-	width: 178px;
-	top: 2px;
+#main > .account > .profile > .wrap > .text.brawlName {
+	width: 65px;
+}
+#main > .account > .profile > .wrap > .text.friendCode {
+	width: 140px;
 }
-#main > .account > .profile > .content > .wrapper.bio {
-	left: 2px;
-	right: 2px;
-	top: 29px;
+#main > .account > .profile > .wrap > .style {
+	width: 150px;
+}
+#main > .account > .profile > .wrap > .sound {
+	width: 150px;
+}
+#main > .account > .profile > .wrap > .signout {
+	width: 90px;
+}
+#main > .account > .profile > .bio.wrapper {
 	height: 25px;
-}
-#main > .account > .profile > .content > .style {
-	left: 2px;
-	top: 56px;
-	width: 157px;
-}
-#main > .account > .profile > .content > .sound {
-	left: 161px;
-	top: 56px;
-	width: 157px;
-}
-
-#main > .account > .channels {
-	left: 0;
-	right: 0;
-	top: 84px;
-	bottom: 30px;
-}
-
-#main > .account > .signout {
-	left: 0;
-	right: 0;
-	bottom: 0;
-	height: 29px;
-	border-top: 1px solid #aaa;
-}
-#main > .account > .signout > .button {
-	top: 2px;
-	width: 320px;
-	left: 50%;
-	margin-left: -160px;
+	margin: 0 2px 2px 2px;
 }
