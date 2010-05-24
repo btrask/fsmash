@@ -18,13 +18,11 @@ var sys = require("sys");
 
 var crypt = require("./utilities/crypt-wrapper");
 var crypto = require("./utilities/crypto-wrapper");
+var http = require("./utilities/http-wrapper");
 var mysql = require("./utilities/mysql-wrapper");
 
 var bt = require("../shared/bt");
 var brawl = require("../shared/brawl");
-
-var mime = require("./utilities/mime");
-var server = require("./utilities/server");
 
 var Group = require("./classes/Group").Group;
 var Session = require("./classes/Session").Session;
@@ -61,7 +59,7 @@ var fileHandler = bt.memoize(function(path, callback) {
 	if(/\.\./.test(path)) return callback(403, {});
 	if(/\/$/.test(path)) path += "index.html";
 	path = __dirname+"/../public"+path;
-	mime.lookup(path, function(type) {
+	http.MIMEForPath(path, function(type) {
 		if("text/" === type.slice(0, 5)) type += "; charset=UTF-8";
 		fs.readFile(path+".gz", function(err, data) {
 			if(err) return callback(2 == err.errno ? 404 : 500, {})
@@ -160,7 +158,7 @@ root.api.session.terminate = bt.dispatch(function(query, session, user) {
 });
 root.api.session.watch = bt.dispatch(function(query, session) {
 	return function(req, res) {
-		session.setEventCallback(bt.curry(server.writeJSON, res));
+		session.setEventCallback(bt.curry(http.writeJSON, res));
 	};
 });
 
@@ -739,4 +737,4 @@ root.api.session.videos = bt.dispatch(function(query, session) {
 	});
 });
 
-server.create(root, fileHandler).listen(config.server.port, config.server.host);
+http.createServer(root, fileHandler).listen(config.server.port, config.server.host);

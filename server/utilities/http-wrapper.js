@@ -12,15 +12,19 @@ GNU Affero General Public License for more details.
 
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>. */
-var server = exports;
+var wrapper = exports;
 
+var fs = require("fs");
 var http = require("http");
-var url = require("url");
+var path = require("path");
 var sys = require("sys");
+var url = require("url");
 
 var bt = require("../../shared/bt");
 
-server.create = function(dispatcher, unknownHandler/* (path, callback (status, header, data, encoding)) */) {
+var MIMEByExt = JSON.parse(fs.readFileSync(__dirname+"/mime.json"));
+
+wrapper.createServer = function(dispatcher, unknownHandler/* (path, callback (status, header, data, encoding)) */) {
 	return http.createServer(function(req, res) {
 		var data = "";
 		req.setEncoding("utf8");
@@ -45,11 +49,11 @@ server.create = function(dispatcher, unknownHandler/* (path, callback (status, h
 				res.end(data, encoding);
 			});
 			if(typeof result === "function") return result(req, res, path);
-			return server.writeJSON(res, result);
+			return wrapper.writeJSON(res, result);
 		});
 	});
 };
-server.writeJSON = function(res, value) {
+wrapper.writeJSON = function(res, value) {
 //	sys.debug(value);
 	var body = JSON.stringify(value);
 	if(!body) body = "";
@@ -58,4 +62,9 @@ server.writeJSON = function(res, value) {
 		"Content-Length": body.length,
 	});
 	res.end(body, "utf8");
+};
+wrapper.MIMEForPath = function(str, callback) {
+	var ext = path.extname(str).slice(1), MIME;
+	if(MIMEByExt.hasOwnProperty(ext)) MIME = MIMEByExt[ext];
+	callback(MIME || "application/octet-stream");
 };
