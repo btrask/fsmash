@@ -43,7 +43,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 	border-bottom: 1px solid #aaa;
 }
 #main > .channel > .content > .info > .game > .commands {
-	/* FIXME: This table appears to have an extra 2px padding on top. */
+	margin-top: -2px;
 }
 
 #main > .channel > .content > .info > .group > .children > .person.idle {
