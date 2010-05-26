@@ -23,9 +23,7 @@ DOM.clone = function(id, childByID) {
 		var dataID;
 		if(elem.getAttribute) dataID = elem.getAttribute("data-id");
 		if(dataID) childByID[dataID] = elem;
-		bt.map(elem.childNodes, function(child) {
-			findIDsInElement(child);
-		});
+		bt.map(elem.childNodes, arguments.callee);
 	})(element);
 	return element;
 };

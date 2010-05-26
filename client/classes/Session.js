@@ -55,7 +55,7 @@ var Session = function() {
 					}
 				}
 				pending.requests.shift();
-				if(pending.requests.length) nextRequest();
+				if(pending.requests.length) arguments.callee();
 			});
 		})();
 	};
@@ -81,7 +81,6 @@ var Session = function() {
 		session.user.updateWithInfo();
 		if(session.user.info.userName) DOM.fill(accountItem.title, session.user.info.userName);
 		accountItem.setContent(session.user.account);
-		return null;
 	}, null, function(body) {
 		return session.user ? session.user.event : null;
 	});

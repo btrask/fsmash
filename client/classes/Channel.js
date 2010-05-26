@@ -172,7 +172,7 @@ var Channel = function(session, user, channelID, parentID) {
 		channel.sidebarItem.select(false);
 		DOM.remove(channel.sidebarItem.element);
 		(function removeRecursively(c) {
-			for(var id in c.channelByID) if(c.channelByID.hasOwnProperty(id)) removeRecursively(c.channelByID[id]);
+			for(var id in c.channelByID) if(c.channelByID.hasOwnProperty(id)) arguments.callee(c.channelByID[id]);
 			if(c.parent) delete c.parent.channelByID[c.info.channelID];
 			delete user.channelByID[c.info.channelID];
 			delete user.rootChannelByID[c.info.channelID];

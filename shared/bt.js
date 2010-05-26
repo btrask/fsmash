@@ -51,19 +51,19 @@ bt.components = function(path) {
 	return stripped[0].split("/");
 };
 bt.dispatch = function(leaf/* args... */, branch/* func, args... */, lookup/* args... */) {
-	return function dispatch(unknown, components, arg1, arg2, etc) {
+	return function(unknown, components, arg1, arg2, etc) {
 		var args = Array.prototype.slice.call(arguments, 2);
 		var obj, component, func;
 		if(components.length) {
-			if(lookup) obj = lookup.apply(dispatch, args);
-			else obj = dispatch;
+			if(lookup) obj = lookup.apply(arguments.callee, args);
+			else obj = arguments.callee;
 			if(!obj) return unknown;
 			component = components.shift();
 			if(obj.hasOwnProperty(component)) func = obj[component];
 			if(!func) return unknown;
-			if(branch) return branch.apply(dispatch, [bt.curry(func, unknown, components)].concat(args));
-			return Function.prototype.apply.call(func, dispatch, arguments);
-		} else if(leaf) return leaf.apply(dispatch, args);
+			if(branch) return branch.apply(arguments.callee, [bt.curry(func, unknown, components)].concat(args));
+			return Function.prototype.apply.call(func, arguments.callee, arguments);
+		} else if(leaf) return leaf.apply(arguments.callee, args);
 		return unknown;
 	};
 };
