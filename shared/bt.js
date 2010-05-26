@@ -100,7 +100,7 @@ bt.map = function(obj, callback/* value, key, obj */) {
 	var result, i, key, value;
 	if(obj.length >= 0) {
 		result = [];
-		for(i = 0; i < obj.length; ++i) if(obj.hasOwnProperty(i)) {
+		for(i = 0; i < obj.length; ++i) {
 			value = callback(obj[i], i, obj);
 			if(undefined !== value) result.push(value);
 		}
