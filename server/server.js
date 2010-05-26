@@ -310,7 +310,6 @@ root.api.session.user = bt.dispatch(function(query, session) {
 								game = new Game(channel);
 								game.info.matchTypeID = channelRow.matchTypeID || 0;
 								game.info.ruleID = channelRow.ruleID || 0;
-								game.info.playersNeeded = 0;
 							}
 						}
 						channel.addUser(session.user);

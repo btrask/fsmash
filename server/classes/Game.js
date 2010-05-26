@@ -23,7 +23,7 @@ var Game = function(channel) {
 	game.info = {
 		matchTypeID: 0,
 		ruleID: 0,
-		playersNeeded: 0,
+		playersNeeded: 1,
 	};
 	game.broadcasting = false;
 	game.applicantByUserID = {};
