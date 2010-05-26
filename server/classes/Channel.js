@@ -67,6 +67,9 @@ var Channel = function(parentID, channelID) {
 		channel.privateGroup.objects.splice(i, 1);
 		delete channel.memberByUserID[user.info.userID];
 		delete user.channelByID[channel.info.channelID];
+		bt.map(channel.broadcastingSubchannelByID, function(subchannel) {
+			delete subchannel.game.applicantByUserID[user.info.userID];
+		});
 		if(!bt.hasOwnProperties(channel.memberByUserID)) {
 			if(channel.game) channel.game.stopBroadcasting();
 			if(channel.parent) (function forgetSubchannels(c) {
