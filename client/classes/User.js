@@ -161,8 +161,8 @@ var User = function(session, userID) {
 		user.playSound = function(name) {
 			if(!soundset || !soundset.path || !soundset.hasOwnProperty(name)) return;
 			var embed = document.createElement("embed");
-			embed.width = 0;
-			embed.height = 0;
+			embed.setAttribute("width", 0);
+			embed.setAttribute("height", 0);
 			embed.setAttribute("hidden", true);
 			embed.setAttribute("autostart", true);
 			embed.setAttribute("volume", 50);
