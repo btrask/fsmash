@@ -65,7 +65,6 @@ var Session = function() {
 		delete session.info.sessionKey;
 		if(session.user) delete Session.byUserID[session.user.info.userID];
 		bt.array.removeObject(Session.all, session);
-		pending.requests = [];
 		SidebarItem.deselect();
 		DOM.remove(session.sidebar);
 		session.closeAllModals();
