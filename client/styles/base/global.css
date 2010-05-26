@@ -222,7 +222,7 @@ td > .button, td > select {
 .right {
 	text-align: right;
 }
-.overflow, .overflow * {
+.overflow * {
 	overflow: visible;
 }
 .commands.floatRight > .button {
@@ -247,4 +247,7 @@ td > .button, td > select {
 	font-weight: bold;
 	text-align: center;
 	text-shadow: #fff 0 1px 1px;
+}
+.alignTop > * {
+	vertical-align: top;
 }
