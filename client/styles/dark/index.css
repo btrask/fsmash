@@ -92,6 +92,9 @@ a:active {
 	color: #fff;
 	text-shadow: #060 0 1px 1px;
 }
+.notice .light {
+	color: #fff;
+}
 
 /* Sidebar */
 
