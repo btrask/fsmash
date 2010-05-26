@@ -34,7 +34,7 @@ wrapper.createServer = function(dispatcher, unknownHandler/* (path, callback (st
 		req.addListener("end", function() {
 			var token = {};
 			var path = url.parse(req.url).pathname;
-			var query = bt.union((data ? JSON.parse(data) : {}), {remoteAddress: req.remoteAddress || null});
+			var query = bt.union((data ? JSON.parse(data) : {}), {remoteAddress: req.socket.remoteAddress || null});
 			var result;
 			try {
 				result = dispatcher(token, bt.components(path), query);
