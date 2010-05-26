@@ -130,8 +130,8 @@ var Channel = function(session, user, channelID, parentID) {
 		};
 
 		channel.groups = {
-			members: new Group("Members", [ignoreAction, rateAction, teamAction], true),
-			formerMembers: new Group("Former Members", [rateAction], true),
+			members: new Group("Members", [ignoreAction, rateAction, teamAction]),
+			formerMembers: new Group("Former Members", [rateAction]),
 			nonMembers: new Group("Non-Members", [inviteAction])
 		};
 		channel.groups.members.onremove = function(item) {

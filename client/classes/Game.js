@@ -217,6 +217,8 @@ var Game = function(session, user, channel) {
 	});
 
 	DOM.changeClass(channel.element, "game");
+	channel.groups.members.setShowsBrawlInfo(true);
+	channel.groups.formerMembers.setShowsBrawlInfo(true);
 	game.element = DOM.clone("game", game);
 
 	game.matchType.parentNode.onchange = function() {

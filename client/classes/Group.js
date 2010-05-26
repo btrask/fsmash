@@ -13,11 +13,12 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 "use strict";
-var Group = function(title, actions, showBrawlInfo) {
+var Group = function(title, actions) {
 	var group = this;
 	group.itemByUserID = {};
 	group.onadd = null;
 	group.onremove = null;
+	group.showsBrawlInfo = false;
 	group.element = DOM.clone("group", group);
 	DOM.fill(group.title, title);
 	group.update = function() {
@@ -52,7 +53,7 @@ var Group = function(title, actions, showBrawlInfo) {
 		group.itemByUserID[userID] = item;
 		item.group = group;
 		generateCommands();
-		DOM.changeClass(item.brawlInfo, "invisible", !showBrawlInfo);
+		DOM.changeClass(item.brawlInfo, "invisible", !group.showsBrawlInfo);
 		if(group.onadd) group.onadd(item);
 		if(update) group.update();
 	};
@@ -67,6 +68,12 @@ var Group = function(title, actions, showBrawlInfo) {
 			if(group.onremove) group.onremove(item);
 			return item;
 		}
+	};
+	group.setShowsBrawlInfo = function(flag) {
+		group.showsBrawlInfo = flag;
+		bt.map(group.itemByUserID, function(item) {
+			DOM.changeClass(item.brawlInfo, "invisible", !group.showsBrawlInfo);
+		});
 	};
 	group.moveAllToGroup = function(otherGroup) {
 		bt.map(group.itemByUserID, function(item, userID) {
