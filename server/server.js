@@ -90,10 +90,8 @@ var configureSessions = (function configureSessions() {
 			Channel.public.byID = {};
 			channelRows.map(function(channelRow) {
 				if(Channel.byID.hasOwnProperty(channelRow.channelID)) channel = Channel.byID[channelRow.channelID];
-				else {
-					channel = new Channel(null, channelRow.channelID);
-					channel.info.topic = channelRow.topic;
-				}
+				else channel = new Channel(null, channelRow.channelID);
+				channel.info.topic = channelRow.topic;
 				Channel.public.byID[channelRow.channelID] = channel;
 			});
 		}
