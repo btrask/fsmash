@@ -6,6 +6,7 @@ CLIENT_SCRIPTS = client/external/json2.js \
                  client/classes/SidebarItem.js \
                  client/classes/Session.js \
                  client/classes/User.js \
+                 client/classes/Admin.js \
                  client/classes/Person.js \
                  client/classes/Group.js \
                  client/classes/Channel.js \

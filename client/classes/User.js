@@ -91,6 +91,11 @@ var User = function(session, userID) {
 	}, null, function(body) {
 		return user.channelByID.hasOwnProperty(body.channelID) ? user.channelByID[body.channelID].event : null;
 	});
+	user.event.admin = bt.dispatch(function(body) {
+		if(!user.admin) user.admin = new Admin(session, user, body.signupAllowed);
+	}, null, function(body) {
+		return user.admin;
+	});
 
 	user.request = function(path, properties, callback) {
 		return session.request("/user" + path, properties, callback);
@@ -188,56 +193,5 @@ var User = function(session, userID) {
 			}, 1000 * 60 * 5);
 		};
 		user.resetIdleTimeout();
-	})();
-	(function admin() {
-		var adminItem;
-		var adminElems = {};
-		var unreadReports = 0;
-		user.event.admin = bt.dispatch(function(body) {
-			adminItem = new SidebarItem("Admin");
-			adminItem.onshow = function() {
-				unreadReports = 0;
-				DOM.fill(adminItem.counter);
-			};
-			session.siteItem.children.appendChild(adminItem.element);
-			adminItem.setContent(DOM.clone("admin", adminElems));
-			(function() {
-				var signupAllowed = body.signupAllowed;
-				adminElems.signupAllowed.value = "Signup allowed: "+signupAllowed;
-				adminElems.signupAllowed.onclick = function() {
-					user.request("/admin/signups/", {signupAllowed: !signupAllowed}, function(result) {
-						if(!result) return;
-						signupAllowed = result.signupAllowed;
-						adminElems.signupAllowed.value = "Signup allowed: "+signupAllowed;
-					});
-				};
-			})();
-			adminElems.uncache.onclick = function() {
-				user.request("/admin/uncache/");
-			};
-			adminElems.reconfigure.onclick = function() {
-				user.request("/admin/reconfigure/");
-			};
-			adminElems.updateRankings.onclick = function() {
-				user.request("/admin/rankings/");
-			};
-			adminElems.updateStatistics.onclick = function() {
-				user.request("/admin/statistics/", {}, function(result) {
-					var stats = [];
-					bt.map(result, function(val, prop) {
-						stats.push(prop+": "+val);
-					});
-					DOM.fill(adminElems.statistics, stats.join("\n"));
-				});
-			};
-		});
-		user.event.admin.reports = bt.dispatch(function(reports) {
-			adminElems.reports.insertBefore(DOM.toElement(bt.map(reports, function(report) {
-				return "User: "+report.userName+"; Channel: "+(report.topic || "")+"; Time: "+new Date(report.time).toUTCString();
-			}).join("\n")+"\n"), adminElems.reports.firstChild);
-			if(adminItem.selected) return;
-			unreadReports += reports.length;
-			DOM.fill(adminItem.counter, unreadReports);
-		});
 	})();
 };
