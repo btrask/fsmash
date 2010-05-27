@@ -86,6 +86,7 @@ var User = function(session, userID) {
 				return bt.array.indexOf(user.config.publicChannels, a.info.channelID, getChannelID) - bt.array.indexOf(user.config.publicChannels, b.info.channelID, getChannelID);
 			});
 		}
+		if(undefined !== body.allowsGameChannels) channel.setAllowsGameChannels(body.allowsGameChannels);
 		return channel;
 	}, null, function(body) {
 		return user.channelByID.hasOwnProperty(body.channelID) ? user.channelByID[body.channelID].event : null;

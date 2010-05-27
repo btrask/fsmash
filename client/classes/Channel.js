@@ -189,6 +189,9 @@ var Channel = function(session, user, channelID, parentID) {
 			chatElems.messages.appendChild(elem);
 		});
 	};
+	channel.setAllowsGameChannels = function(flag) {
+		DOM.input.enable(chnlElems.newGame, flag && !channel.game);
+	};
 
 	channel.event = bt.dispatch();
 	channel.event.member = bt.dispatch(function(body) {
