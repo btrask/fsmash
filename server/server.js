@@ -270,7 +270,10 @@ root.api.session.user = bt.dispatch(function(query, session) {
 				" LEFT JOIN fips_regions regions ON (l.country_code = regions.country_code AND l.region_code = regions.code)"+
 				" WHERE ip_start <= INET_ATON($) ORDER BY ip_start DESC LIMIT 1",
 				query.remoteAddress), function(locationResult) {
-					if(locationResult.records.length) session.user.info.location = bt.array.unique(locationResult.records[0]).join(", ");
+					if(!locationResult.records.length) return;
+					session.user.info.location = bt.array.unique(bt.map(locationResult.records[0], function(value) {
+						return value || undefined;
+					})).join(", ");
 				}
 			);
 			db.query(mysql.format(
