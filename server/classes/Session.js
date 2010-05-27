@@ -23,7 +23,7 @@ var User = require("./User").User;
 
 var config = {
 	activeTimeout: 1000 * 30,
-	inactiveTimeout: 1000 * 10,
+	inactiveTimeout: 1000 * 60 * 1,
 };
 
 var Session = function(remoteAddress) {
