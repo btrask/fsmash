@@ -30,6 +30,10 @@ var Admin = function(session, user, signupAllowed) {
 		DOM.fill(adminItem.counter, unreadReports);
 	});
 
+	admin.request = function(path, properties, callback) {
+		return user.request("/admin" + path, properties, callback);
+	};
+
 	adminItem = new SidebarItem("Admin");
 	adminItem.onshow = function() {
 		unreadReports = 0;
@@ -40,7 +44,7 @@ var Admin = function(session, user, signupAllowed) {
 
 	adminElems.signupAllowed.value = "Signup allowed: "+signupAllowed;
 	adminElems.signupAllowed.onclick = function() {
-		user.request("/admin/signups/", {signupAllowed: !signupAllowed}, function(result) {
+		admin.request("/signups/", {signupAllowed: !signupAllowed}, function(result) {
 			if(!result) return;
 			signupAllowed = result.signupAllowed;
 			adminElems.signupAllowed.value = "Signup allowed: "+signupAllowed;
@@ -48,16 +52,16 @@ var Admin = function(session, user, signupAllowed) {
 	};
 
 	adminElems.uncache.onclick = function() {
-		user.request("/admin/uncache/");
+		admin.request("/uncache/");
 	};
 	adminElems.reconfigure.onclick = function() {
-		user.request("/admin/reconfigure/");
+		admin.request("/reconfigure/");
 	};
 	adminElems.updateRankings.onclick = function() {
-		user.request("/admin/rankings/");
+		admin.request("/rankings/");
 	};
 	adminElems.updateStatistics.onclick = function() {
-		user.request("/admin/statistics/", {}, function(result) {
+		admin.request("/statistics/", {}, function(result) {
 			var stats = [];
 			bt.map(result, function(val, prop) {
 				stats.push(prop+": "+val);
