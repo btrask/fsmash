@@ -446,6 +446,13 @@ root.api.session.user.admin.statistics = bt.dispatch(function(query, session, us
 		uptime: (new Date().getTime() - config.startTime) / (1000 * 60 * 60 * 24),
 	});
 });
+root.api.session.user.admin.ban = bt.dispatch(function(query, session, user) {
+	var personUserID = query.personUserID;
+	if(Number(personUserID) !== personUserID) return {error: "Invalid person user ID"};
+	db.query(mysql.format("INSERT IGNORE INTO bannedSessions (modUserID, sessionID) SELECT $, sessionID FROM sessions WHERE userID = $", user.info.userID, personUserID));
+	if(Session.byUserID.hasOwnProperty(personUserID)) Session.byUserID[personUserID].terminate();
+	return true;
+});
 
 root.api.session.user.person = bt.dispatch(null, function(func, query, session, user) {
 	var personUserID = query.personUserID;

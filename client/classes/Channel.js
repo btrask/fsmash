@@ -68,6 +68,15 @@ var Channel = function(session, user, channelID, parentID) {
 	};
 
 	(function() {
+		var banAction = function(validate, item) {
+			if(validate) {
+				this.value = "Ban…";
+				return user.admin && item.person !== user.person;
+			}
+			DOM.button.confirm(this, function() {
+				user.admin.request("/ban/", {personUserID: item.person.info.userID});
+			});
+		};
 		var rateAction = function(validate, item) {
 			var button = this;
 			if(validate) {
@@ -130,9 +139,9 @@ var Channel = function(session, user, channelID, parentID) {
 		};
 
 		channel.groups = {
-			members: new Group("Members", [ignoreAction, rateAction, teamAction]),
-			formerMembers: new Group("Former Members", [rateAction]),
-			nonMembers: new Group("Non-Members", [inviteAction])
+			members: new Group("Members", [banAction, ignoreAction, rateAction, teamAction]),
+			formerMembers: new Group("Former Members", [banAction, rateAction]),
+			nonMembers: new Group("Non-Members", [banAction, inviteAction])
 		};
 		channel.groups.members.onremove = function(item) {
 			item.setTeamID();
