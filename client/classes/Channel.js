@@ -231,9 +231,12 @@ var Channel = function(session, user, channelID, parentID) {
 	channel.event.message = bt.dispatch(function(body) {
 		if(!user.personByUserID.hasOwnProperty(body.userID)) return;
 		if(user.personByUserID[body.userID].ignored) return;
-		if(body.userID != user.person.info.userID) channel.incoming("message");
+		var incoming = body.userID != user.person.info.userID;
+		if(incoming) channel.incoming("message");
 		DOM.scroll.preserve(channel.scrollBox, function() {
-			chatElems.messages.appendChild(incomingMessage(body));
+			var msgElement = incomingMessage(body);
+			if(!incoming) DOM.changeClass(msgElement, "light");
+			chatElems.messages.appendChild(msgElement);
 		});
 	});
 	channel.event.history = bt.dispatch(function(body) {
