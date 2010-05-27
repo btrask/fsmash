@@ -26,11 +26,13 @@ CREATE TABLE `admins` (
 CREATE TABLE `bannedSessions` (
   `bannedSessionID` int(11) NOT NULL AUTO_INCREMENT,
   `sessionID` int(11) NOT NULL,
+  `modUserID` int(11) DEFAULT NULL,
   `dependentSessionID` int(11) DEFAULT NULL,
   `reason` text COLLATE utf8_unicode_ci,
   `bannedTime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`bannedSessionID`),
-  UNIQUE KEY `sessionID` (`sessionID`)
+  UNIQUE KEY `sessionID` (`sessionID`),
+  KEY `modUserID` (`modUserID`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 -- --------------------------------------------------------
