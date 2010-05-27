@@ -80,7 +80,7 @@ var configureSessions = (function configureSessions() {
 		}
 	);
 	db.query(
-		"SELECT pc.channelID, c.topic, pc.descriptionHTML"+
+		"SELECT pc.channelID, c.topic, c.allowsGameChannels, pc.descriptionHTML"+
 		" FROM publicChannels pc"+
 		" LEFT JOIN channels c ON (pc.channelID = c.channelID)"+
 		" WHERE 1 ORDER BY pc.sortOrder ASC",
@@ -92,6 +92,7 @@ var configureSessions = (function configureSessions() {
 				if(Channel.byID.hasOwnProperty(channelRow.channelID)) channel = Channel.byID[channelRow.channelID];
 				else channel = new Channel(null, channelRow.channelID);
 				channel.info.topic = channelRow.topic;
+				channel.info.allowsGameChannels = !!Number(channelRow.allowsGameChannels);
 				Channel.public.byID[channelRow.channelID] = channel;
 			});
 		}
@@ -302,6 +303,7 @@ root.api.session.user = bt.dispatch(function(query, session) {
 						if(Channel.byID.hasOwnProperty(channelRow.channelID)) channel = Channel.byID[channelRow.channelID];
 						else {
 							channel = new Channel(channelRow.parentID, channelRow.channelID);
+							channel.info.allowsGameChannels = !!Number(channelRow.allowsGameChannels);
 							if(channelRow.topic) {
 								channel.info.topic = channelRow.topic;
 							} else {
@@ -486,7 +488,10 @@ root.api.session.user.channel = bt.dispatch(null, function(func, query, session,
 root.api.session.user.channel.spawn = bt.dispatch(function(query, session, user, parentChannel) {
 	if(parentChannel.game) return {error: "Subchannels cannot be spawned from game channels"};
 	var topic = (query.topic || "").toString().replace(/^\s*|\s\s+|\s*$/g, "").slice(0, config.channel.maxTopicLength);
-	if(!topic) topic = null;
+	if(!topic) {
+		if(!channel.info.allowsGameChannels) return false;
+		topic = null;
+	}
 	return session.promise(function(ticket) {
 		db.query(mysql.format(
 			"INSERT INTO channels (parentID, topic)"+

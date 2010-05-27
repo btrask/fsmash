@@ -59,6 +59,7 @@ CREATE TABLE `channels` (
   `channelID` int(11) NOT NULL AUTO_INCREMENT,
   `topic` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `parentID` int(11) DEFAULT NULL,
+  `allowsGameChannels` tinyint(4) NOT NULL DEFAULT '1',
   `creationTime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`channelID`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;

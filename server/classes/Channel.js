@@ -29,6 +29,7 @@ var Channel = function(parentID, channelID) {
 	channel.info = {
 		channelID: channelID,
 		parentID: parentID,
+		allowsGameChannels: true,
 	};
 	channel.privateGroup = new Group();
 	channel.group = channel.privateGroup;
