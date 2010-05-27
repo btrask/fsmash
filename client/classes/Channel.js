@@ -140,7 +140,6 @@ var Channel = function(session, user, channelID, parentID) {
 	})();
 
 	DOM.fill(infoPane, channel.groups.members.element, channel.groups.formerMembers.element, channel.groups.nonMembers.element);
-	DOM.changeClass(channel.groups.formerMembers.element, "invisible");
 
 	channel.request = function(path, properties, callback) {
 		return user.request("/channel" + path, bt.union(properties, {channelID: channel.info.channelID}), callback);
@@ -257,7 +256,6 @@ var Channel = function(session, user, channelID, parentID) {
 			channel.game = new Game(session, user, channel);
 			infoPane.insertBefore(channel.game.groups.applicants.element, infoPane.firstChild);
 			infoPane.insertBefore(channel.game.element, infoPane.firstChild);
-			DOM.changeClass(channel.groups.formerMembers.element, "invisible", false);
 			DOM.input.enable(chnlElems.newGame, chnlElems.newDiscussion, false);
 		}
 		channel.game.updateSettings(body);
@@ -311,6 +309,7 @@ var Channel = function(session, user, channelID, parentID) {
 	} else {
 		user.rootChannelByID[channelID] = channel;
 		DOM.changeClass(channel.groups.nonMembers.element, "invisible");
+		DOM.changeClass(channel.groups.formerMembers.element, "invisible");
 	}
 
 	chnlElems.info.onclick = function() {
