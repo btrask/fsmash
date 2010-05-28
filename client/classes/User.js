@@ -94,7 +94,7 @@ var User = function(session, userID) {
 	user.event.admin = bt.dispatch(function(body) {
 		if(!user.admin) user.admin = new Admin(session, user, body.signupAllowed);
 	}, null, function(body) {
-		return user.admin;
+		return user.admin.event;
 	});
 
 	user.request = function(path, properties, callback) {
