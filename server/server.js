@@ -294,7 +294,7 @@ root.api.session.user = bt.dispatch(function(query, session) {
 		};
 		var loadChannels = function() {
 			db.query(mysql.format(
-				"SELECT cm.channelID, c.parentID, c.topic, g.matchTypeID, g.ruleID"+
+				"SELECT cm.channelID, c.parentID, c.topic, c.allowsGameChannels, g.matchTypeID, g.ruleID"+
 				" FROM channelMembers cm"+
 				" LEFT JOIN channels c ON (cm.channelID = c.channelID)"+
 				" LEFT JOIN games g ON (cm.channelID = g.channelID)"+
@@ -499,7 +499,7 @@ root.api.session.user.channel.spawn = bt.dispatch(function(query, session, user,
 	if(parentChannel.game) return {error: "Subchannels cannot be spawned from game channels"};
 	var topic = (query.topic || "").toString().replace(/^\s*|\s\s+|\s*$/g, "").slice(0, config.channel.maxTopicLength);
 	if(!topic) {
-		if(!channel.info.allowsGameChannels) return false;
+		if(!parentChannel.info.allowsGameChannels) return false;
 		topic = null;
 	}
 	return session.promise(function(ticket) {
