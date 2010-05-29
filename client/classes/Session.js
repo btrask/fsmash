@@ -60,15 +60,7 @@ var Session = function() {
 		})();
 	};
 	session.terminate = function() {
-		if(undefined === session.info.sessionID) return;
-		delete session.info.sessionID;
-		delete session.info.sessionKey;
-		if(session.user) delete Session.byUserID[session.user.info.userID];
-		bt.array.removeObject(Session.all, session);
-		SidebarItem.deselect();
-		DOM.remove(session.sidebar);
-		session.closeAllModals();
-		new Session();
+		window.location = window.location;
 	};
 
 	session.event = bt.dispatch();
