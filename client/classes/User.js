@@ -27,6 +27,7 @@ var User = function(session, userID) {
 	user.rootChannelByID = {};
 	user.config = {};
 	user.person = new Person(session, user, userID);
+	user.broadcastCount = 0;
 
 	DOM.changeClass(session.videoSubmitPane, "invisible", false);
 
@@ -105,6 +106,12 @@ var User = function(session, userID) {
 		acctElems.friendCode.value = brawl.friendCode(user.info.friendCode);
 		acctElems.bio.value = user.info.bio || "";
 		DOM.field.placeholder(acctElems.brawlName, acctElems.friendCode, acctElems.bio);
+	};
+	user.setBroadcasting = function(flag) {
+		user.broadcastCount += flag ? 1 : -1;
+		if(user.broadcastCount <= 1) bt.map(user.channelByID, function(channel) {
+			if(channel.game) channel.game.update();
+		});
 	};
 
 	acctElems.signout.onclick = function() {

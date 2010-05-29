@@ -16,10 +16,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 var Game = function(session, user, channel) {
 	var game = this;
 
+	var setBroadcasting = function(flag) {
+		if(flag == game.broadcasting) return;
+		game.broadcasting = !!flag;
+		if(channel.userIsMember) user.setBroadcasting(game.broadcasting);
+	};
 	var updateIsBroadcasting = function() {
 		DOM.changeClass(channel.sidebarItem.row, "notice", game.broadcasting);
 		DOM.changeClass(game.groups.applicants.element, "invisible", !game.broadcasting);
-		game.updateUserIsMember();
+		game.update();
 	};
 
 	var userIsApplicant = false;
@@ -69,10 +74,10 @@ var Game = function(session, user, channel) {
 		delete game.applicantByUserID[applicantUserID];
 		if(applicantUserID == user.info.userID) {
 			userIsApplicant = false;
-			game.updateUserIsMember();
+			game.update();
 		}
 	};
-	game.updateUserIsMember = function() {
+	game.update = function() {
 		if(channel.userIsMember) {
 			game.action.value = "Broadcast Invitation";
 			game.cancel.value = "Cancel Broadcast…";
@@ -85,8 +90,9 @@ var Game = function(session, user, channel) {
 				});
 			};
 
-			DOM.changeClass(game.action, "notice", game.info.playersNeeded > 0 && game.broadcasting != channel.userIsMember);
-			DOM.input.enable(game.action, game.info.playersNeeded > 0);
+			var canBroadcast = game.info.playersNeeded > 0 && (game.broadcasting || !user.broadcastCount);
+			DOM.changeClass(game.action, "notice", canBroadcast && game.broadcasting != channel.userIsMember);
+			DOM.input.enable(game.action, canBroadcast);
 			DOM.input.enable(game.cancel, game.broadcasting);
 		} else {
 			game.action.value = "Ask to Join";
@@ -147,13 +153,13 @@ var Game = function(session, user, channel) {
 			item.setTeamID();
 		});
 		channel.groups.members.update();
-		game.updateUserIsMember();
+		game.update();
 	};
 
 	game.event = bt.dispatch(null, null, null, 1);
 	game.event.broadcast = bt.dispatch(function(body) {
 		if(game.broadcasting) return;
-		game.broadcasting = true;
+		setBroadcasting(true);
 
 		if(body.time) channel.postNotification("Broadcasting was started by "+channel.memberByUserID[body.broadcasterUserID].info.userName, new Date(body.time));
 		announcement = DOM.clone("announcement", announcementElems);
@@ -174,7 +180,7 @@ var Game = function(session, user, channel) {
 		return func(body);
 	});
 	game.event.broadcast.stop = bt.dispatch(function(body) {
-		game.broadcasting = false;
+		setBroadcasting(false);
 		DOM.remove(announcement);
 		announcementElems = {};
 		if(channel.removeIfNecessary()) return;
@@ -201,7 +207,7 @@ var Game = function(session, user, channel) {
 		}
 		if(applicantUserID === user.info.userID) {
 			userIsApplicant = true;
-			game.updateUserIsMember();
+			game.update();
 		}
 	});
 	game.event.broadcast.application.stop = bt.dispatch(function(body) {

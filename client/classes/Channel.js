@@ -23,6 +23,7 @@ var Channel = function(session, user, channelID, parentID) {
 		var flag = channel.memberByUserID.hasOwnProperty(user.info.userID);
 		if(flag !== channel.userIsMember) {
 			channel.userIsMember = flag;
+			if(channel.game && channel.game.broadcasting) user.setBroadcasting(channel.userIsMember);
 			chnlElems.info.onclick();
 			if(channel.removeIfNecessary()) return;
 		}
@@ -30,7 +31,7 @@ var Channel = function(session, user, channelID, parentID) {
 		channel.groups.members.update();
 		channel.groups.formerMembers.update();
 		channel.groups.nonMembers.update();
-		if(channel.game) channel.game.updateUserIsMember();
+		if(channel.game) channel.game.update();
 	};
 	var incomingMessage = function(info) {
 		if(!channel.userIsMember) throw "Non-members should not be able to receive messages";
