@@ -645,10 +645,14 @@ root.api.session.user.channel.game.member.team = bt.dispatch(function(query, ses
 root.api.session.user.channel.game.broadcast = bt.dispatch(function(query, session, user, channel, game) {
 	if(!channel.parent) return {error: "Root channels cannot be broadcast"};
 	if(!(game.info.playersNeeded > 0)) return false;
+	if(user.broadcastCount) return false;
 	clearTimeout(game.broadcastTimeout);
 	game.broadcastTimeout = setTimeout(game.stopBroadcasting, config.broadcast.timeout);
 	if(game.broadcasting) return true;
 	return session.promise(function(ticket) {
+		bt.map(channel.memberByUserID, function(member) {
+			member.broadcastCount++;
+		});
 		channel.parent.broadcastingSubchannelByID[channel.info.channelID] = channel;
 		channel.group = channel.parent.privateGroup;
 		channel.sendInfoToTarget(channel.group);

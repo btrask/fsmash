@@ -29,6 +29,7 @@ var User = function(session, userID) {
 	};
 	user.channelByID = {};
 	user.blockedByUserID = {};
+	user.broadcastCount = 0;
 
 	session.user = user;
 	session.constructor.byUserID[user.info.userID] = session;

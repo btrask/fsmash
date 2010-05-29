@@ -59,7 +59,10 @@ var Channel = function(parentID, channelID) {
 		user.channelByID[channel.info.channelID] = channel;
 		channel.memberByUserID[user.info.userID] = user;
 		if(!channel.teamIDByUserID.hasOwnProperty(user.info.userID)) channel.teamIDByUserID[user.info.userID] = 0;
-		if(-1 === channel.privateGroup.objects.indexOf(user)) channel.privateGroup.objects.push(user);
+		if(-1 === channel.privateGroup.objects.indexOf(user)) {
+			channel.privateGroup.objects.push(user);
+			if(channel.game && channel.game.broadcasting) user.broadcastCount++;
+		}
 		channel.sendInfoToTarget(user, true, ticket);
 	};
 	channel.removeUser = function(user) {
@@ -71,6 +74,7 @@ var Channel = function(parentID, channelID) {
 		bt.map(channel.broadcastingSubchannelByID, function(subchannel) {
 			delete subchannel.game.applicantByUserID[user.info.userID];
 		});
+		if(channel.game && channel.game.broadcasting) user.broadcastCount--;
 		if(!bt.hasOwnProperties(channel.memberByUserID)) {
 			if(channel.game) channel.game.stopBroadcasting();
 			if(channel.parent) (function forgetSubchannels(c) {

@@ -41,6 +41,9 @@ var Game = function(channel) {
 		assert.ok(channel.parent, "Root channels should never start broadcasting in the first place");
 		game.broadcasting = false;
 		clearTimeout(game.broadcastTimeout);
+		bt.map(channel.memberByUserID, function(member) {
+			member.broadcastCount--;
+		});
 		channel.group.sendEvent("/user/channel/game/broadcast/stop/", {channelID: channel.info.channelID, stoppedUserID: (user ? user.info.userID : null), time: new Date().getTime()}, ticket);
 		channel.group = channel.privateGroup;
 		game.applicantByUserID = {};
