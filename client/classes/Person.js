@@ -50,10 +50,22 @@ var Person = function(session, user, userID) {
 		for(var component in Person.keysByComponent) if(Person.keysByComponent.hasOwnProperty(component)) DOM.fill(item[component], DOM.linkify(stringForComponent(component)));
 	};
 
+	var nameElements = [];
+
 	person.info = {userID: userID};
 	user.personByUserID[person.info.userID] = person;
 	person.ignored = false;
 	person.rated = false;
+	person.online = false;
+
+	person.event = bt.dispatch();
+	person.event.signout = bt.dispatch(function(body) {
+		bt.map(user.channelByID, function(channel) {
+			channel.removeMember(person);
+		});
+		person.setOnline(false);
+		if(person === user.person) session.terminate();
+	});
 
 	person.item = function() {
 		return new PersonItem();
@@ -81,14 +93,21 @@ var Person = function(session, user, userID) {
 			}
 		}
 	};
-
-	person.event = bt.dispatch();
-	person.event.signout = bt.dispatch(function(body) {
-		bt.map(user.channelByID, function(channel) {
-			channel.removeMember(person);
+	person.setOnline = function(flag) {
+		if(flag == person.online) return;
+		person.online = !!flag;
+		bt.map(nameElements, function(elem) {
+			DOM.changeClass(elem, "online", person.online);
 		});
-		if(person === user.person) session.terminate();
-	});
+	};
+	person.nameElement = function() {
+		var elem = document.createElement("span");
+		DOM.fill(elem, person.info.userName);
+		DOM.changeClass(elem, "name");
+		if(person.online) DOM.changeClass(elem, "online");
+		nameElements.push(elem);
+		return elem;
+	};
 };
 Person.keysByComponent = {
 	title: ["userName", "location", "rank"],

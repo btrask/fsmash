@@ -38,7 +38,7 @@ var Channel = function(session, user, channelID, parentID) {
 		var msgElems = {};
 		var elem = DOM.clone("message", msgElems);
 		DOM.fill(msgElems.date, new Date(info.time).toLocaleTimeString());
-		DOM.fill(msgElems.name, info.userName);
+		DOM.fill(msgElems.name, user.getPerson(info.userID, info.userName).nameElement());
 		DOM.fill(msgElems.text, DOM.linkify(info.text));
 		return elem;
 	};

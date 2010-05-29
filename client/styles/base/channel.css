@@ -109,3 +109,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 	right: 2px;
 	width: 70px;
 }
+
+.name.online {
+	color: #000;
+}

@@ -71,6 +71,7 @@ var User = function(session, userID) {
 		if(user.personByUserID.hasOwnProperty(body.userID)) person = user.personByUserID[body.userID];
 		else person = new Person(session, user, body.userID);
 		person.updateWithInfo(body);
+		person.setOnline(true);
 	}, null, function(body) {
 		return user.personByUserID.hasOwnProperty(body.userID) ? user.personByUserID[body.userID].event : null;
 	});
@@ -112,6 +113,13 @@ var User = function(session, userID) {
 		if(user.broadcastCount <= 1) bt.map(user.channelByID, function(channel) {
 			if(channel.game) channel.game.update();
 		});
+	};
+	user.getPerson = function(userID, userName) {
+		if(!user.personByUserID.hasOwnProperty(userID)) {
+			user.personByUserID[userID] = new Person(session, user, userID);
+			if(userName) user.personByUserID[userID].updateWithInfo({userName: userName});
+		}
+		return user.personByUserID[userID];
 	};
 
 	acctElems.signout.onclick = function() {

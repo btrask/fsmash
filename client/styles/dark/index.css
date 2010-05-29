@@ -155,6 +155,10 @@ a:active {
 	border-color: #666;
 }
 
+.name.online {
+	color: #bbb;
+}
+
 /* Videos */
 
 #main > .videos > .submit {
