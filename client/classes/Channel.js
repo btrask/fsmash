@@ -16,10 +16,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 var Channel = function(session, user, channelID, parentID) {
 	var channel = this;
 
+	var chnlElems = {}, chatElems = {};
+	var infoPane = DOM.clone("info"), chatPane = DOM.clone("chat", chatElems);
+
 	var updateUserIsMember = function() {
 		var flag = channel.memberByUserID.hasOwnProperty(user.info.userID);
 		if(flag !== channel.userIsMember) {
 			channel.userIsMember = flag;
+			chnlElems.info.onclick();
 			if(channel.removeIfNecessary()) return;
 		}
 		DOM.input.enable(chnlElems.leave, chnlElems.chat, channel.userIsMember);
@@ -37,9 +41,6 @@ var Channel = function(session, user, channelID, parentID) {
 		DOM.fill(msgElems.text, DOM.linkify(info.text));
 		return elem;
 	};
-
-	var chnlElems = {}, chatElems = {};
-	var infoPane = DOM.clone("info"), chatPane = DOM.clone("chat", chatElems);
 	var focusMessageInput = function() {
 		DOM.field.focus(chatElems.input);
 	};
