@@ -46,6 +46,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 	margin-top: -2px;
 }
 
+#main > .channel > .content > .info > .group > .children > .person + .person {
+	border-top: 1px solid #aaa;
+}
 #main > .channel > .content > .info > .group > .children > .person.idle {
 	background: #ddd;
 	color: #777;

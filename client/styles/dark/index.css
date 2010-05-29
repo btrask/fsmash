@@ -135,10 +135,16 @@ a:active {
 #main > .account > .profile {
 	border-color: #666;
 }
+#main > .account > .channels > .channel + .channel {
+	border-color: #666;
+}
 
 /* Channel */
 
 #main > .channel > .content > .info > .game {
+	border-color: #666;
+}
+#main > .channel > .content > .info > .group > .children > .person + .person {
 	border-color: #666;
 }
 #main > .channel > .content > .info > .group > .children > .person.idle {

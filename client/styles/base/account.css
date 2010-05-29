@@ -42,3 +42,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 	height: 25px;
 	margin: 0 2px 2px 2px;
 }
+
+#main > .account > .channels > .channel + .channel {
+	border-top: 1px solid #aaa;
+}
