@@ -280,12 +280,11 @@ root.api.session.user = bt.dispatch(function(query, session) {
 				"SELECT totalPoints FROM rankings WHERE userID = $ LIMIT 1",
 				session.user.info.userID),
 				function(pointsResult) {
-					if(!pointsResult.records.length) return loadChannels();
 					db.query(mysql.format(
-						"SELECT COUNT(*) FROM rankings WHERE totalPoints > $",
-						mysql.rows(pointsResult)[0].totalPoints),
+						"SELECT COUNT(*) + 1 rank FROM rankings WHERE totalPoints > $",
+						pointsResult.records.length ? mysql.rows(pointsResult)[0].totalPoints : 0),
 						function(rankResult) {
-							session.user.info.rank = Number(rankResult.records[0][0]) + 1;
+							session.user.info.rank = mysql.rows(rankResult)[0].rank;
 							loadChannels();
 						}
 					);
