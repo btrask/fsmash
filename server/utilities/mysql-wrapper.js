@@ -30,6 +30,7 @@ wrapper.connect = function(conf, callback) {
 	})();
 	connection.defaultErrback = function(error) {
 		sys.puts("MySQL error: "+error);
+		connection.close();
 		connect(); // FIXME: Hack.
 	};
 	proxy.query = function(sql, callback, errback) {
