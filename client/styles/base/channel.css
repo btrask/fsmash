@@ -40,14 +40,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 }
 
 #main > .channel > .content > .info > .game {
-	border-bottom: 1px solid #aaa;
+	border-bottom-width: 1px;
 }
 #main > .channel > .content > .info > .game > .commands {
 	margin-top: -2px;
 }
 
 #main > .channel > .content > .info > .group > .children > .person + .person {
-	border-top: 1px solid #aaa;
+	border-top-width: 1px;
 }
 #main > .channel > .content > .info > .group > .children > .person.idle {
 	background: #ddd;
@@ -72,7 +72,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 }
 #main > .channel > .content > .chat > .content > .messages > .history {
 	color: #777;
-	border-bottom: 1px solid #aaa;
+	border-bottom-width: 1px;
 	margin-bottom: 2px;
 	padding-bottom: 2px;
 }
@@ -91,7 +91,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 	left: 0;
 	right: 146px;
 	height: 29px;
-	border: solid #aaa;
 	border-width: 1px 1px 0 0;
 }
 #main > .channel > .content > .chat > .input > .wrapper {

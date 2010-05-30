@@ -42,7 +42,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 	width: 256px;
 }
 #main > .authenticate > .step + .step {
-	border-top: 2px solid #ccc;
+	border-top-width: 2px;
 }
 
 #main > .authenticate > .step > .content > .field {

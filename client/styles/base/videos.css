@@ -17,7 +17,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 	right: 0;
 	top: 0;
 	height: 29px;
-	border-bottom: 1px solid #aaa;
+	border-bottom-width: 1px;
 }
 #main > .videos > .submit > .wrapper {
 	left: 2px;

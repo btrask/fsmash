@@ -14,6 +14,9 @@ You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
 /* Global */
+* {
+	border-color: #666;
+}
 #resizer > .line {
 	background: #555;
 }
@@ -45,7 +48,7 @@ a:active {
 .button, select {
 	background: #444;
 	color: #fff;
-	border: 1px solid #555;
+	border-color: #555;
 }
 .button {
 	background: -moz-linear-gradient(#444, #222);
@@ -126,43 +129,18 @@ a:active {
 #main > .authenticate > .step > .label {
 	background: #666;
 }
-#main > .authenticate > .step + .step {
-	border-color: #666;
-}
-
-/* Account */
-
-#main > .account > .profile {
-	border-color: #666;
-}
-#main > .account > .channels > .channel + .channel {
-	border-color: #666;
-}
 
 /* Channel */
 
-#main > .channel > .content > .info > .game {
-	border-color: #666;
-}
-#main > .channel > .content > .info > .group > .children > .person + .person {
-	border-color: #666;
-}
 #main > .channel > .content > .info > .group > .children > .person.idle {
 	background: #555;
 }
 #main > .channel > .content > .chat > .input {
 	background: #222;
-	border-color: #666;
 }
 
 .name.online {
 	color: #bbb;
-}
-
-/* Videos */
-
-#main > .videos > .submit {
-	border-color: #666;
 }
 
 /* Modal */

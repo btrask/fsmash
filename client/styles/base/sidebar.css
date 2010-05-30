@@ -74,7 +74,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 	background: #8996b8;
 	background: -moz-linear-gradient(#b3bdd7, #8996b8);
 	background: -webkit-gradient(linear, left top, left bottom, from(#b3bdd7), to(#8996b8));
-	border: solid #8996b8;
+	border-color: #8996b8;
 	border-width: 1px 0;
 	padding-top: 3px;
 	padding-bottom: 3px;
