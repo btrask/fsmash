@@ -24,7 +24,7 @@ all: gzip
 clean:
 	-rm -rf public
 
-public: public/robots.txt public/favicon.ico public/index.html public/compiled.js public/soundsets $(STYLES)
+public: public/robots.txt public/favicon.ico public/thumbnail.gif public/index.html public/compiled.js public/soundsets $(STYLES)
 
 public/compiled.js: $(CLIENT_SCRIPTS)
 	-mkdir -p $(dir $@)
