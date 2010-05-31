@@ -164,7 +164,7 @@ root.api.session.watch = bt.dispatch(function(query, session) {
 
 root.api.session.user = bt.dispatch(function(query, session) {
 	if(undefined === query.userName) return {error: "No user name specified"};
-	if(undefined === query.password) return {error: "No password specified"};
+	if(undefined === query.password && undefined === query.userToken) return {error: "No password specified"};
 	return session.promise(function(ticket) {
 		var accountError = function(reason) {
 			session.sendEvent("/user/", {accountError: reason}, ticket);
@@ -198,7 +198,6 @@ root.api.session.user = bt.dispatch(function(query, session) {
 			);
 		};
 		var signin = function() {
-			var legacyPassHash = crypto.SHA1(query.password);
 			db.query(mysql.format(
 				"INSERT INTO signinAttempts (ipAddress, userName)"+
 				" VALUES (INET_ATON($), $)",
@@ -210,24 +209,39 @@ root.api.session.user = bt.dispatch(function(query, session) {
 				query.remoteAddress, config.signin.throttleMinutes),
 				function(signinResult) {
 					if(signinResult.records[0][0] > config.signin.throttleAttempts) return accountError("Too many signin attempts");
-					db.query(mysql.format(
-						"SELECT userID, userName, passHash2 passHash FROM users"+
-						" WHERE userName = $ AND (passHash2 IS NOT NULL OR passHash = $) LIMIT 1",
-						query.userName, legacyPassHash), function(userResult) {
-							if(!userResult.records.length) return accountError("Incorrect username or password");
-							var userRow = mysql.rows(userResult)[0];
-							if(userRow.passHash) {
-								if(!crypt.check(query.password, userRow.passHash)) return accountError("Incorrect username or password");
-							} else {
-								db.query(mysql.format(
-									"UPDATE users SET passHash = NULL, passHash2 = $"+
-									" WHERE userID = $ AND passHash = $ LIMIT 1",
-									crypt.hash(query.password), userRow.userID, legacyPassHash
-								));
+					if(query.userToken) {
+						db.query(mysql.format(
+							"SELECT u.userID, u.userName"+
+							" FROM users u"+
+							" LEFT JOIN tokens t ON (u.userID = t.userID)"+
+							" WHERE u.userName = $ AND t.token = $ LIMIT 1",
+							query.userName, query.userToken), function(userResult) {
+								if(!userResult.records.length) return accountError("Invalid token");
+								var userRow = mysql.rows(userResult)[0];
+								logSession(userRow.userID, userRow.userName);
 							}
-							logSession(userRow.userID, userRow.userName);
-						}
-					);
+						);
+					} else {
+						var legacyPassHash = crypto.SHA1(query.password);
+						db.query(mysql.format(
+							"SELECT userID, userName, passHash2 passHash FROM users"+
+							" WHERE userName = $ AND (passHash2 IS NOT NULL OR passHash = $) LIMIT 1",
+							query.userName, legacyPassHash), function(userResult) {
+								if(!userResult.records.length) return accountError("Incorrect username or password");
+								var userRow = mysql.rows(userResult)[0];
+								if(userRow.passHash) {
+									if(!crypt.check(query.password, userRow.passHash)) return accountError("Incorrect username or password");
+								} else {
+									db.query(mysql.format(
+										"UPDATE users SET passHash = NULL, passHash2 = $"+
+										" WHERE userID = $ AND passHash = $ LIMIT 1",
+										crypt.hash(query.password), userRow.userID, legacyPassHash
+									));
+								}
+								logSession(userRow.userID, userRow.userName);
+							}
+						);
+					}
 				}
 			);
 		};
@@ -365,6 +379,11 @@ root.api.session.user = bt.dispatch(function(query, session) {
 }, function(func, query, session) {
 	if(!session.user) return {error: "Session not signed in"};
 	return func(query, session, session.user);
+});
+root.api.session.user.remember = bt.dispatch(function(query, session, user) {
+	var token = crypt.randomString(50);
+	db.query(mysql.format("REPLACE tokens (userID, token) VALUES ($, $)", user.info.userID, token));
+	return {token: token};
 });
 root.api.session.user.settings = bt.dispatch(function(query, session, user) {
 	var settings = [];

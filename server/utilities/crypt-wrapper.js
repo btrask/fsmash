@@ -24,5 +24,5 @@ wrapper.check = function(password, hash) {
 wrapper.randomString = function(length) {
 	var str = "";
 	while(str.length < length) str += Math.random().toString(36).slice(2);
-	return str;
+	return str.substring(0, length);
 };

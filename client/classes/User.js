@@ -122,7 +122,27 @@ var User = function(session, userID) {
 		return user.personByUserID[userID];
 	};
 
+	(function rememberMeButton() {
+		acctElems.remember.value = cookie.get("userName") ? "Forget Me" : "Remember Me";
+		acctElems.remember.onclick = function() {
+			if(cookie.get("userName")) {
+				cookie.clear("userName");
+				cookie.clear("userKey");
+				acctElems.remember.value = "Remember Me";
+			} else {
+				DOM.input.enable(acctElems.remember, false);
+				user.request("/remember/", {}, function(result) {
+					DOM.input.enable(acctElems.remember, true);
+					if(!result) return;
+					cookie.set("userName", user.info.userName, 14);
+					cookie.set("userToken", result.token, 14);
+					acctElems.remember.value = "Forget Me";
+				});
+			}
+		};
+	})();
 	acctElems.signout.onclick = function() {
+		if(cookie.get("userName")) cookie.set("requirePassword", "1");
 		DOM.button.confirm(this, function() {
 			session.request("/terminate/");
 		});

@@ -252,3 +252,12 @@ td > .button, td > select {
 .alignTop > * {
 	vertical-align: top;
 }
+.loading {
+	width: 220px;
+	height: 19px;
+	left: 50%;
+	top: 50%;
+	margin-left: -110px;
+	margin-top: -10px;
+	background: url("resources/loading.gif");
+}

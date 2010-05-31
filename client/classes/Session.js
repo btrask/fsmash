@@ -21,8 +21,38 @@ var Session = function() {
 		callbackByPromiseID: {},
 		dataByPromiseID: {}
 	};
-
 	var accountItem = new SidebarItem("Account");
+
+	var askForSignin = function() {
+		var delay = false;
+		var authElems = {};
+		var signin = function(signup, event) {
+			if(delay) return;
+			DOM.input.enable(authElems.signinButton, authElems.signupButton, false);
+			session.request("/user/", {userName: authElems.userNameField.value, password: authElems.passwordField.value, signup: signup}, function(error) {
+				if(!error) return;
+				DOM.fill(authElems.error, error);
+				delay = true;
+				setTimeout(function() {
+					delay = false;
+					DOM.input.enable(authElems.signinButton, authElems.signupButton, true);
+				}, 1000 * 1);
+			});
+		};
+		accountItem.setContent(DOM.clone("authenticate", authElems));
+		accountItem.onshow = function() {
+			DOM.field.focus(authElems.userNameField);
+		};
+		accountItem.onshow();
+		authElems.signinButton.onclick = bt.curry(signin, false);
+		authElems.signupButton.onclick = bt.curry(signin, true);
+		authElems.userNameField.onkeypress = function(event) {
+			if(DOM.event.isReturn(event)) DOM.field.focus(authElems.passwordField);
+		};
+		authElems.passwordField.onkeypress = function(event) {
+			if(DOM.event.isReturn(event)) signin(false);
+		};
+	};
 
 	session.siteItem = new SidebarItem("FSMASH.org");
 	session.siteItem.children.appendChild(accountItem.element);
@@ -30,6 +60,8 @@ var Session = function() {
 	session.sidebar = DOM.clone("sidebarList");
 	session.sidebar.appendChild(session.siteItem.element);
 	DOM.id("sidebar").appendChild(session.sidebar);
+
+	accountItem.setContent(DOM.clone("loading"));
 	accountItem.select(true);
 
 	session.info = {};
@@ -39,22 +71,22 @@ var Session = function() {
 	session.request = function(path, props, callback) {
 		pending.requests.push({path: path, props: props || {}, callback: callback});
 		if(1 === pending.requests.length) (function nextRequest() {
-			Session.request("/session" + pending.requests[0].path, bt.union(pending.requests[0].props, session.info), function(obj) {
+			var request = pending.requests.shift();
+			Session.request("/session" + request.path, bt.union(request.props, session.info), function(obj) {
 				if(obj && obj.needsNewSession) {
 					session.terminate();
 					return;
-				} else if(obj && obj.error) {
-					throw obj.error;
-				} else if(pending.requests[0].callback) {
+				}
+				if(obj && obj.error) throw obj.error;
+				if(request.callback) {
 					if(!obj || !obj.promiseID) {
-						pending.requests[0].callback(obj);
+						request.callback(obj);
 					} else if(pending.dataByPromiseID.hasOwnProperty(obj.promiseID)) {
-						pending.requests[0].callback(pending.dataByPromiseID[obj.promiseID]);
+						request.callback(pending.dataByPromiseID[obj.promiseID]);
 					} else {
-						pending.callbackByPromiseID[obj.promiseID] = pending.requests[0].callback;
+						pending.callbackByPromiseID[obj.promiseID] = request.callback;
 					}
 				}
-				pending.requests.shift();
 				if(pending.requests.length) nextRequest();
 			});
 		})();
@@ -158,36 +190,25 @@ var Session = function() {
 	})();
 
 	session.request("/", {}, function(info) {
-		var delay = false;
-		var authElems = {};
-		var signin = function(signup, event) {
-			if(delay) return;
-			DOM.input.enable(authElems.signinButton, authElems.signupButton, false);
-			session.request("/user/", {userName: authElems.userNameField.value, password: authElems.passwordField.value, signup: signup}, function(error) {
-				if(!error) return;
-				DOM.fill(authElems.error, error);
-				delay = true;
-				setTimeout(function() {
-					delay = false;
-					DOM.input.enable(authElems.signinButton, authElems.signupButton, true);
-				}, 1000 * 1);
-			});
-		};
-		accountItem.setContent(DOM.clone("authenticate", authElems));
-		accountItem.onshow = function() {
-			DOM.field.focus(authElems.userNameField);
-		};
-		accountItem.onshow();
-		authElems.signinButton.onclick = bt.curry(signin, false);
-		authElems.signupButton.onclick = bt.curry(signin, true);
-		authElems.userNameField.onkeypress = function(event) {
-			if(DOM.event.isReturn(event)) DOM.field.focus(authElems.passwordField);
-		};
-		authElems.passwordField.onkeypress = function(event) {
-			if(DOM.event.isReturn(event)) signin(false);
-		};
-
 		session.info = info;
+
+		var tokenInfo = {
+			userName: cookie.get("userName"),
+			userToken: cookie.get("userToken"),
+			signup: false
+		};
+		if(tokenInfo.userName && !cookie.get("requirePassword")) {
+			session.request("/user/", tokenInfo, function(error) {
+				if(!error) return;
+				cookie.clear("userName");
+				cookie.clear("userToken");
+				askForSignin();
+			});
+		} else {
+			cookie.clear("requirePassword");
+			askForSignin();
+		}
+
 		session.watch = function() {
 			Session.request("/session/watch/", session.info, function(events) {
 				if(!events) return session.watch();

@@ -1,4 +1,5 @@
 CLIENT_SCRIPTS = client/external/json2.js \
+                 client/external/cookie.js \
                  shared/bt.js \
                  shared/brawl.js \
                  client/utilities/DOM.js \
