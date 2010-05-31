@@ -27,4 +27,4 @@ brawl.friendCode = function(code, separator) {
 	return [fc.slice(0, 4), fc.slice(4, 8), fc.slice(8)].join(separator);
 };
 brawl.teams = {};
-brawl.teams.colors = ["teamNone", "teamRed", "teamGreen", "teamBlue"];
+brawl.teams.colors = ["teamNone", "teamRed", "teamBlue", "teamGreen"];
