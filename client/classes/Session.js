@@ -55,7 +55,7 @@ var Session = function() {
 					}
 				}
 				pending.requests.shift();
-				if(pending.requests.length) arguments.callee();
+				if(pending.requests.length) nextRequest();
 			});
 		})();
 	};
