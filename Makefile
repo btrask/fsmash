@@ -34,7 +34,7 @@ public/styles/base/index.css: $(addprefix client/styles/base/,$(STYLE_BASE_COMPO
 	-mkdir -p $(dir $@)
 	cat $+ | java -jar deps/yuicompressor-2.4.2/build/yuicompressor-2.4.2.jar --type css -o $@
 
-public/styles/dark/index.css: client/styles/dark/index.css
+public/styles/%/index.css: client/styles/%/index.css
 	-mkdir -p $(dir $@)
 	cat $+ | java -jar deps/yuicompressor-2.4.2/build/yuicompressor-2.4.2.jar --type css -o $@
 
