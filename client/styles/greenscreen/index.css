@@ -159,6 +159,9 @@ select {
 	background: #050;
 	color: #090;
 }
+#main > .channel > .content > .info > .group > .children > .person.teamNone > .title {
+	color: #fff;
+}
 #main > .channel > .content > .chat > .content > .messages > .history {
 	border-color: #090;
 }
