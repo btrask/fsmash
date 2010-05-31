@@ -162,6 +162,9 @@ select {
 #main > .channel > .content > .info > .group > .children > .person.teamNone > .title {
 	color: #fff;
 }
+#main > .channel > .content > .info > .group > .children > .person.teamNone.idle > .title {
+	color: #090;
+}
 #main > .channel > .content > .chat > .content > .messages > .history {
 	border-color: #090;
 }
