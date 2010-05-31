@@ -15,7 +15,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
 /* Global */
 * {
-	border-color: #000;
+	border-color: #0f0;
 }
 #resizer > .line {
 	background: #0f0;
@@ -42,7 +42,7 @@ a:active {
 .text {
 	background: #000;
 	color: #0f0;
-	border-color: #0a0;
+	border-color: #090;
 }
 .text:focus {
 	outline: 2px solid #0f0;
@@ -50,6 +50,9 @@ a:active {
 .button, select {
 	background: #000;
 	color: #6bf;
+}
+select {
+	border-color: #000;
 }
 .button {
 	text-shadow: none;
@@ -86,7 +89,7 @@ a:active {
 }
 
 .header {
-	background: #0a0;
+	background: #090;
 	color: #000;
 	border: none;
 	text-shadow: none;
@@ -98,7 +101,7 @@ a:active {
 	text-shadow: none;
 }
 .light, .text.placeholder {
-	color: #0a0;
+	color: #090;
 }
 
 /* Sidebar */
@@ -125,34 +128,39 @@ a:active {
 }
 #sidebar .counter {
 	background: #f00;
+	color: #000;
+	-moz-border-radius: 0;
+	-webkit-border-radius: 0;
+	border-radius: 0;
 }
 
 /* Authenticate */
 
 #main > .authenticate > .step > .label {
-	background: #0a0;
+	background: #090;
 	color: #000;
 }
 
 /* Account */
 
 #main > .account > .channels > .channel + .channel {
-	border-color: #0a0;
+	border-color: #090;
 }
 
 /* Channel */
 
 #main > .channel > .commands > .tabs .button {
-	border-color: #000;
+	border-color: #0f0;
 }
 #main > .channel > .content > .info > .group > .children > .person + .person {
-	border-color: #0a0;
+	border-color: #090;
 }
 #main > .channel > .content > .info > .group > .children > .person.idle {
 	background: #050;
+	color: #090;
 }
-#main > .channel > .content > .chat > .input {
-	border-color: #0f0;
+#main > .channel > .content > .chat > .content > .messages > .history {
+	border-color: #090;
 }
 
 .name.online {
@@ -163,4 +171,7 @@ a:active {
 
 #modal > .shield > .content {
 	background: #000;
+	-moz-border-radius: 0;
+	-webkit-border-radius: 0;
+	border-radius: 0;
 }
