@@ -134,10 +134,19 @@ a:active {
 	color: #000;
 }
 
+/* Account */
+
+#main > .account > .channels > .channel + .channel {
+	border-color: #0a0;
+}
+
 /* Channel */
 
 #main > .channel > .commands > .tabs .button {
 	border-color: #000;
+}
+#main > .channel > .content > .info > .group > .children > .person + .person {
+	border-color: #0a0;
 }
 #main > .channel > .content > .info > .group > .children > .person.idle {
 	background: #050;
