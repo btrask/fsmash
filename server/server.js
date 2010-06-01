@@ -29,9 +29,9 @@ var Session = require("./classes/Session").Session;
 var Channel = require("./classes/Channel").Channel;
 var Game = require("./classes/Game").Game;
 
-var db = mysql.connect(JSON.parse(fs.readFileSync(__dirname+"/db.json")));
+var db = mysql.connect(JSON.parse(fs.readFileSync(__dirname+"/db.json", "utf8")));
 var config = {
-	server: JSON.parse(fs.readFileSync(__dirname+"/config.json")),
+	server: JSON.parse(fs.readFileSync(__dirname+"/config.json", "utf8")),
 	signin: {
 		throttleMinutes: 15,
 		throttleAttempts: 50,

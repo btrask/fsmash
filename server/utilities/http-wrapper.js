@@ -22,7 +22,7 @@ var url = require("url");
 
 var bt = require("../../shared/bt");
 
-var MIMEByExt = JSON.parse(fs.readFileSync(__dirname+"/mime.json"));
+var MIMEByExt = JSON.parse(fs.readFileSync(__dirname+"/mime.json", "utf8"));
 
 wrapper.createServer = function(dispatcher, unknownHandler/* (path, callback (status, header, data, encoding)) */) {
 	return http.createServer(function(req, res) {
