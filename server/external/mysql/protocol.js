@@ -140,6 +140,7 @@ Protocol.prototype.query_command = function(query, immediately) {
     var promise = new Promise();
     
     var err = utils.scope(this, function(error) {
+	error.query = query;
 	this.set_state('READY');
 	promise.emitError(error);
     });

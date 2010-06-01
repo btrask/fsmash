@@ -24,7 +24,7 @@ var mysql = require("../external/mysql");
 wrapper.connect = function(conf, callback, errback) {
 	var connection = new mysql.Connection(conf.hostname, conf.username, conf.password, conf.database, conf.port);
 	connection.defaultErrback = function(error) {
-		sys.puts(sys.inspect(error));
+		sys.puts(JSON.stringify(error, null, 1));
 	};
 	connection.connect(callback, errback);
 	return connection;
