@@ -27,7 +27,7 @@ wrapper.connect = function(conf, callback, errback) {
 		sys.puts(sys.inspect(error));
 	};
 	connection.connect(callback, errback);
-	return proxy;
+	return connection;
 };
 wrapper.format = function(format, arg1, arg2, etc) {
 	var originalArgs = arguments;
