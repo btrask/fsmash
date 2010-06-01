@@ -21,21 +21,12 @@ var bt = require("../../shared/bt");
 
 var mysql = require("../external/mysql");
 
-wrapper.connect = function(conf, callback) {
-	var connection, proxy = {};
-	var connect = (function() {
-		connection = new mysql.Connection(conf.hostname, conf.username, conf.password, conf.database, conf.port);
-		connection.connect(callback);
-		return arguments.callee;
-	})();
+wrapper.connect = function(conf, callback, errback) {
+	var connection = new mysql.Connection(conf.hostname, conf.username, conf.password, conf.database, conf.port);
 	connection.defaultErrback = function(error) {
-		sys.puts("MySQL error: "+error);
-		connection.close();
-		connect(); // FIXME: Hack.
+		sys.puts(sys.inspect(error));
 	};
-	proxy.query = function(sql, callback, errback) {
-		connection.query.apply(connection, arguments);
-	};
+	connection.connect(callback, errback);
 	return proxy;
 };
 wrapper.format = function(format, arg1, arg2, etc) {
