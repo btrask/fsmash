@@ -81,6 +81,10 @@ Connection.prototype.autocommit = function(flag, callback, errback) {
 }
 
 Connection.prototype.query = function(sql, callback, errback) {
+    var internalErrback = utils.scope(this, function(error) { // DEBUG
+	if(error) error.query = sql;
+	(errback || this.defaultErrback)(error);
+    });
     var sql = this.extract_placeholder(sql);
     if(sql.constructor==errors.ClientError.prototype.constructor) {
 	(errback || this.defaultErrback)(sql);
@@ -99,12 +103,13 @@ Connection.prototype.query = function(sql, callback, errback) {
 				    if(callback) callback(rows);
 				}
 				catch(error) {
-				    (errback || this.defaultErrback)(error);
+				    internalErrback(error);
+//				    (errback || this.defaultErrback)(error);
 				}
 			    }))
-			    .addErrback(errback || this.defaultErrback);
+			    .addErrback(/*errback || this.defaultErrback*/internalErrback);
 		    }))
-		    .addErrback(errback || this.defaultErrback);
+		    .addErrback(/*errback || this.defaultErrback*/internalErrback);
 	    }
 	    else {
 		var result = {};
@@ -117,11 +122,12 @@ Connection.prototype.query = function(sql, callback, errback) {
 		    if(callback) callback(result);
 		}
 		catch(error) {
-		    (errback || this.defaultErrback)(error);
+		    internalErrback(error);
+//		    (errback || this.defaultErrback)(error);
 		}
 	    }
 	}))
-	.addErrback(errback || this.defaultErrback);
+	.addErrback(/*errback || this.defaultErrback*/internalErrback);
 }
 
 Connection.prototype.extract_placeholder = function(sql) {
