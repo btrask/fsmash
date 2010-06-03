@@ -269,12 +269,13 @@ root.api.session.user = bt.dispatch(function(query, session) {
 		};
 		var loadUser = function(userID, userName) {
 			session.signin(userID);
-			session.user.info.userName = userName;
+			var user = session.user;
+			user.info.userName = userName;
 			db.query(mysql.format(
 				"SELECT brawlName, friendCode, bio FROM profiles"+
 				" WHERE userID = $ LIMIT 1",
-				session.user.info.userID), function(profileResult) {
-					if(profileResult.records.length) bt.mixin(session.user.info, mysql.rows(profileResult)[0]);
+				user.info.userID), function(profileResult) {
+					if(profileResult.records.length) bt.mixin(user.info, mysql.rows(profileResult)[0]);
 				}
 			);
 			db.query(mysql.format(
@@ -285,36 +286,36 @@ root.api.session.user = bt.dispatch(function(query, session) {
 				" WHERE ip_start <= INET_ATON($) ORDER BY ip_start DESC LIMIT 1",
 				query.remoteAddress), function(locationResult) {
 					if(!locationResult.records.length) return;
-					session.user.info.location = bt.array.unique(bt.map(locationResult.records[0], function(value) {
+					user.info.location = bt.array.unique(bt.map(locationResult.records[0], function(value) {
 						return value || undefined;
 					})).join(", ");
 				}
 			);
 			db.query(mysql.format(
 				"SELECT totalPoints FROM rankings WHERE userID = $ LIMIT 1",
-				session.user.info.userID),
+				user.info.userID),
 				function(pointsResult) {
-					if(!pointsResult.records.length) return loadChannels();
+					if(!pointsResult.records.length) return loadChannels(user);
 					db.query(mysql.format(
 						"SELECT COUNT(*) + 1 rank FROM rankings WHERE totalPoints > $",
 						mysql.rows(pointsResult)[0].totalPoints),
 						function(rankResult) {
-							session.user.info.rank = mysql.rows(rankResult)[0].rank;
-							loadChannels();
+							user.info.rank = mysql.rows(rankResult)[0].rank;
+							loadChannels(user);
 						}
 					);
 				}
 			);
 		};
-		var loadChannels = function() {
+		var loadChannels = function(user) {
 			db.query(mysql.format(
 				"SELECT cm.channelID, c.parentID, c.topic, c.allowsGameChannels, g.matchTypeID, g.ruleID"+
 				" FROM channelMembers cm"+
 				" LEFT JOIN channels c ON (cm.channelID = c.channelID)"+
 				" LEFT JOIN games g ON (cm.channelID = g.channelID)"+
 				" WHERE cm.userID = $ ORDER BY cm.channelID ASC",
-				session.user.info.userID), function(channelResult) {
-					sendUser();
+				user.info.userID), function(channelResult) {
+					sendUser(user);
 					mysql.rows(channelResult).map(function(channelRow) {
 						var channel, game;
 						if(Channel.byID.hasOwnProperty(channelRow.channelID)) channel = Channel.byID[channelRow.channelID];
@@ -329,36 +330,36 @@ root.api.session.user = bt.dispatch(function(query, session) {
 								game.info.ruleID = channelRow.ruleID || 0;
 							}
 						}
-						channel.addUser(session.user);
-						channel.group.sendEvent("/user/channel/member/", {channelID: channel.info.channelID, memberUserID: session.user.info.userID}, undefined, [session.user]);
+						channel.addUser(user);
+						channel.group.sendEvent("/user/channel/member/", {channelID: channel.info.channelID, memberUserID: user.info.userID}, undefined, [user]);
 					});
 				}
 			);
 		};
-		var sendUser = function() {
-			session.sendEvent("/user/", session.user.info, ticket);
-			session.user.sendEvent("/user/config/", Session.config);
-			Group.users.sendEvent("/user/person/", session.user.info);
+		var sendUser = function(user) {
+			session.sendEvent("/user/", user.info, ticket);
+			user.sendEvent("/user/config/", Session.config);
+			Group.users.sendEvent("/user/person/", user.info);
 			bt.map(Session.byUserID, function(otherSession, otherUserID) {
-				if(otherUserID === session.user.info.userID) return;
+				if(otherUserID === user.info.userID) return;
 				session.sendEvent("/user/person/", otherSession.user.info);
 			});
 			db.query(mysql.format(
 				"SELECT styleID, soundsetID FROM settings WHERE userID = $ LIMIT 1",
-				session.user.info.userID),
+				user.info.userID),
 				function(settingsResult) {
 					if(!settingsResult.records.length) return;
-					session.user.sendEvent("/user/settings/", mysql.rows(settingsResult)[0]);
+					user.sendEvent("/user/settings/", mysql.rows(settingsResult)[0]);
 				}
 			);
 			db.query(mysql.format(
 				"SELECT adminID FROM admins WHERE userID = $ LIMIT 1",
-				session.user.info.userID),
+				user.info.userID),
 				function(adminResult) {
 					if(!adminResult.records.length) return;
-					session.user.admin = true;
-					Group.admins.objects.push(session.user);
-					session.user.sendEvent("/user/admin/", {signupAllowed: config.signup.allowed});
+					user.admin = true;
+					Group.admins.objects.push(user);
+					user.sendEvent("/user/admin/", {signupAllowed: config.signup.allowed});
 					db.query(mysql.format(
 						"SELECT u.userName, c.topic, UNIX_TIMESTAMP(r.reportTime) * 1000 time"+
 						" FROM reports r"+
@@ -367,7 +368,7 @@ root.api.session.user = bt.dispatch(function(query, session) {
 						" WHERE r.reportTime > DATE_SUB(NOW(), INTERVAL 7 DAY) AND r.isResolved = 0"+
 						" ORDER BY r.reportTime DESC"),
 						function(reportResults) {
-							session.user.sendEvent("/user/admin/reports/", mysql.rows(reportResults));
+							user.sendEvent("/user/admin/reports/", mysql.rows(reportResults));
 						}
 					);
 				}
