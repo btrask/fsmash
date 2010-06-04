@@ -87,21 +87,10 @@ exports.Promise.prototype.addCallback = function (listener) {
 
 exports.Promise.prototype.addErrback = function (listener) {
     if(typeof(listener)=='undefined') return this;
-
-    // DEBUG
-    var stack = new Error().stack; // Capture the stack outside of the callback.
-    var wrapper = function(error, arg1, arg2, etc) {
-	if(error) {
-		if(!error.stacks) error.stacks = [];
-		error.stacks.push(stack); // FIXME: This has problems if we have more than one listener since we add everything to the same object.
-	}
-	listener.apply(this, arguments);
-    };
-
     if (this.hasFired === 'error') {
-	wrapper.apply(this, this._values);
+	listener.apply(this, this._values);
     }
-    return this.addListener("error", wrapper);
+    return this.addListener("error", listener);
 };
 
 /* Poor Man's coroutines */
