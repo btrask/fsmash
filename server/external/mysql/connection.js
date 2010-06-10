@@ -8,6 +8,7 @@ var utils = require('./utils');
 var errors = require('./errors');
 var Promise = require('./node-promise').Promise;
 var Socket = require('./node-socket').Socket;
+var Requeue = require('./Requeue').Requeue;
 
 
 var MAX_PACKET_LENGTH = 16777215;
@@ -19,6 +20,7 @@ var Connection = function(port, hostname) {
     this.seq = 0; // packet sequence number
     this.socket = new Socket(utils.scope(this, function(){ this.emit("connect"); }),
 			     utils.scope(this, function(){ this.emit("close"); }));
+    this.requeue = new Requeue();
 }
 sys.inherits(Connection, events.EventEmitter);
 exports.Connection = Connection;
@@ -55,9 +57,11 @@ Connection.prototype.read = function(packet_count) {
     var len = undefined;
     var packets = [];
     var read_packet = utils.scope(this, function() {
+	var wait1 = this.requeue.multiWait("wait1");
 	try {
 	    this.socket.read(4)
-		.addCallback(utils.scope(this, function(header) {
+		.addCallback(wait1(utils.scope(this, function(header) {
+		    var wait2 = this.requeue.multiWait("wait2");
 		    try {
 			var res = pack.unpack("CvC", header);
 			len = (res[1] << 8) + res[0];
@@ -67,7 +71,7 @@ Connection.prototype.read = function(packet_count) {
 			}
 			this.seq = (res[2] + 1) % 256;
 			this.socket.read(len)
-			    .addCallback(utils.scope(this, function(data) {
+			    .addCallback(wait2(utils.scope(this, function(data) {
 				try {
 				    ret = ret.concat(data);
 				    var sqlstate = "00000";
@@ -98,24 +102,26 @@ Connection.prototype.read = function(packet_count) {
 				catch(e) {
 				    promise.emitError(new errors.ClientError(String(e)));
 				}
-			    }))
-			    .addErrback(utils.scope(this, function(error) {
+			    })))
+			    .addErrback(wait2(utils.scope(this, function(error) {
 				promise.emitError(error);
-			    }));
+			    })));
 		    }
 		    catch(e) {
+			wait2.remove();
 			promise.emitError(new errors.ClientError(String(e)));
 		    }
-	    }))
-	    .addErrback(utils.scope(this, function(error) {
+	    })))
+	    .addErrback(wait1(utils.scope(this, function(error) {
 		promise.emitError(error);
-	    }));
+	    })));
 	}
 	catch(e) {
+	    wait1.remove();
 	    promise.emitError(new errors.ClientError(String(e)));
 	}
     });
-    read_packet();
+    this.requeue.addAtTop(read_packet, "read_packet");
     return promise;
 }
 
