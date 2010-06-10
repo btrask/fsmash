@@ -113,7 +113,7 @@ var Channel = function(session, user, channelID, parentID) {
 		};
 		var ignoreAction = function(validate, item) {
 			if(validate) {
-				this.value = (item.person.ignored ? "Unignore" : "Ignore…");
+				this.value = (item.person.ignored ? "Unignore" : "Ignore");
 				return channel.userIsMember && item.person !== user.person;
 			}
 			var setIgnored = function(flag) {
@@ -121,8 +121,7 @@ var Channel = function(session, user, channelID, parentID) {
 				user.request("/person/block/", {personUserID: item.person.info.userID, block: flag});
 				item.group.update();
 			};
-			if(item.person.ignored) setIgnored(false);
-			else DOM.button.confirm(this, bt.curry(setIgnored, true));
+			setIgnored(!item.person.ignored);
 		};
 		var teamAction = function(validate, item) {
 			if(validate) {

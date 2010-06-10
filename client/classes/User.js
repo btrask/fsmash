@@ -143,9 +143,7 @@ var User = function(session, userID) {
 	})();
 	acctElems.signout.onclick = function() {
 		if(cookie.get("userName")) cookie.set("requirePassword", "1");
-		DOM.button.confirm(this, function() {
-			session.request("/terminate/");
-		});
+		session.request("/terminate/");
 	};
 	(function profile() {
 		var changeProfileField = function(name) {
