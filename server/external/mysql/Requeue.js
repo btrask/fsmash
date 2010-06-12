@@ -44,15 +44,15 @@ exports.Requeue = function() {
 	};
 	var handler = function(queue, func, name, external) {
 		assert.ok(func, "Function required");
-		var original = {
-			add: requeue.add,
-			wait: requeue.wait,
-		};
 		var subQueue = [], removed = false;
 		var blocker = function() {
 			debugStr("Blocking", name);
 		};
 		var caller = function(arg1, arg2, etc) {
+			var original = {
+				add: requeue.add,
+				wait: requeue.wait,
+			};
 			var index = queue.indexOf(marker);
 			if(removed) return debugStr("Unblocked after removing", name);
 			if(external) debugStr("Unblocking", name);
