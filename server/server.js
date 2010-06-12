@@ -255,17 +255,30 @@ root.api.session.user = bt.dispatch(function(query, session) {
 				"SELECT bs.sessionID FROM bannedSessions bs"+
 				" LEFT JOIN sessions s ON (bs.sessionID = s.sessionID)"+
 				" WHERE s.userID = $ OR s.ipAddress = INET_ATON($) LIMIT 1",
-				userID, query.remoteAddress), function(banResult) {
-					if(!banResult.records.length) return loadUser(userID, userName);
+				userID, query.remoteAddress), function(bannedSessionResult) {
+					if(bannedSessionResult.records.length) return recordBan(userID, mysql.rows(bannedSessionResult)[0].sessionID);
 					db.query(mysql.format(
-						"INSERT IGNORE INTO bannedSessions (dependentSessionID, sessionID)"+
-						" SELECT $, sessionID FROM sessions"+
-						" WHERE userID = $ OR ipAddress = INET_ATON($)",
-						mysql.rows(banResult)[0].sessionID, userID, query.remoteAddress
-					));
-					accountError("You are banned");
+						"SELECT bannedIPID"+
+						" FROM bannedIPs"+
+						" WHERE minIPAddress <= INET_ATON($) AND maxIPAddress >= INET_ATON($)",
+						query.remoteAddress, query.remoteAddress),
+						function(bannedIPResult) {
+							if(bannedIPResult.records.length) return recordBan(userID);
+							loadUser(userID, userName);
+						}
+					);
 				}
 			);
+		};
+		var recordBan = function(userID, dependentSession) {
+			db.query(mysql.format(
+				"INSERT IGNORE INTO bannedSessions"+
+				" (dependentSessionID, sessionID) SELECT $, sessionID"+
+				" FROM sessions"+
+				" WHERE userID = $ OR ipAddress = INET_ATON($)",
+				dependentSession || null, userID, query.remoteAddress
+			));
+			accountError("You are banned");
 		};
 		var loadUser = function(userID, userName) {
 			session.signin(userID);

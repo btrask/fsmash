@@ -20,6 +20,24 @@ CREATE TABLE `admins` (
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `bannedIPs`
+--
+
+CREATE TABLE `bannedIPs` (
+  `bannedIPID` int(11) NOT NULL AUTO_INCREMENT,
+  `minIPAddress` int(11) NOT NULL,
+  `maxIPAddress` int(11) NOT NULL,
+  `modUserID` int(11) NOT NULL,
+  `reason` text COLLATE utf8_unicode_ci NOT NULL,
+  `bannedTime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`bannedIPID`),
+  KEY `minIPAddress` (`minIPAddress`),
+  KEY `maxIPAddress` (`maxIPAddress`)
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `bannedSessions`
 --
 
@@ -33,7 +51,7 @@ CREATE TABLE `bannedSessions` (
   PRIMARY KEY (`bannedSessionID`),
   UNIQUE KEY `sessionID` (`sessionID`),
   KEY `modUserID` (`modUserID`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 -- --------------------------------------------------------
 
@@ -351,6 +369,21 @@ CREATE TABLE `soundsets` (
   `sortOrder` int(11) NOT NULL,
   PRIMARY KEY (`soundsetID`),
   UNIQUE KEY `sortOrder` (`sortOrder`)
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tokens`
+--
+
+CREATE TABLE `tokens` (
+  `tokenID` int(11) NOT NULL AUTO_INCREMENT,
+  `userID` int(11) NOT NULL,
+  `token` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
+  PRIMARY KEY (`tokenID`),
+  UNIQUE KEY `userID` (`userID`),
+  KEY `token` (`token`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 -- --------------------------------------------------------
