@@ -205,7 +205,7 @@ var User = function(session, userID) {
 			embed.setAttribute("hidden", true);
 			embed.setAttribute("autostart", true);
 			embed.setAttribute("volume", 50);
-			embed.src = "soundsets/"+soundset.path+"/"+soundset[name]+".wav";
+			embed.src = "soundsets/"+soundset.path+"/"+soundset[name]+".wav?r=1";
 			DOM.fill(DOM.id("audio"), embed);
 		};
 

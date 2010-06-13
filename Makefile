@@ -43,9 +43,9 @@ public/%: client/%
 	cp -R $< $@
 
 gzip: public
-	for F in `find public -type f ! -name '*.gz' ! -name '.*'`; do gzip -nc9 $$F > $$F.gz; done
+	for F in `find public -type f ! -name '*.gz' ! -name '*.wav' ! -name '.*'`; do gzip -nc9 $$F > $$F.gz; done
 
 gzip-only: gzip
-	for F in `find public -type f ! -name '*.gz' ! -name '.*'`; do rm $$F; done
+	for F in `find public -type f ! -name '*.gz' ! -name '*.wav' ! -name '.*'`; do rm $$F; done
 
 .PHONY: all clean gzip

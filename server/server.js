@@ -60,13 +60,21 @@ var fileHandler = bt.memoize(function(path, callback) {
 	if(/\/$/.test(path)) path += "index.html";
 	path = __dirname+"/../public"+path;
 	http.MIMEForPath(path, function(type) {
+		var readFileCompressed = function(path, callback) {
+			fs.readFile(path+".gz", function(err, data) {
+				if(!err) return callback(err, data, "gzip");
+				fs.readFile(path, function(err, data) {
+					callback(err, data, "identity");
+				});
+			});
+		};
 		if("text/" === type.slice(0, 5)) type += "; charset=UTF-8";
-		fs.readFile(path+".gz", function(err, data) {
+		readFileCompressed(path, function(err, data, compression) {
 			if(err) return callback(2 == err.errno ? 404 : 500, {})
 			return callback(200, {
-				"Content-Encoding": "gzip",
 				"Content-Type": type,
 				"Content-Length": data.length,
+				"Content-Encoding": compression,
 			}, data);
 		});
 	});
