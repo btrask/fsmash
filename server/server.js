@@ -474,6 +474,7 @@ root.api.session.user.admin.rankings = bt.dispatch(function(query, session, user
 root.api.session.user.admin.statistics = bt.dispatch(function(query, session, user) {
 	return bt.union(process.memoryUsage(), {
 		platform: process.platform,
+		version: process.version,
 		sessions: Group.sessions.objects.length,
 		users: Group.users.objects.length,
 		uptime: (new Date().getTime() - config.startTime) / (1000 * 60 * 60 * 24),
