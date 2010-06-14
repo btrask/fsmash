@@ -55,30 +55,7 @@ process.addListener("uncaughtException", function(err) {
 	sys.log(err);
 });
 
-var fileHandler = bt.memoize(function(path, callback) {
-	if(/\.\./.test(path)) return callback(403, {});
-	if(/\/$/.test(path)) path += "index.html";
-	path = __dirname+"/../public"+path;
-	http.MIMEForPath(path, function(type) {
-		var readFileCompressed = function(path, callback) {
-			fs.readFile(path+".gz", function(err, data) {
-				if(!err) return callback(err, data, "gzip");
-				fs.readFile(path, function(err, data) {
-					callback(err, data, "identity");
-				});
-			});
-		};
-		if("text/" === type.slice(0, 5)) type += "; charset=UTF-8";
-		readFileCompressed(path, function(err, data, compression) {
-			if(err) return callback(2 == err.errno ? 404 : 500, {})
-			return callback(200, {
-				"Content-Type": type,
-				"Content-Length": data.length,
-				"Content-Encoding": compression,
-			}, data);
-		});
-	});
-});
+var fileHandler = http.createFileHandler(__dirname+"/../public");
 var configureSessions = (function configureSessions() {
 	db.query(
 		"SELECT soundsetID, label, path, challenge, `join`, `leave`, message"+

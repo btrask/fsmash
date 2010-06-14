@@ -22,7 +22,14 @@ var url = require("url");
 
 var bt = require("../../shared/bt");
 
-var MIMEByExt = JSON.parse(fs.readFileSync(__dirname+"/mime.json", "utf8"));
+var MIMEForPath = (function() {
+	var MIMEByExt = JSON.parse(fs.readFileSync(__dirname+"/mime.json", "utf8"));
+	return function(str, callback) {
+		var ext = path.extname(str).slice(1), MIME;
+		if(MIMEByExt.hasOwnProperty(ext)) MIME = MIMEByExt[ext];
+		callback(MIME || "application/octet-stream");
+	};
+})();
 
 wrapper.createServer = function(dispatcher, unknownHandler/* (path, callback (status, header, data, encoding)) */) {
 	return http.createServer(function(req, res) {
@@ -55,6 +62,32 @@ wrapper.createServer = function(dispatcher, unknownHandler/* (path, callback (st
 		});
 	});
 };
+wrapper.createFileHandler = function(basePath) {
+	return bt.memoize(function(path, callback) {
+		if(/\.\./.test(path)) return callback(403, {});
+		if(/\/$/.test(path)) path += "index.html";
+		path = basePath + path;
+		MIMEForPath(path, function(type) {
+			var readFileCompressed = function(path, callback) {
+				fs.readFile(path+".gz", function(err, data) {
+					if(!err) return callback(err, data, "gzip");
+					fs.readFile(path, function(err, data) {
+						callback(err, data, "identity");
+					});
+				});
+			};
+			if("text/" === type.slice(0, 5)) type += "; charset=UTF-8";
+			readFileCompressed(path, function(err, data, compression) {
+				if(err) return callback(2 == err.errno ? 404 : 500, {})
+				return callback(200, {
+					"Content-Type": type,
+					"Content-Length": data.length,
+					"Content-Encoding": compression,
+				}, data);
+			});
+		});
+	});
+};
 wrapper.writeJSON = function(res, value) {
 //	sys.debug(value);
 	var body = JSON.stringify(value);
@@ -64,9 +97,4 @@ wrapper.writeJSON = function(res, value) {
 		"Content-Length": body.length,
 	});
 	res.end(body, "utf8");
-};
-wrapper.MIMEForPath = function(str, callback) {
-	var ext = path.extname(str).slice(1), MIME;
-	if(MIMEByExt.hasOwnProperty(ext)) MIME = MIMEByExt[ext];
-	callback(MIME || "application/octet-stream");
 };
