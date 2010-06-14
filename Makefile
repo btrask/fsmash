@@ -48,4 +48,4 @@ gzip: public
 gzip-only: gzip
 	for F in `find public -type f ! -name '*.gz' ! -name '*.wav' ! -name '.*'`; do rm $$F; done
 
-.PHONY: all clean gzip
+.PHONY: all clean gzip gzip-only
