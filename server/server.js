@@ -136,7 +136,7 @@ root.api.session = bt.dispatch(function(query) {
 	if(query.remoteAddress !== session.remoteAddress) return {error: "Wrong IP address", needsNewSession: true};
 	return func(query, session);
 });
-root.api.session.terminate = bt.dispatch(function(query, session, user) {
+root.api.session.terminate = bt.dispatch(function(query, session) {
 	session.terminate();
 	return true;
 });
