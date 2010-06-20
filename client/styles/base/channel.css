@@ -55,13 +55,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 }
 
 #main > .channel > .content > .info > .group > .children > .person.teamRed > .title {
-	color: #f00;
+	color: #a00;
 }
 #main > .channel > .content > .info > .group > .children > .person.teamGreen > .title {
-	color: #0f0;
+	color: #0a0;
 }
 #main > .channel > .content > .info > .group > .children > .person.teamBlue > .title {
-	color: #00f;
+	color: #00d;
 }
 
 #main > .channel > .content > .chat > .content {

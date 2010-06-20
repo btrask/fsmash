@@ -159,11 +159,17 @@ select {
 	background: #050;
 	color: #090;
 }
-#main > .channel > .content > .info > .group > .children > .person.teamNone > .title {
-	color: #fff;
-}
 #main > .channel > .content > .info > .group > .children > .person.teamNone.idle > .title {
 	color: #090;
+}
+#main > .channel > .content > .info > .group > .children > .person.teamRed > .title {
+	color: #faa;
+}
+#main > .channel > .content > .info > .group > .children > .person.teamGreen > .title {
+	color: #afa;
+}
+#main > .channel > .content > .info > .group > .children > .person.teamBlue > .title {
+	color: #aaf;
 }
 #main > .channel > .content > .chat > .content > .messages > .history {
 	border-color: #090;

@@ -135,6 +135,15 @@ a:active {
 #main > .channel > .content > .info > .group > .children > .person.idle {
 	background: #555;
 }
+#main > .channel > .content > .info > .group > .children > .person.teamRed > .title {
+	color: #f55;
+}
+#main > .channel > .content > .info > .group > .children > .person.teamGreen > .title {
+	color: #5f5;
+}
+#main > .channel > .content > .info > .group > .children > .person.teamBlue > .title {
+	color: #77f;
+}
 #main > .channel > .content > .chat > .input {
 	background: #222;
 }
