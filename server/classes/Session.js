@@ -85,6 +85,8 @@ var Session = function(remoteAddress) {
 		func({session: session, promiseID: pid, used: false});
 		return {promiseID: pid};
 	};
+
+	sendEvents();
 };
 Session.uniqueID = 0;
 Session.byID = {};
