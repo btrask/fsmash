@@ -416,3 +416,18 @@ CREATE TABLE `videos` (
   PRIMARY KEY (`videoID`),
   UNIQUE KEY `youtubeID` (`youtubeID`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `whitelist`
+--
+
+CREATE TABLE `whitelist` (
+  `whitelistID` int(11) NOT NULL AUTO_INCREMENT,
+  `userID` int(11) NOT NULL,
+  `modID` int(11) DEFAULT NULL,
+  `whitelistTime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`whitelistID`),
+  UNIQUE KEY `userID` (`userID`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;

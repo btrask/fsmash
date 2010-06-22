@@ -237,19 +237,26 @@ root.api.session.user = bt.dispatch(function(query, session) {
 				userID, query.remoteAddress
 			));
 			db.query(mysql.format(
-				"SELECT bs.sessionID FROM bannedSessions bs"+
-				" LEFT JOIN sessions s ON (bs.sessionID = s.sessionID)"+
-				" WHERE s.userID = $ OR s.ipAddress = INET_ATON($) LIMIT 1",
-				userID, query.remoteAddress), function(bannedSessionResult) {
-					if(bannedSessionResult.records.length) return recordBan(userID, mysql.rows(bannedSessionResult)[0].sessionID);
+				"SELECT * FROM whitelist WHERE userID = $ LIMIT 1",
+				userID),
+				function(whitelistResult) {
+					if(whitelistResult.records.length) return loadUser(userID, userName);
 					db.query(mysql.format(
-						"SELECT bannedIPID"+
-						" FROM bannedIPs"+
-						" WHERE minIPAddress <= INET_ATON($) AND maxIPAddress >= INET_ATON($)",
-						query.remoteAddress, query.remoteAddress),
-						function(bannedIPResult) {
-							if(bannedIPResult.records.length) return recordBan(userID);
-							loadUser(userID, userName);
+						"SELECT bs.sessionID FROM bannedSessions bs"+
+						" LEFT JOIN sessions s ON (bs.sessionID = s.sessionID)"+
+						" WHERE s.userID = $ OR s.ipAddress = INET_ATON($) LIMIT 1",
+						userID, query.remoteAddress), function(bannedSessionResult) {
+							if(bannedSessionResult.records.length) return recordBan(userID, mysql.rows(bannedSessionResult)[0].sessionID);
+							db.query(mysql.format(
+								"SELECT bannedIPID"+
+								" FROM bannedIPs"+
+								" WHERE minIPAddress <= INET_ATON($) AND maxIPAddress >= INET_ATON($)",
+								query.remoteAddress, query.remoteAddress),
+								function(bannedIPResult) {
+									if(bannedIPResult.records.length) return recordBan(userID);
+									loadUser(userID, userName);
+								}
+							);
 						}
 					);
 				}
@@ -468,6 +475,7 @@ root.api.session.user.admin.statistics = bt.dispatch(function(query, session, us
 root.api.session.user.admin.ban = bt.dispatch(function(query, session, user) {
 	var personUserID = query.personUserID;
 	if(Number(personUserID) !== personUserID) return {error: "Invalid person user ID"};
+	db.query(mysql.format("DELETE FROM whitelist WHERE userID = $", personUserID));
 	db.query(mysql.format("INSERT IGNORE INTO bannedSessions (modUserID, sessionID) SELECT $, sessionID FROM sessions WHERE userID = $", user.info.userID, personUserID));
 	if(Session.byUserID.hasOwnProperty(personUserID)) Session.byUserID[personUserID].terminate();
 	return true;
