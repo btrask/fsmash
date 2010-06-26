@@ -64,7 +64,7 @@ DOM.linkify = function(string) {
 	var URL, anchor, index;
 	var fullURLRegExp = /[\w-]+:\/\/?[\w\d\/!@#$%^&*?.=+-:~]+[\w\d\/&#*]/;
 	var emailRegExp = /[\w\d.-]+@[\w\d.-]+[.][\w\d.-]*[\w\d]/;
-	var allRegExp = new RegExp(fullURLRegExp.source + "|" + emailRegExp.source0);
+	var allRegExp = new RegExp(fullURLRegExp.source + "|" + emailRegExp.source);
 	while(URL = allRegExp.exec(remainder)) {
 		URL = URL[0];
 		index = remainder.indexOf(URL);
