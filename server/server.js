@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 /* Copyright (C) 2010 Ben Trask
 
 This program is free software: you can redistribute it and/or modify
