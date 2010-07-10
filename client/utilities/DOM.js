@@ -68,7 +68,7 @@ DOM.linkify = function(string) {
 	while(URL = allRegExp.exec(remainder)) {
 		URL = URL[0];
 		index = remainder.indexOf(URL);
-		anchor = youtube.anchorForVideoID(youtube.videoIDForURL(URL));
+		anchor = youtube.anchorForVideoURL(URL);
 		if(!anchor) {
 			anchor = DOM.clone("anchor");
 			DOM.fill(anchor, URL);

@@ -17,15 +17,8 @@ youtube.dataByVideoID = {};
 youtube.callbackByUniqueID = {};
 youtube.uniqueID = 0;
 youtube.videoIDForURL = function(url) {
-	var prefixes = ["#!v=", "?v=", "&v="];
-	var loc, id, i;
-	for(i = 0; i < prefixes.length; ++i) {
-		loc = url.indexOf(prefixes[i]);
-		if(-1 === loc) continue;
-		id = /[\w\d-]{11}/.exec(url.slice(loc + prefixes[i].length));
-		if(id) return id[0];
-	}
-	return null;
+	var result = /youtube.*[#!|#|\?|&]v=([\w\d-]{11})/.exec(url);
+	return result && result[1];
 };
 youtube.infoForVideoID = function(videoID, callback/* (data) */) {
 	if(youtube.dataByVideoID.hasOwnProperty(videoID)) {
@@ -51,10 +44,14 @@ youtube.infoForVideoID = function(videoID, callback/* (data) */) {
 	script.src = "http://gdata.youtube.com/feeds/api/videos/"+encodeURIComponent(videoID)+"?v=2&alt=jsonc&callback=youtube.callbackByUniqueID["+encodeURIComponent(uniqueID)+"]";
 	document.body.appendChild(script);
 };
-youtube.anchorForVideoID = function(videoID) {
+youtube.anchorForVideoURL = function(url) {
+	var videoID = youtube.videoIDForURL(url);
+	var time = /[#!|#|\?|&]t=([hms\d]+)/.exec(url);
+	var anchor;
 	if(!videoID) return null;
-	var anchor = DOM.clone("anchor");
+	anchor = DOM.clone("anchor");
 	anchor.href = "http://www.youtube.com/watch#!v=" + videoID;
+	if(time) anchor.href += "&t=" + time[1];
 	DOM.fill(anchor, "Loading video…");
 	youtube.infoForVideoID(videoID, function(data) {
 		DOM.fill(anchor, data.title || "Unknown video");
