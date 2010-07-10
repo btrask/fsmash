@@ -19,7 +19,7 @@ var Connection = function(port, hostname) {
     this.port = port;
     this.seq = 0; // packet sequence number
     this.socket = new Socket(utils.scope(this, function(){ this.emit("connect"); }),
-			     utils.scope(this, function(){ this.emit("close"); }));
+			     utils.scope(this, function(error){ this.emit("close", error); }));
     this.requeue = new Requeue();
 }
 sys.inherits(Connection, events.EventEmitter);

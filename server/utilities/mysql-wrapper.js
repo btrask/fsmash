@@ -22,7 +22,7 @@ var bt = require("../../shared/bt");
 var mysql = require("../external/mysql");
 
 wrapper.connect = function(conf, callback, errback) {
-	var connection = new mysql.Connection(conf.hostname, conf.username, conf.password, conf.database, conf.port);
+	var connection = new mysql.Connection(conf);
 	connection.defaultErrback = function(error) {
 		sys.puts(JSON.stringify(error, null, 1));
 	};

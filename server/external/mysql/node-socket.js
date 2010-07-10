@@ -24,6 +24,7 @@ Socket.prototype.timeout = function(timeout) {
 }
 
 Socket.prototype.connect = function(port, host) {
+    var lastError;
     if(this.conn) {
 	throw "Already open";
     }
@@ -39,13 +40,16 @@ Socket.prototype.connect = function(port, host) {
 	    this.conn.setTimeout(this._timeout);
 	    this.connect_callback();
 	}));
+	this.conn.addListener("error", utils.scope(this, function(error) {
+	    lastError = error;
+	}));
 	this.conn.addListener("close", utils.scope(this, function(hasError) {
 	    var task;
 	    while(task=this.read_queue.shift()) {
 		task.promise.emitError(new errors.ClientError('connection was closed'));
 	    }
 	    this.conn = undefined;
-	    this.close_callback(hasError);
+	    this.close_callback(hasError ? lastError : undefined);
 	}));
     }
 }

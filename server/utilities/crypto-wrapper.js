@@ -17,5 +17,5 @@ var wrapper = exports;
 var crypto = require("crypto");
 
 wrapper.SHA1 = function(string) {
-	return (new crypto.Hash).init("sha1").update(string).digest("hex");
+	return crypto.createHash("sha1").update(string).digest("hex");
 };

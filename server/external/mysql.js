@@ -19,11 +19,11 @@ exports.quote = types.quote;
 exports.constants = constants;
 
 
-var Connection = function(hostname, username, password, dbname, port) {
+var Connection = function(config /* {hostname, username, password, dbname, port} */) {
     events.EventEmitter.call(this);
     this.protocol = undefined;
     this.active = false;
-    this.connect_parameter = Array.prototype.slice.call(arguments);
+    this.config = config;
     this.last_error = undefined;
     this.sqlstate = undefined;
     this._timeout = undefined;
@@ -35,23 +35,32 @@ sys.inherits(Connection, events.EventEmitter);
 exports.Connection = Connection;
 
 Connection.prototype.connect = function(callback, errback) {
-    this.protocol = new Protocol(this.connect_parameter[0], this.connect_parameter[4]);
+    var hasFired = false;
+    this.protocol = new Protocol(this.config.hostname, this.config.port);
     if(this._timeout) this.protocol.timeout(this._timeout);
     this.protocol.addListener('connect', utils.scope(this, function() {	
 	this.active = false;
 	this.emit('connect');
-	this.protocol.authenticate(this.connect_parameter[1],
-				   this.connect_parameter[2],
-				   this.connect_parameter[3],
+	this.protocol.authenticate(this.config.username,
+				   this.config.password,
+				   this.config.database,
 				   (this.local_infile ? constants.client.LOCAL_FILES : 0),
 				   'utf8_general_ci'
 				  )
-	    .addCallback(callback)
-	    .addErrback(errback || this.defaultErrback);
+	    .addCallback(function(arg1, arg2, etc) {
+	        if(!hasFired && callback) callback.apply(this, arguments);
+		hasFired = true;
+	    })
+	    .addErrback(function(arg1, arg2, etc) {
+	        if(!hasFired) (errback || this.defaultErrback).apply(this, arguments);
+		hasFired = true;
+	    });
     }));
-    this.protocol.addListener('close', utils.scope(this, function() {	
+    this.protocol.addListener('close', utils.scope(this, function(error) {	
 	this.active = false;
 	this.emit('close');
+	if(!hasFired) (errback || this.defaultErrback).apply(this, arguments);
+	hasFired = true;
     }));
     this.protocol.addListener('authorized', utils.scope(this, function() {	
 	this.active = true;

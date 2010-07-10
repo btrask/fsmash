@@ -36,10 +36,10 @@ var Protocol = function(host, port) {
     this.conn.addListener('connect', utils.scope(this, function() {	
 	this.emit('connect');
     }));
-    this.conn.addListener('close', utils.scope(this, function() {	
+    this.conn.addListener('close', utils.scope(this, function(error) {	
 	this.gc_stmt_queue = [];
 	this.set_state('INIT');
-	this.emit('close');
+	this.emit('close', error);
     }));
 
     this.conn.connect();
