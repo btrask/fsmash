@@ -138,6 +138,7 @@ var Session = function() {
 			var videoID = youtube.videoIDForURL(videosElems.videoURL.value);
 			if(videoID) session.user.request("/video/", {youtubeID: videoID});
 			videosElems.videoURL.value = "";
+			videosElems.videoURL.onblur();
 		};
 		videosElems.videoURL.onkeypress = function(event) {
 			if(!DOM.event.isReturn(event)) return;
