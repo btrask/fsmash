@@ -72,7 +72,7 @@ var Person = function(session, user, userID) {
 	};
 	person.updateWithInfo = function(info) {
 		var i;
-		if(undefined !== info.friendCode) info.friendCode = brawl.friendCode(info.friendCode);
+		if(undefined !== info.friendCode) info.friendCode = brawl.friendCode(info.friendCode) || "(no friend code specified)";
 		if(undefined !== info.idle) {
 			person.info.idle = !!info.idle;
 			for(i = 0; i < allItems.length; ++i) DOM.changeClass(allItems[i].element, "idle", person.info.idle);
