@@ -106,76 +106,13 @@ var Session = function() {
 	}, null, function(body) {
 		return session.user ? session.user.event : null;
 	});
+	session.event.videos = bt.dispatch(function(body) {
+		session.videosPage.add(body);
+	});
 
-	(function about() {
-		var aboutItem = new SidebarItem("About");
-		session.siteItem.children.appendChild(aboutItem.element);
-		aboutItem.setContent(DOM.clone("about"));
-	})();
-	(function video() {
-		var count = {
-			total: 0,
-			unseen: 0
-		};
-		var videosElems = {};
-		var videosItem = new SidebarItem("Videos");
-		session.siteItem.children.appendChild(videosItem.element);
-		videosItem.setContent(DOM.clone("videos", videosElems));
-		DOM.field.placeholder(videosElems.videoURL);
-		session.videoSubmitPane = videosElems.submitPane;
+	session.aboutPage = new AboutPage(session);
+	session.videosPage = new VideosPage(session);
 
-		videosElems.more.onclick = function() {
-			session.request("/videos/", {start: count.total})
-		};
-		videosItem.onshow = function() {
-			if(count.total < 10) videosElems.more.onclick();
-			count.unseen = 0;
-			DOM.fill(videosItem.counter);
-		};
-		videosElems.submit.onclick = function() {
-			if(!session.user) throw "Only users can submit videos";
-			var videoID = youtube.videoIDForURL(videosElems.videoURL.value);
-			if(videoID) session.user.request("/video/", {youtubeID: videoID});
-			videosElems.videoURL.value = "";
-			videosElems.videoURL.onblur();
-		};
-		videosElems.videoURL.onkeypress = function(event) {
-			if(!DOM.event.isReturn(event)) return;
-			videosElems.submit.onclick();
-			this.blur();
-		};
-
-		session.event.videos = bt.dispatch(function(body) {
-			if(!body.videos) return;
-			count.total += body.videos.length;
-			var videos = bt.map(body.videos, function(videoInfo) {
-				var videoElems = {};
-				var video = DOM.clone("video", videoElems);
-				videoElems.anchor.href = "http://www.youtube.com/watch#!v=" + videoInfo.youtubeID;
-				DOM.fill(videoElems.submitterName, videoInfo.userName);
-				youtube.infoForVideoID(videoInfo.youtubeID, function(data) {
-					videoElems.thumbnail.src = (data.thumbnail || {}).sqDefault;
-					DOM.fill(videoElems.anchor, data.title || "Unknown video");
-					DOM.fill(videoElems.uploaderName, data.uploader || "Unknown");
-					videoElems.uploaderName.href = "http://www.youtube.com/user/"+data.uploader;
-					if(data.duration) DOM.fill(videoElems.duration, "" + Math.floor(data.duration / 60) + ":" + ("0" + (data.duration % 60)).slice(-2));
-				});
-				return video;
-			});
-			if(body.old) {
-				bt.map(videos, function(video) {
-					videosElems.videos.appendChild(video);
-				});
-				return;
-			}
-			bt.map(videos.reverse(), function(video) {
-				videosElems.videos.insertBefore(video, videosElems.videos.firstChild);
-			});
-			if(videosItem.selected) return;
-			count.unseen += videos.length;
-			DOM.fill(videosItem.counter, count.unseen);
-		});
-	})();
 	(function() {
 		var modals = [];
 		session.showModal = function(modal) {

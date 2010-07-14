@@ -5,6 +5,8 @@ CLIENT_SCRIPTS = client/external/json2.js \
                  client/utilities/DOM.js \
                  client/utilities/youtube.js \
                  client/classes/SidebarItem.js \
+                 client/classes/AboutPage.js \
+                 client/classes/VideosPage.js \
                  client/classes/Session.js \
                  client/classes/User.js \
                  client/classes/Admin.js \

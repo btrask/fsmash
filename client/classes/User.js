@@ -28,7 +28,7 @@ var User = function(session, userID) {
 	user.person = new Person(session, user, userID);
 	user.broadcastCount = 0;
 
-	DOM.changeClass(session.videoSubmitPane, "invisible", false);
+	session.videosPage.allowSubmissions();
 
 	user.event = bt.dispatch();
 	user.event.config = bt.dispatch(function(body) {
