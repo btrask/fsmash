@@ -61,11 +61,7 @@ var Admin = function(session, user, signupAllowed) {
 	};
 	adminElems.updateStatistics.onclick = function() {
 		admin.request("/statistics/", {}, function(result) {
-			var stats = [];
-			bt.map(result, function(val, prop) {
-				stats.push(prop+": "+val);
-			});
-			DOM.fill(adminElems.statistics, stats.join("\n"));
+			DOM.fill(adminElems.statistics, JSON.stringify(result, undefined, "\t"));
 		});
 	};
 };

@@ -465,13 +465,15 @@ root.api.session.user.admin.rankings = bt.dispatch(function(query, session, user
 	return true;
 });
 root.api.session.user.admin.statistics = bt.dispatch(function(query, session, user) {
-	return bt.union(process.memoryUsage(), {
+	return {
+		memory: process.memoryUsage(),
 		platform: process.platform,
 		version: process.version,
 		sessions: Group.sessions.objects.length,
 		users: Group.users.objects.length,
+		channels: Channel.count,
 		uptime: (new Date().getTime() - config.startTime) / (1000 * 60 * 60 * 24),
-	});
+	};
 });
 root.api.session.user.admin.ban = bt.dispatch(function(query, session, user) {
 	var personUserID = query.personUserID;

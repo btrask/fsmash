@@ -13,6 +13,7 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 var assert = require("assert");
+var sys = require("sys");
 
 var bt = require("../../shared/bt");
 
@@ -21,11 +22,27 @@ var Group = require("./Group").Group;
 var config = {
 	maxHistoryLength: 50,
 	maxMessageLength: 300,
+	cacheTimeout: 1000 * 60 * 60 * 24 * 7,
 };
 
 var Channel = function(parentID, channelID) {
 	var channel = this;
+
+	var cacheTimeout;
+	var uncache = function() {
+		if(!channel.parent) return;
+		if(cacheTimeout) return;
+		Channel.count.active--;
+		Channel.count.inactive++;
+		cacheTimeout = setTimeout(bt.curry(function forgetSubchannels(c) {
+			bt.map(c.subchannelByID, forgetSubchannels);
+			if(Channel.byID.hasOwnProperty(c.info.channelID)) Channel.count.inactive--;
+			delete Channel.byID[c.info.channelID];
+		}, channel), config.cacheTimeout);
+	};
+
 	Channel.byID[channelID] = channel;
+	Channel.count.active++;
 	channel.info = {
 		channelID: channelID,
 		parentID: parentID,
@@ -56,6 +73,12 @@ var Channel = function(parentID, channelID) {
 		while(channel.history.length > config.maxHistoryLength) channel.history.shift();
 	};
 	channel.addUser = function(user, ticket) {
+		if(cacheTimeout) {
+			Channel.count.inactive--;
+			Channel.count.active++;
+		}
+		clearTimeout(cacheTimeout);
+		cacheTimeout = null;
 		user.channelByID[channel.info.channelID] = channel;
 		channel.memberByUserID[user.info.userID] = user;
 		if(!channel.teamIDByUserID.hasOwnProperty(user.info.userID)) channel.teamIDByUserID[user.info.userID] = 0;
@@ -77,10 +100,7 @@ var Channel = function(parentID, channelID) {
 		if(channel.game && channel.game.broadcasting) user.broadcastCount--;
 		if(!bt.hasOwnProperties(channel.memberByUserID)) {
 			if(channel.game) channel.game.stopBroadcasting();
-			if(channel.parent) (function forgetSubchannels(c) {
-				bt.map(c.subchannelByID, forgetSubchannels);
-				delete Channel.byID[c.info.channelID];
-			})(channel);
+			uncache();
 		}
 	};
 	channel.leaveRecursively = function(user, callback/* channelID */) {
@@ -110,5 +130,9 @@ var Channel = function(parentID, channelID) {
 };
 Channel.byID = {};
 Channel.public = {byID: {}};
+Channel.count = {
+	active: 0,
+	inactive: 0,
+};
 
 exports.Channel = Channel;
