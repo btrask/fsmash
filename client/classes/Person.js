@@ -51,7 +51,10 @@ var Person = function(session, user, userID) {
 
 	var nameElements = [];
 
-	person.info = {userID: userID};
+	person.info = {
+		userID: userID,
+		friendCode: "(no friend code specified in profile)"
+	};
 	user.personByUserID[person.info.userID] = person;
 	person.ignored = false;
 	person.rated = false;
@@ -71,7 +74,7 @@ var Person = function(session, user, userID) {
 	};
 	person.updateWithInfo = function(info) {
 		var i;
-		if(undefined !== info.friendCode) info.friendCode = brawl.friendCode(info.friendCode) || "(no friend code specified)";
+		if(undefined !== info.friendCode) info.friendCode = brawl.friendCode(info.friendCode) || "(no friend code specified in profile)";
 		if(undefined !== info.idle) {
 			person.info.idle = !!info.idle;
 			for(i = 0; i < allItems.length; ++i) DOM.changeClass(allItems[i].element, "idle", person.info.idle);
