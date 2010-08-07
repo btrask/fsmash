@@ -30,7 +30,6 @@ wrapper.connect = function(conf, callback, errback) {
 	return connection;
 };
 wrapper.format = function(format, arg1, arg2, etc) {
-	var originalArgs = arguments;
 	var args = Array.prototype.slice.call(arguments, 1);
 	return format.replace(/[$#]/g, function(type) { // $: Quoted value; #: Unquoted value
 		var arg = args.shift();
