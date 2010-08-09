@@ -25,8 +25,8 @@ CREATE TABLE `admins` (
 
 CREATE TABLE `bannedIPs` (
   `bannedIPID` int(11) NOT NULL AUTO_INCREMENT,
-  `minIPAddress` int(11) NOT NULL,
-  `maxIPAddress` int(11) NOT NULL,
+  `minIPAddress` bigint(20) unsigned NOT NULL,
+  `maxIPAddress` bigint(20) unsigned NOT NULL,
   `modUserID` int(11) NOT NULL,
   `reason` text COLLATE utf8_unicode_ci NOT NULL,
   `bannedTime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -314,7 +314,7 @@ CREATE TABLE `rules` (
 CREATE TABLE `sessions` (
   `sessionID` int(11) NOT NULL AUTO_INCREMENT,
   `userID` int(11) NOT NULL,
-  `ipAddress` int(11) DEFAULT NULL,
+  `ipAddress` bigint(20) unsigned DEFAULT NULL,
   `creationTime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`sessionID`),
   KEY `userID` (`userID`),
@@ -344,7 +344,7 @@ CREATE TABLE `settings` (
 
 CREATE TABLE `signinAttempts` (
   `signinAttemptID` int(11) NOT NULL AUTO_INCREMENT,
-  `ipAddress` int(11) DEFAULT NULL,
+  `ipAddress` bigint(20) unsigned DEFAULT NULL,
   `userName` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
   `signinTime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`signinAttemptID`),
@@ -430,4 +430,4 @@ CREATE TABLE `whitelist` (
   `whitelistTime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`whitelistID`),
   UNIQUE KEY `userID` (`userID`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM  DEFAULT CHARSET=latin1;
