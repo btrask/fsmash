@@ -9,7 +9,7 @@ cookie.get = function(name) {
 	name += "=";
 	for(var i = 0; i < ca.length; i++) {
 		c = ca[i].replace(/^\s*/, "");
-		if(0 === c.indexOf(name)) return c.substring(name.length, c.length);
+		if(0 === c.indexOf(name)) return c.slice(name.length, c.length);
 	}
 	return null;
 };

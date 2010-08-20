@@ -75,9 +75,9 @@ DOM.linkify = function(string) {
 			if(emailRegExp.test(URL)) anchor.href = "mailto:" + URL;
 			else anchor.href = URL;
 		}
-		span.appendChild(DOM.toElement(remainder.substr(0, index)));
+		span.appendChild(DOM.toElement(remainder.slice(0, index)));
 		if(anchor) span.appendChild(anchor);
-		remainder = remainder.substr(index + URL.length);
+		remainder = remainder.slice(index + URL.length);
 	}
 	span.appendChild(DOM.toElement(remainder));
 	return span;
