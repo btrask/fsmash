@@ -46,7 +46,7 @@ var Person = function(session, user, userID) {
 		item.element = DOM.clone("person", item);
 		DOM.changeClass(item.element, "idle", item.person.info.idle);
 		item.setTeamID();
-		for(var component in Person.keysByComponent) if(Person.keysByComponent.hasOwnProperty(component)) DOM.fill(item[component], DOM.linkify(stringForComponent(component)));
+		for(var component in Person.keysByComponent) if(Person.keysByComponent.hasOwnProperty(component)) DOM.fill(item[component], DOM.inputify(stringForComponent(component)));
 	};
 
 	var nameElements = [];
@@ -91,7 +91,7 @@ var Person = function(session, user, userID) {
 			}
 			if(componentNeedsUpdate) {
 				string = stringForComponent(component);
-				for(i = 0; i < allItems.length; ++i) DOM.fill(allItems[i][component], DOM.linkify(string));
+				for(i = 0; i < allItems.length; ++i) DOM.fill(allItems[i][component], DOM.inputify(string));
 			}
 		}
 	};

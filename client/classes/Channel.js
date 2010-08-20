@@ -34,19 +34,11 @@ var Channel = function(session, user, channelID, parentID) {
 	};
 	var incomingMessage = function(info) {
 		if(!channel.userIsMember) throw "Non-members should not be able to receive messages";
-		var quotify = function(string) {
-			var match = /(.*[\S].*)[\s]<-[\s](.*[\S].*)/.exec(string);
-			if(!match) return [DOM.linkify(string)];
-			var quote = DOM.linkify(match[1]);
-			var comment = DOM.linkify(match[2]);
-			DOM.changeClass(quote, "quote");
-			return [quote, " <- ", comment];
-		};
 		var msgElems = {};
 		var elem = DOM.clone("message", msgElems);
 		DOM.fill(msgElems.date, new Date(info.time).toLocaleTimeString());
 		DOM.fill(msgElems.name, user.getPerson(info.userID, info.userName).nameElement());
-		DOM.fill.apply(DOM, [msgElems.text].concat(quotify(info.text)));
+		DOM.fill(msgElems.text, DOM.inputify(info.text));
 		return elem;
 	};
 	var focusMessageInput = function() {

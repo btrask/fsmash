@@ -82,6 +82,16 @@ DOM.linkify = function(string) {
 	span.appendChild(DOM.toElement(remainder));
 	return span;
 };
+DOM.inputify = function(string) {
+	var match = /(.*[\S].*)[\s]<-[\s](.*[\S].*)/.exec(string);
+	if(!match) return DOM.linkify(string);
+	var quote = DOM.linkify(match[1]);
+	var comment = DOM.linkify(match[2]);
+	DOM.changeClass(quote, "quote");
+	var span = document.createElement("span");
+	DOM.fill(span, quote, " <- ", comment);
+	return span;
+};
 
 DOM.input = {};
 DOM.input.enable = function(elem1, elem2, etc, flag) {
