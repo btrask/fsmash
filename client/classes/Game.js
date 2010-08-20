@@ -109,6 +109,7 @@ var Game = function(session, user, channel) {
 		}
 		DOM.input.enable(game.matchType.parentNode, game.rule.parentNode, game.playersNeeded.parentNode, channel.userIsMember);
 		game.groups.applicants.update();
+		game.updateTitle();
 	};
 	game.updateConfig = function() {
 		var i;
@@ -136,7 +137,20 @@ var Game = function(session, user, channel) {
 		DOM.select.choose(game.rule.parentNode, game.info.ruleID);
 		DOM.select.choose(game.playersNeeded.parentNode, game.info.playersNeeded);
 
+		if(!user.config.matchTypes[game.info.matchTypeID].hasTeams) bt.map(channel.groups.members.itemByUserID, function(item) {
+			item.setTeamID();
+		});
+		channel.groups.members.update();
+		game.update();
+	};
+	game.updateTitle = function() {
+		var memberNames = [];
+		bt.map(channel.memberByUserID, function(member) {
+			memberNames.push(member.info.userName);
+		});
+		memberNames.sort();
 		var labels = [
+			memberNames.join(", "),
 			user.config.matchTypes[game.info.matchTypeID].label,
 			user.config.rules[game.info.ruleID].label
 		];
@@ -147,12 +161,6 @@ var Game = function(session, user, channel) {
 		if(announcement) DOM.scroll.preserve(channel.scrollBox, function() {
 			DOM.fill(announcementElems.title, channel.title);
 		});
-
-		if(!user.config.matchTypes[game.info.matchTypeID].hasTeams) bt.map(channel.groups.members.itemByUserID, function(item) {
-			item.setTeamID();
-		});
-		channel.groups.members.update();
-		game.update();
 	};
 
 	game.event = bt.dispatch(null, null, null, 1);
