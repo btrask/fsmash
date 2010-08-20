@@ -261,3 +261,6 @@ td > .button, td > select {
 	margin-top: -10px;
 	background: url("resources/loading.gif");
 }
+.quote {
+	font-style: italic;
+}
