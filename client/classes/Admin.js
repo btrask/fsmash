@@ -50,8 +50,8 @@ var Admin = function(session, user, signupAllowed) {
 		});
 	};
 
-	adminElems.uncache.onclick = function() {
-		admin.request("/uncache/");
+	adminElems.rescan.onclick = function() {
+		admin.request("/rescan/");
 	};
 	adminElems.reconfigure.onclick = function() {
 		admin.request("/reconfigure/");

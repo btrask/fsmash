@@ -67,34 +67,6 @@ bt.dispatch = function(leaf/* args... */, branch/* func, args... */, lookup/* ar
 		return unknown;
 	};
 };
-bt.memoize = function(func) {
-	var argumentsByHash = {};
-	var callbacksByHash = {};
-	var hashArray = function(array) {
-		return array.map(function(obj) {
-			return obj.toString().replace(/:/g, "::");
-		}).join(":");
-	};
-	var memoized = function(arg1, arg2, etc, callback) {
-		var args = Array.prototype.slice.call(arguments);
-		var callback = args.pop();
-		var hash = hashArray(args);
-		if(argumentsByHash.hasOwnProperty(hash)) return callback.apply(null, argumentsByHash[hash]), undefined;
-		if(callbacksByHash.hasOwnProperty(hash)) return callbacksByHash[hash].push(callback), undefined;
-		callbacksByHash[hash] = [];
-		func.apply(this, args.concat([function(arg1, arg2, etc) {
-			callback.apply(null, arguments);
-			for(var i = 0; i < callbacksByHash[hash].length; i++) callbacksByHash[hash][i].apply(null, arguments);
-			delete callbacksByHash[hash];
-			argumentsByHash[hash] = arguments;
-		}]));
-	};
-	memoized.uncache = function() {
-		argumentsByHash = {};
-		callbacksByHash = {};
-	};
-	return memoized;
-};
 
 bt.map = function(obj, callback/* value, key, obj */) {
 	var result, i, key, value;

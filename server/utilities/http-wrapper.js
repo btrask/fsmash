@@ -22,16 +22,14 @@ var url = require("url");
 
 var bt = require("../../shared/bt");
 
-var MIMEForPath = (function() {
+var MIMEForExtension = (function() {
 	var MIMEByExt = JSON.parse(fs.readFileSync(__dirname+"/mime.json", "utf8"));
-	return function(str, callback) {
-		var ext = path.extname(str).slice(1), MIME;
-		if(MIMEByExt.hasOwnProperty(ext)) MIME = MIMEByExt[ext];
-		callback(MIME || "application/octet-stream");
+	return function(ext) {
+		return MIMEByExt[ext.slice(1)] || "application/octet-stream";
 	};
 })();
 
-wrapper.createServer = function(dispatcher, unknownHandler/* (path, callback (status, header, data, encoding)) */) {
+wrapper.createServer = function(dispatcher, unknownHandler/* (filename, callback (status, header, data, encoding)) */) {
 	return http.createServer(function(req, res) {
 		var data = "";
 		req.setEncoding("utf8");
@@ -40,53 +38,96 @@ wrapper.createServer = function(dispatcher, unknownHandler/* (path, callback (st
 		});
 		req.addListener("end", function() {
 			var token = {};
-			var path = url.parse(req.url).pathname;
+			var filename = url.parse(req.url).pathname;
 			var remoteAddress = req.socket.remoteAddress || null;
 			if("127.0.0.1" == remoteAddress) remoteAddress = null;
 			var query = bt.union((data ? JSON.parse(data) : {}), {remoteAddress: remoteAddress});
 			var result;
 			try {
-				result = dispatcher(token, bt.components(path), query);
+				result = dispatcher(token, bt.components(filename), query);
 			} catch(err) {
 				res.writeHead(500, {});
 				res.end();
 				sys.log(err);
 				return;
 			}
-			if(result === token) return unknownHandler(path, function(status, header, data, encoding) {
+			if(result === token) return unknownHandler(filename, function(status, header, data, encoding) {
 				res.writeHead(status, header);
 				res.end(data, encoding);
 			});
-			if(typeof result === "function") return result(req, res, path);
+			if(typeof result === "function") return result(req, res, filename);
 			return wrapper.writeJSON(res, result);
 		});
 	});
 };
-wrapper.createFileHandler = function(basePath) {
-	return bt.memoize(function(path, callback) {
-		if(/\.\./.test(path)) return callback(403, {});
-		if(/\/$/.test(path)) path += "index.html";
-		path = basePath + path;
-		MIMEForPath(path, function(type) {
-			var readFileCompressed = function(path, callback) {
-				fs.readFile(path+".gz", function(err, data) {
-					if(!err) return callback(err, data, "gzip");
-					fs.readFile(path, function(err, data) {
-						callback(err, data, "identity");
-					});
-				});
-			};
-			if("text/" === type.slice(0, 5)) type += "; charset=UTF-8";
-			readFileCompressed(path, function(err, data, compression) {
-				if(err) return callback(2 == err.errno ? 404 : 500, {})
-				return callback(200, {
+wrapper.createFileHandler = function(rootdir) {
+	var pendingLookups = null;
+	var cacheByDisplayName = {};
+	var scandir = function(dirname, callback) {
+		fs.readdir(dirname, function(err, filenames) {
+			if(err) {
+				if(/* ENOTDIR */20 != err.errno) return callback();
+				return scanfile(dirname, callback);
+			}
+			(function recurseOverFilenames(i) {
+				if(i >= filenames.length) return callback();
+				scandir(path.join(dirname, filenames[i]), bt.curry(recurseOverFilenames, i + 1));
+			})(0);
+		});
+	};
+	var scanfile = function(filename, callback) {
+		var displayName = filename.slice(rootdir.length);
+		var ext = path.extname(displayName), compression, type;
+		switch(ext) {
+			case ".gz":
+				compression = "gzip";
+				displayName = displayName.slice(0, -ext.length);
+				ext = path.extname(displayName);
+				break;
+			default:
+				if(cacheByDisplayName.hasOwnProperty(displayName)) return callback();
+				compression = "identity";
+				break;
+		}
+		type = MIMEForExtension(ext);
+		if("text/" === type.slice(0, 5)) type += "; charset=UTF-8";
+		fs.readFile(filename, function(err, data) {
+			if(!err) cacheByDisplayName[displayName] = {
+				status: 200,
+				header: {
 					"Content-Type": type,
 					"Content-Length": data.length,
 					"Content-Encoding": compression,
-				}, data);
-			});
+				},
+				body: data,
+			};
+			callback();
 		});
-	});
+	};
+	var fileHandler = function(filename, callback) {
+		if("/" === filename[filename.length - 1]) filename += "index.html";
+		var lookup = cacheByDisplayName.hasOwnProperty(filename) ? function() {
+			var cache = cacheByDisplayName[filename];
+			callback(cache.status, cache.header, cache.body);
+		} : function() {
+			callback(404, {});
+		};
+		if(null === pendingLookups) lookup();
+		else pendingLookups.push(lookup);
+	};
+	fileHandler.rescan = function() {
+		if(null !== pendingLookups) return false;
+		pendingLookups = [];
+		cacheByDisplayName = {};
+		scandir(rootdir, function() {
+			for(var i = 0; i < pendingLookups.length; ++i) pendingLookups[i]();
+			pendingLookups = null;
+		});
+		return true;
+	};
+	rootdir = path.normalize(rootdir);
+	fileHandler.rescan();
+	return fileHandler;
 };
 wrapper.writeJSON = function(res, value) {
 //	sys.debug(value);

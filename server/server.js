@@ -449,8 +449,8 @@ root.api.session.user.admin = bt.dispatch(null, function(func, query, session, u
 	if(!user.admin) return {error: "Admin permissions required"};
 	return func(query, session, user);
 });
-root.api.session.user.admin.uncache = bt.dispatch(function(query, session, user) {
-	fileHandler.uncache();
+root.api.session.user.admin.rescan = bt.dispatch(function(query, session, user) {
+	fileHandler.rescan();
 	return true;
 });
 root.api.session.user.admin.reconfigure = bt.dispatch(function(query, session, user) {
