@@ -76,8 +76,8 @@ var VideosPage = function(session) {
 		bt.map(videos.reverse(), function(video) {
 			videosElems.videos.insertBefore(video, videosElems.videos.firstChild);
 		});
-		if(videosItem.selected) return;
+		if(videosPage.sidebarItem.selected) return;
 		count.unseen += videos.length;
-		DOM.fill(videosItem.counter, count.unseen);
+		DOM.fill(videosPage.sidebarItem.counter, count.unseen);
 	};
 };
