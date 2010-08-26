@@ -21,7 +21,7 @@ var Group = require("./Group").Group;
 
 var config = {
 	maxHistoryLength: 50,
-	maxMessageLength: 300,
+	maxMessageLength: 500,
 	cacheTimeout: 1000 * 60 * 60 * 24 * 7,
 };
 
