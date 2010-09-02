@@ -54,7 +54,7 @@ var config = {
 
 process.title = "fsmash-server";
 process.addListener("uncaughtException", function(err) {
-	sys.log(err);
+	sys.log(sys.inspect(err));
 });
 
 var fileHandler = http.createFileHandler(__dirname+"/../public");
@@ -62,7 +62,7 @@ var configureSessions = (function configureSessions() {
 	db.query(
 		"SELECT soundsetID, label, path, challenge, `join`, `leave`, message"+
 		" FROM soundsets WHERE 1 ORDER BY sortOrder ASC",
-		function(soundsetsResult) {
+		function(err, soundsetsResult) {
 			Session.config.soundsets = mysql.rows(soundsetsResult);
 		}
 	);
@@ -71,7 +71,7 @@ var configureSessions = (function configureSessions() {
 		" FROM publicChannels pc"+
 		" LEFT JOIN channels c ON (pc.channelID = c.channelID)"+
 		" WHERE 1 ORDER BY pc.sortOrder ASC",
-		function(channelsResult) {
+		function(err, channelsResult) {
 			var channelRows = mysql.rows(channelsResult), channel;
 			Session.config.publicChannels = channelRows;
 			Channel.public.byID = {};
@@ -87,7 +87,7 @@ var configureSessions = (function configureSessions() {
 	db.query(
 		"SELECT matchTypeID, label, hasTeams, playerCount"+
 		" FROM matchTypes WHERE 1 ORDER BY sortOrder ASC",
-		function(matchTypesResult) {
+		function(err, matchTypesResult) {
 			Session.config.matchTypes = mysql.rows(matchTypesResult);
 			bt.map(Session.config.matchTypes, function(matchType) {
 				matchType.hasTeams = ("1" == matchType.hasTeams);
@@ -97,7 +97,7 @@ var configureSessions = (function configureSessions() {
 	db.query(
 		"SELECT ruleID, label"+
 		" FROM rules WHERE 1 ORDER BY sortOrder ASC",
-		function(rulesResult) {
+		function(err, rulesResult) {
 			Session.config.rules = mysql.rows(rulesResult);
 			Group.users.sendEvent("/user/config/", Session.config);
 		}
@@ -162,68 +162,66 @@ root.api.session.user = bt.dispatch(function(query, session) {
 			if(!query.userName.length) return accountError("Enter a name & pass, then click “Sign Up”");
 			if(/^\s|\s\s+|\s$/.test(query.userName)) return accountError("Invalid whitespace in user name");
 			if(query.password.length < 5) return accountError("Passwords must be at least 5 characters");
-			db.query(mysql.format(
+			db.query(
 				"SELECT * FROM sessions WHERE ipAddress = INET_ATON($) LIMIT 1",
-				query.remoteAddress), function(sessionsResult) {
-					if(sessionsResult.records.length) return accountError("You already have an account");
-					db.query(mysql.format(
+				[query.remoteAddress],
+				function(err, sessionsResult) {
+					if(sessionsResult.length) return accountError("You already have an account");
+					db.query(
 						"INSERT INTO users (userName, passHash2) VALUES ($, $)",
-						query.userName, crypt.hash(query.password)),
-						function(userResult) {
-							var userID = userResult.insert_id;
-							db.query(mysql.format(
-								"INSERT IGNORE INTO settings (userID) VALUES ($)",
-								userID
-							));
+						[query.userName, crypt.hash(query.password)],
+						function(err, userResult) {
+							if(1062 === err.number) return accountError("Username already in use");
+							var userID = userResult.insertId;
+							db.query("INSERT IGNORE INTO settings (userID) VALUES ($)", [userID]);
 							logSession(userID, query.userName);
-						}, function(error) {
-							if("ER_DUP_ENTRY" === error.error_name) return accountError("Username already in use");
-							session.sendEvent("/user/", {error: "Database error: "+error}, ticket);
 						}
 					);
 				}
 			);
 		};
 		var signin = function() {
-			db.query(mysql.format(
+			db.query(
 				"INSERT INTO signinAttempts (ipAddress, userName)"+
 				" VALUES (INET_ATON($), $)",
-				query.remoteAddress, query.userName
-			));
-			db.query(mysql.format(
-				"SELECT COUNT(*) FROM signinAttempts"+
+				[query.remoteAddress, query.userName]
+			);
+			db.query(
+				"SELECT COUNT(*) count FROM signinAttempts"+
 				" WHERE ipAddress = $ AND signinTime > DATE_SUB(NOW(), INTERVAL $ MINUTE)",
-				query.remoteAddress, config.signin.throttleMinutes),
-				function(signinResult) {
-					if(signinResult.records[0][0] > config.signin.throttleAttempts) return accountError("Too many signin attempts");
+				[query.remoteAddress, config.signin.throttleMinutes],
+				function(err, signinResult) {
+					if(signinResult[0].count > config.signin.throttleAttempts) return accountError("Too many signin attempts");
 					if(query.userToken) {
-						db.query(mysql.format(
+						db.query(
 							"SELECT u.userID, u.userName"+
 							" FROM users u"+
 							" LEFT JOIN tokens t ON (u.userID = t.userID)"+
 							" WHERE u.userName = $ AND t.token = $ LIMIT 1",
-							query.userName, query.userToken), function(userResult) {
-								if(!userResult.records.length) return accountError("Invalid token");
+							[query.userName, query.userToken],
+							function(err, userResult) {
+								if(!userResult.length) return accountError("Invalid token");
 								var userRow = mysql.rows(userResult)[0];
 								logSession(userRow.userID, userRow.userName);
 							}
 						);
 					} else {
 						var legacyPassHash = crypto.SHA1(query.password);
-						db.query(mysql.format(
+						db.query(
 							"SELECT userID, userName, passHash2 passHash FROM users"+
 							" WHERE userName = $ AND (passHash2 IS NOT NULL OR passHash = $) LIMIT 1",
-							query.userName, legacyPassHash), function(userResult) {
-								if(!userResult.records.length) return accountError("Incorrect username or password");
+							[query.userName, legacyPassHash],
+							function(err, userResult) {
+								if(!userResult.length) return accountError("Incorrect username or password");
 								var userRow = mysql.rows(userResult)[0];
 								if(userRow.passHash) {
 									if(!crypt.check(query.password, userRow.passHash)) return accountError("Incorrect username or password");
 								} else {
-									db.query(mysql.format(
+									db.query(
 										"UPDATE users SET passHash = NULL, passHash2 = $"+
 										" WHERE userID = $ AND passHash = $ LIMIT 1",
-										crypt.hash(query.password), userRow.userID, legacyPassHash
-									));
+										[crypt.hash(query.password), userRow.userID, legacyPassHash]
+									);
 								}
 								logSession(userRow.userID, userRow.userName);
 							}
@@ -233,29 +231,26 @@ root.api.session.user = bt.dispatch(function(query, session) {
 			);
 		};
 		var logSession = function(userID, userName) {
-			db.query(mysql.format(
-				"INSERT INTO sessions (userID, ipAddress)"+
-				" VALUES ($, INET_ATON($))",
-				userID, query.remoteAddress
-			));
-			db.query(mysql.format(
+			db.query("INSERT INTO sessions (userID, ipAddress) VALUES ($, INET_ATON($))", [userID, query.remoteAddress]);
+			db.query(
 				"SELECT * FROM whitelist WHERE userID = $ LIMIT 1",
-				userID),
-				function(whitelistResult) {
-					if(whitelistResult.records.length) return loadUser(userID, userName);
-					db.query(mysql.format(
+				[userID],
+				function(err, whitelistResult) {
+					if(whitelistResult.length) return loadUser(userID, userName);
+					db.query(
 						"SELECT bs.sessionID FROM bannedSessions bs"+
 						" LEFT JOIN sessions s ON (bs.sessionID = s.sessionID)"+
 						" WHERE s.userID = $ OR s.ipAddress = INET_ATON($) LIMIT 1",
-						userID, query.remoteAddress), function(bannedSessionResult) {
-							if(bannedSessionResult.records.length) return recordBan(userID, mysql.rows(bannedSessionResult)[0].sessionID);
-							db.query(mysql.format(
+						[userID, query.remoteAddress],
+						function(err, bannedSessionResult) {
+							if(bannedSessionResult.length) return recordBan(userID, mysql.rows(bannedSessionResult)[0].sessionID);
+							db.query(
 								"SELECT bannedIPID"+
 								" FROM bannedIPs"+
 								" WHERE minIPAddress <= INET_ATON($) AND maxIPAddress >= INET_ATON($)",
-								query.remoteAddress, query.remoteAddress),
-								function(bannedIPResult) {
-									if(bannedIPResult.records.length) return recordBan(userID);
+								[query.remoteAddress, query.remoteAddress],
+								function(err, bannedIPResult) {
+									if(bannedIPResult.length) return recordBan(userID);
 									loadUser(userID, userName);
 								}
 							);
@@ -265,48 +260,48 @@ root.api.session.user = bt.dispatch(function(query, session) {
 			);
 		};
 		var recordBan = function(userID, dependentSession) {
-			db.query(mysql.format(
+			db.query(
 				"INSERT IGNORE INTO bannedSessions"+
 				" (dependentSessionID, sessionID) SELECT $, sessionID"+
 				" FROM sessions"+
 				" WHERE userID = $ OR ipAddress = INET_ATON($)",
-				dependentSession || null, userID, query.remoteAddress
-			));
+				[dependentSession || null, userID, query.remoteAddress]
+			);
 			accountError("You are banned");
 		};
 		var loadUser = function(userID, userName) {
 			session.signin(userID);
 			var user = session.user;
 			user.info.userName = userName;
-			db.query(mysql.format(
+			db.query(
 				"SELECT brawlName, friendCode, bio FROM profiles"+
 				" WHERE userID = $ LIMIT 1",
-				user.info.userID), function(profileResult) {
-					if(profileResult.records.length) bt.mixin(user.info, mysql.rows(profileResult)[0]);
+				[user.info.userID],
+				function(err, profileResult) {
+					if(profileResult.length) bt.mixin(user.info, mysql.rows(profileResult)[0]);
 				}
 			);
-			db.query(mysql.format(
+			db.query(
 				"SELECT regions.name region, countries.name country FROM ip_group_city cities"+
 				" LEFT JOIN locations l ON (cities.location = l.id)"+
 				" LEFT JOIN iso3166_countries countries ON (l.country_code = countries.code)"+
 				" LEFT JOIN fips_regions regions ON (l.country_code = regions.country_code AND l.region_code = regions.code)"+
 				" WHERE ip_start <= INET_ATON($) ORDER BY ip_start DESC LIMIT 1",
-				query.remoteAddress), function(locationResult) {
-					if(!locationResult.records.length) return;
-					user.info.location = bt.array.unique(bt.map(locationResult.records[0], function(value) {
-						return value || undefined;
-					})).join(", ");
+				[query.remoteAddress],
+				function(err, locationResult) {
+					if(!locationResult.length) return;
+					user.info.location = bt.array.unique([locationResult[0].region || undefined, locationResult[0].country || undefined]).join(", ");
 				}
 			);
-			db.query(mysql.format(
+			db.query(
 				"SELECT totalPoints FROM rankings WHERE userID = $ LIMIT 1",
-				user.info.userID),
-				function(pointsResult) {
-					if(!pointsResult.records.length) return loadChannels(user);
-					db.query(mysql.format(
+				[user.info.userID],
+				function(err, pointsResult) {
+					if(!pointsResult.length) return loadChannels(user);
+					db.query(
 						"SELECT COUNT(*) + 1 rank FROM rankings WHERE totalPoints > $",
-						mysql.rows(pointsResult)[0].totalPoints),
-						function(rankResult) {
+						[mysql.rows(pointsResult)[0].totalPoints],
+						function(err, rankResult) {
 							user.info.rank = mysql.rows(rankResult)[0].rank;
 							loadChannels(user);
 						}
@@ -315,13 +310,14 @@ root.api.session.user = bt.dispatch(function(query, session) {
 			);
 		};
 		var loadChannels = function(user) {
-			db.query(mysql.format(
+			db.query(
 				"SELECT cm.channelID, c.parentID, c.topic, c.allowsGameChannels, g.matchTypeID, g.ruleID"+
 				" FROM channelMembers cm"+
 				" LEFT JOIN channels c ON (cm.channelID = c.channelID)"+
 				" LEFT JOIN games g ON (cm.channelID = g.channelID)"+
 				" WHERE cm.userID = $ ORDER BY cm.channelID ASC",
-				user.info.userID), function(channelResult) {
+				[user.info.userID],
+				function(err, channelResult) {
 					sendUser(user);
 					mysql.rows(channelResult).map(function(channelRow) {
 						var channel, game;
@@ -351,30 +347,30 @@ root.api.session.user = bt.dispatch(function(query, session) {
 				if(otherUserID === user.info.userID) return;
 				session.sendEvent("/user/person/", otherSession.user.info);
 			});
-			db.query(mysql.format(
+			db.query(
 				"SELECT styleID, soundsetID FROM settings WHERE userID = $ LIMIT 1",
-				user.info.userID),
-				function(settingsResult) {
-					if(!settingsResult.records.length) return;
+				[user.info.userID],
+				function(err, settingsResult) {
+					if(!settingsResult.length) return;
 					user.sendEvent("/user/settings/", mysql.rows(settingsResult)[0]);
 				}
 			);
-			db.query(mysql.format(
+			db.query(
 				"SELECT adminID FROM admins WHERE userID = $ LIMIT 1",
-				user.info.userID),
-				function(adminResult) {
-					if(!adminResult.records.length) return;
+				[user.info.userID],
+				function(err, adminResult) {
+					if(!adminResult.length) return;
 					user.admin = true;
 					Group.admins.objects.push(user);
 					user.sendEvent("/user/admin/", {signupAllowed: config.signup.allowed});
-					db.query(mysql.format(
+					db.query(
 						"SELECT u.userName, c.topic, UNIX_TIMESTAMP(r.reportTime) * 1000 time"+
 						" FROM reports r"+
 						" LEFT JOIN users u ON (r.userID = u.userID)"+
 						" LEFT JOIN channels c ON (r.channelID = c.channelID)"+
 						" WHERE r.reportTime > DATE_SUB(NOW(), INTERVAL 7 DAY) AND r.isResolved = 0"+
-						" ORDER BY r.reportTime DESC"),
-						function(reportResults) {
+						" ORDER BY r.reportTime DESC",
+						function(err, reportResults) {
 							user.sendEvent("/user/admin/reports/", mysql.rows(reportResults));
 						}
 					);
@@ -390,20 +386,20 @@ root.api.session.user = bt.dispatch(function(query, session) {
 });
 root.api.session.user.remember = bt.dispatch(function(query, session, user) {
 	var token = crypt.randomString(50);
-	db.query(mysql.format("REPLACE tokens (userID, token) VALUES ($, $)", user.info.userID, token));
+	db.query("REPLACE tokens (userID, token) VALUES ($, $)", [user.info.userID, token]);
 	return {token: token};
 });
 root.api.session.user.settings = bt.dispatch(function(query, session, user) {
 	var settings = [];
 	if(undefined !== query.styleID) {
-		settings.push(mysql.format("styleID = $", Number(query.styleID)));
+		settings.push(db.format("styleID = $", Number(query.styleID)));
 	}
 	if(undefined !== query.soundsetID) {
-		settings.push(mysql.format("soundsetID = $", Number(query.soundsetID)));
+		settings.push(db.format("soundsetID = $", Number(query.soundsetID)));
 	}
 	if(settings.length) {
-		db.query(mysql.format("INSERT IGNORE INTO settings (userID) VALUES ($)", user.info.userID));
-		db.query(mysql.format("UPDATE settings SET # WHERE userID = $ LIMIT 1", settings.join(", "), user.info.userID));
+		db.query("INSERT IGNORE INTO settings (userID) VALUES ($)", [user.info.userID]);
+		db.query("UPDATE settings SET # WHERE userID = $ LIMIT 1", [settings.join(", "), user.info.userID]);
 	}
 	return true;
 });
@@ -411,30 +407,21 @@ root.api.session.user.profile = bt.dispatch(function(query, session, user) {
 	var fields = [];
 	if(undefined !== query.brawlName) {
 		user.info.brawlName = brawl.brawlName(query.brawlName.toString());
-		fields.push(mysql.format("brawlName = $", user.info.brawlName));
+		fields.push(db.format("brawlName = $", user.info.brawlName));
 	}
 	if(undefined !== query.friendCode) {
 		user.info.friendCode = brawl.friendCode(query.friendCode.toString(), "");
-		fields.push(mysql.format("friendCode = $", user.info.friendCode));
+		fields.push(db.format("friendCode = $", user.info.friendCode));
 	}
 	if(undefined !== query.bio) {
 		user.setBio(query.bio.toString());
-		fields.push(mysql.format("bio = $", user.info.bio));
+		fields.push(db.format("bio = $", user.info.bio));
 	}
 	if(!fields.length) return false;
 	return session.promise(function(ticket) {
 		Group.users.sendEvent("/user/person/", user.info, ticket);
-		db.query(mysql.format(
-			"INSERT IGNORE INTO profiles (userID)"+
-			" VALUES ($)",
-			user.info.userID), function() {
-				db.query(mysql.format(
-					"UPDATE profiles SET #"+
-					" WHERE userID = $ LIMIT 1",
-					fields.join(", "), user.info.userID
-				));
-			}
-		);
+		db.query("INSERT IGNORE INTO profiles (userID) VALUES ($)", [user.info.userID]);
+		db.query("UPDATE profiles SET # WHERE userID = $ LIMIT 1", [fields.join(", "), user.info.userID]);
 	});
 });
 root.api.session.user.idle = bt.dispatch(function(query, session, user) {
@@ -479,8 +466,8 @@ root.api.session.user.admin.statistics = bt.dispatch(function(query, session, us
 root.api.session.user.admin.ban = bt.dispatch(function(query, session, user) {
 	var personUserID = query.personUserID;
 	if(Number(personUserID) !== personUserID) return {error: "Invalid person user ID"};
-	db.query(mysql.format("DELETE FROM whitelist WHERE userID = $", personUserID));
-	db.query(mysql.format("INSERT IGNORE INTO bannedSessions (modUserID, sessionID) SELECT $, sessionID FROM sessions WHERE userID = $", user.info.userID, personUserID));
+	db.query("DELETE FROM whitelist WHERE userID = $", [personUserID]);
+	db.query("INSERT IGNORE INTO bannedSessions (modUserID, sessionID) SELECT $, sessionID FROM sessions WHERE userID = $", [user.info.userID, personUserID]);
 	if(Session.byUserID.hasOwnProperty(personUserID)) Session.byUserID[personUserID].terminate();
 	return true;
 });
@@ -498,22 +485,16 @@ root.api.session.user.person.rate = bt.dispatch(function(query, session, user, p
 	var rating = query.rating;
 	if(Number(rating) !== rating) return {error: "Invalid rating"};
 	if(query.rating < -1 || query.rating > 1) return {error: "Invalid rating"};
-	db.query(mysql.format(
-		"UPDATE ratings SET isContradicted = 0"+
-		" WHERE fromUserID = $ AND toUserID = $",
-		personUserID, user.info.userID),
-		function() {
-			db.query(mysql.format(
-				"UPDATE ratings SET isContradicted = 1"+
-				" WHERE fromUserID = $ AND toUserID = $ AND ratingType != $",
-				personUserID, user.info.userID, -rating),
-				function(contradictedResult) {
-					db.query(mysql.format(
-						"REPLACE ratings (fromUserID, toUserID, ratingType, isContradicted)"+
-						" VALUES ($, $, $, $)",
-						user.info.userID, personUserID, rating, (contradictedResult.affected_rows ? 1 : 0)
-					));
-				}
+	db.query("UPDATE ratings SET isContradicted = 0 WHERE fromUserID = $ AND toUserID = $", [personUserID, user.info.userID]);
+	db.query(
+		"UPDATE ratings SET isContradicted = 1"+
+		" WHERE fromUserID = $ AND toUserID = $ AND ratingType != $",
+		[personUserID, user.info.userID, -rating],
+		function(err, contradictedResult) {
+			db.query(
+				"REPLACE ratings (fromUserID, toUserID, ratingType, isContradicted)"+
+				" VALUES ($, $, $, $)",
+				[user.info.userID, personUserID, rating, (contradictedResult.affected_rows ? 1 : 0)]
 			);
 		}
 	);
@@ -534,11 +515,12 @@ root.api.session.user.channel.spawn = bt.dispatch(function(query, session, user,
 		topic = null;
 	}
 	return session.promise(function(ticket) {
-		db.query(mysql.format(
+		db.query(
 			"INSERT INTO channels (parentID, topic)"+
 			" VALUES ($, $)",
-			parentChannel.info.channelID, topic), function(channelResult) {
-				var channelID = channelResult.insert_id;
+			[parentChannel.info.channelID, topic],
+			function(err, channelResult) {
+				var channelID = channelResult.insertId;
 				assert.ok(!Channel.byID[channelID], "New channels must have unique IDs");
 				var channel = new Channel(parentChannel.info.channelID, channelID);
 				var game;
@@ -548,10 +530,10 @@ root.api.session.user.channel.spawn = bt.dispatch(function(query, session, user,
 					game = new Game(channel);
 				}
 				channel.addUser(user, ticket);
-				db.query(mysql.format(
+				db.query(
 					"INSERT IGNORE INTO channelMembers (channelID, userID, isCreator)"+
-					" VALUES ($, $, 1)", channelResult.insert_id, user.info.userID
-				));
+					" VALUES ($, $, 1)", [channelID, user.info.userID]
+				);
 			}
 		);
 	});
@@ -574,7 +556,7 @@ root.api.session.user.channel.invite = bt.dispatch(function(query, session, user
 		if(!channel.game.info.playersNeeded) channel.game.stopBroadcasting();
 	}
 	channel.group.sendEvent("/user/channel/member/", {channelID: channel.info.channelID, memberUserID: invitedUser.info.userID, invitingUserID: user.info.userID, time: new Date().getTime()});
-	db.query(mysql.format("INSERT IGNORE INTO channelMembers (channelID, userID) VALUES ($, $)", channel.info.channelID, invitedUser.info.userID));
+	db.query("INSERT IGNORE INTO channelMembers (channelID, userID) VALUES ($, $)", [channel.info.channelID, invitedUser.info.userID]);
 	return true;
 });
 root.api.session.user.channel.message = bt.dispatch(function(query, session, user, channel) {
@@ -588,27 +570,27 @@ root.api.session.user.channel.message = bt.dispatch(function(query, session, use
 });
 root.api.session.user.channel.leave = bt.dispatch(function(query, session, user, channel) {
 	channel.leaveRecursively(user, function(channelID) {
-		db.query(mysql.format("DELETE FROM channelMembers WHERE userID = $ AND channelID = $ LIMIT 1", user.info.userID, channelID));
+		db.query("DELETE FROM channelMembers WHERE userID = $ AND channelID = $ LIMIT 1", [user.info.userID, channelID]);
 	});
 	return true;
 });
 root.api.session.user.channel.report = bt.dispatch(function(query, session, user, channel) {
-	db.query(mysql.format(
+	db.query(
 		"INSERT INTO reports (channelID, userID) VALUES ($, $)",
-		channel.info.channelID, user.info.userID),
-		function(reportResult) {
+		[channel.info.channelID, user.info.userID],
+		function(err, reportResult) {
 			var values = channel.history.map(function(body) {
-				return mysql.format(
+				return db.format(
 					"($, $, $, FROM_UNIXTIME($))",
-					reportResult.insert_id, body.userID, body.text, Math.floor(body.time / 1000)
+					reportResult.insertId, body.userID, body.text, Math.floor(body.time / 1000)
 				);
 			});
-			if(values.length) db.query(mysql.format(
+			if(values.length) db.query(
 				"INSERT INTO reportMessages"+
 				" (reportID, messageUserID, messageText, messageTime)"+
 				" VALUES #",
-				values.join(", ")
-			));
+				[values.join(", ")]
+			);
 		}
 	);
 	Group.admins.sendEvent("/user/admin/reports/", [{userName: user.info.userName, topic: channel.info.topic, time: new Date().getTime()}]);
@@ -623,7 +605,7 @@ root.api.session.user.channel.game.settings = bt.dispatch(function(query, sessio
 	var settings = [], didAnything;
 	if(Session.config.matchTypes.hasOwnProperty(query.matchTypeID)) {
 		game.info.matchTypeID = query.matchTypeID;
-		settings.push(mysql.format("matchTypeID = $", game.info.matchTypeID));
+		settings.push(db.format("matchTypeID = $", game.info.matchTypeID));
 		if(!Session.config.matchTypes[game.info.matchTypeID].hasTeams) bt.map(channel.teamIDByUserID, function(teamID, userID) {
 			channel.teamIDByUserID[userID] = 0;
 		});
@@ -632,7 +614,7 @@ root.api.session.user.channel.game.settings = bt.dispatch(function(query, sessio
 	}
 	if(Session.config.rules.hasOwnProperty(query.ruleID)) {
 		game.info.ruleID = query.ruleID;
-		settings.push(mysql.format("ruleID = $", game.info.ruleID));
+		settings.push(db.format("ruleID = $", game.info.ruleID));
 		didAnything = true;
 	}
 	if(query.playersNeeded >= 0 && query.playersNeeded < Session.config.matchTypes[game.info.matchTypeID].playerCount) {
@@ -641,15 +623,10 @@ root.api.session.user.channel.game.settings = bt.dispatch(function(query, sessio
 		didAnything = true;
 	}
 	if(!didAnything) return false;
-	if(settings.length) db.query(mysql.format(
-		"INSERT IGNORE INTO games (channelID) VALUES ($)",
-		channel.info.channelID), function() {
-			db.query(mysql.format(
-				"UPDATE games SET # WHERE channelID = $ LIMIT 1",
-				settings.join(", "), channel.info.channelID
-			));
-		}
-	);
+	if(settings.length) {
+		db.query("INSERT IGNORE INTO games (channelID) VALUES ($)", [channel.info.channelID]);
+		db.query("UPDATE games SET # WHERE channelID = $ LIMIT 1", [settings.join(", "), channel.info.channelID]);
+	}
 	return session.promise(function(ticket) {
 		channel.group.sendEvent("/user/channel/game/", bt.union(game.info, {channelID: channel.info.channelID}), ticket);
 	});
@@ -718,7 +695,7 @@ root.api.session.user.publicChannel.join = bt.dispatch(function(query, session, 
 	return session.promise(function(ticket) {
 		channel.addUser(user, ticket);
 		channel.group.sendEvent("/user/channel/member/", {channelID: channel.info.channelID, memberUserID: user.info.userID, time: new Date().getTime()});
-		db.query(mysql.format("INSERT IGNORE INTO channelMembers (channelID, userID) VALUES ($, $)", channel.info.channelID, user.info.userID));
+		db.query("INSERT IGNORE INTO channelMembers (channelID, userID) VALUES ($, $)", [channel.info.channelID, user.info.userID]);
 	});
 });
 
@@ -755,14 +732,12 @@ root.api.session.user.video = bt.dispatch(function(query, session, user) {
 	if(!youtubeID) return {error: "No YouTube ID specified"};
 	if(youtubeID.length != 11) return false;
 	return session.promise(function(ticket) {
-		db.query(mysql.format(
+		db.query(
 			"INSERT INTO videos (userID, youtubeID) VALUES ($, $)",
-			user.info.userID, youtubeID),
-			function(result) {
+			[user.info.userID, youtubeID],
+			function(err, result) {
+				if(1062 === err.number) return user.sendEvent("/videos/", {videoError: "Duplicate video"}, ticket);
 				Group.sessions.sendEvent("/videos/", {old: false, videos: [{youtubeID: youtubeID, userName: user.info.userName, time: new Date().getTime()}]}, ticket);
-			}, function(error) {
-				if("ER_DUP_ENTRY" === error.error_name) return user.sendEvent("/videos/", {videoError: "Duplicate video"}, ticket);
-				user.sendEvent("/videos/", {error: "Database error: "+error}, ticket);
 			}
 		);
 	});
@@ -772,12 +747,13 @@ root.api.session.videos = bt.dispatch(function(query, session) {
 	var start = Math.round(Number(query.start)) || 0;
 	var count = Math.round(Number(query.count)) || 10;
 	return session.promise(function(ticket) {
-		db.query(mysql.format(
-			"SELECT v.youtubeID, u.userName, FROM_UNIXTIME(v.submitTime) * 1000 time"+
+		db.query(
+			"SELECT v.youtubeID, u.userName, UNIX_TIMESTAMP(v.submitTime) * 1000 time"+
 			" FROM videos v"+
 			" LEFT JOIN users u ON (v.userID = u.userID)"+
 			" WHERE 1 ORDER BY v.submitTime DESC LIMIT $, $",
-			start, count), function(result) {
+			[start, count],
+			function(err, result) {
 				session.sendEvent("/videos/", {old: true, videos: mysql.rows(result)}, ticket);
 			}
 		);

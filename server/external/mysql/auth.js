@@ -1,25 +1,32 @@
-var crypto = require('crypto');
+var Buffer = require('buffer').Buffer,
+    crypto = require('crypto');
 
-function sha1(message) {
-    return crypto.createHash("sha1").update(message).digest();
-}
+function sha1(msg) {
+  var hash = crypto.createHash('sha1');
+  hash.update(msg);
+  // hash.digest() does not output buffers yet
+  return hash.digest('binary');
+};
+exports.sha1 = sha1;
 
-function encrypt_password(plain, scramble) {
-    var stage1 = sha1(plain);
-    var stage2 = sha1(scramble + sha1(stage1));
-    var result = "";
-    for (var i = 0; i < stage1.length; ++i) {
-        result += String.fromCharCode(stage1.charCodeAt(i)
-                ^ stage2.charCodeAt(i));
-    }
-    return result;
-}
+function xor(a, b) {
+  a = new Buffer(a, 'binary');
+  b = new Buffer(b, 'binary');
+  var result = new Buffer(a.length);
+  for (var i = 0; i < a.length; i++) {
+    result[i] = (a[i] ^ b[i]);
+  }
+  return result;
+};
+exports.xor = xor;
 
-exports.encrypt_password = encrypt_password;
+exports.token = function(password, scramble) {
+  if (!password) {
+    return new Buffer(0);
+  }
 
-/*
- * node-mysql A node.js interface for MySQL
- * http://github.com/masuidrive/node-mysql
- * 
- * Copyright (c) Yuichiro MASUI <masui@masuidrive.jp> License: MIT License
- */
+  var stage1 = sha1(password);
+  var stage2 = sha1(stage1);
+  var stage3 = sha1(scramble.toString('binary') + stage2);
+  return xor(stage3, stage1);
+};

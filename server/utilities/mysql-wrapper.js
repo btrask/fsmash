@@ -19,34 +19,28 @@ var sys = require("sys");
 
 var bt = require("../../shared/bt");
 
-var mysql = require("../external/mysql");
+var mysql = require("../external/mysql/");
 
-wrapper.connect = function(conf, callback, errback) {
-	var connection = new mysql.Connection(conf);
-	connection.defaultErrback = function(error) {
-		sys.puts(JSON.stringify(error, null, 1));
+wrapper.connect = function(conf) {
+	var connection = new mysql.Client(conf);
+	connection.charsetNumber = 192/* utf8_unicode_ci */;
+	connection.connect();
+	connection.format = function(format, params) {
+		if(!Array.isArray(params)) params = Array.prototype.slice.call(arguments, 1);
+		return format.replace(/[$#]/g, function(type) { // $: Quoted value; #: Unquoted value
+			var arg = params.shift();
+			assert.ok(undefined !== arg, "Format arguments must not be undefined");
+			if(null === arg) return "NULL";
+			if(Number === arg.constructor && isNaN(arg)) return 0;
+			if(String === arg.constructor) {
+				if("#" === type) return arg;
+				return connection.escape(arg);
+			}
+			return arg.toString();
+		});
 	};
-	connection.connect(callback, errback);
 	return connection;
 };
-wrapper.format = function(format, arg1, arg2, etc) {
-	var args = Array.prototype.slice.call(arguments, 1);
-	return format.replace(/[$#]/g, function(type) { // $: Quoted value; #: Unquoted value
-		var arg = args.shift();
-		assert.ok(undefined !== arg, "Format arguments must not be undefined");
-		if(null === arg) return "NULL";
-		if(Number === arg.constructor && isNaN(arg)) return 0;
-		if(String === arg.constructor) {
-			if("#" === type) return arg;
-			return "'"+mysql.quote(arg)+"'";
-		}
-		return arg.toString();
-	});
-};
 wrapper.rows = function(result) {
-	return result.records.map(function(values) {
-		return bt.pair(result.fields.map(function(field) {
-			return field.name;
-		}), values);
-	});
+	return result;
 };
