@@ -66,7 +66,7 @@ wrapper.createFileHandler = function(rootdir) {
 	var scandir = function(dirname, callback) {
 		fs.readdir(dirname, function(err, filenames) {
 			if(err) {
-				if(/* ENOTDIR */20 != err.errno) return callback();
+				if(err.errno != process.ENOTDIR) return callback();
 				return scanfile(dirname, callback);
 			}
 			(function recurseOverFilenames(i) {
