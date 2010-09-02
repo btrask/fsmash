@@ -19,13 +19,14 @@ function Client(config) {
   this.port = 3306;
   this.user = null;
   this.password = null;
-  this.database = null;
+  this.database = '';
 
   this.flags = Client.defaultFlags;
   this.maxPacketSize = 0x01000000;
-  this.charsetNumber = 192;
+  this.charsetNumber = 8;
   this.debug = false;
 
+  this._greeting = null;
   this._queue = [];
   this._connection = null;
   this._parser = null;
@@ -194,6 +195,11 @@ Client.prototype._handlePacket = function(packet) {
     return;
   }
 
+  if (packet.type == Parser.USE_OLD_PASSWORD_PROTOCOL_PACKET) {
+    this._sendOldAuth(this._greeting);
+    return;
+  }
+
   var type = packet.type,
       task = this._queue[0],
       delegate = (task)
@@ -239,6 +245,11 @@ Client.prototype._sendAuth = function(greeting) {
   packet.writeNullTerminated(this.database);
 
   this.write(packet);
+
+  // Keep a reference to the greeting packet. We might receive a
+  // USE_OLD_PASSWORD_PROTOCOL_PACKET as a response, in which case we will need
+  // the greeting packet again. See _sendOldAuth()
+  this._greeting = greeting;
 };
 
 Client._packetToUserObject = function(packet) {
@@ -282,6 +293,22 @@ Client.prototype._debugPacket = function(packet) {
     }
   }
   console.log('<- %s: %j', packetName, packet);
+};
+
+Client.prototype._sendOldAuth = function(greeting) {
+  var token = auth.scramble323(greeting.scrambleBuffer, this.password),
+      packetSize = (
+        token.length + 1
+      ),
+      packet = new OutgoingPacket(packetSize, greeting.number+3);
+
+  // I could not find any official documentation for this, but from sniffing
+  // the mysql command line client, I think this is the right way to send the
+  // scrambled token after receiving the USE_OLD_PASSWORD_PROTOCOL_PACKET.
+  packet.write(token);
+  packet.writeFiller(1);
+
+  this.write(packet);
 };
 
 // Client Flags
