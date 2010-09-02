@@ -171,7 +171,7 @@ root.api.session.user = bt.dispatch(function(query, session) {
 						"INSERT INTO users (userName, passHash2) VALUES ($, $)",
 						[query.userName, crypt.hash(query.password)],
 						function(err, userResult) {
-							if(1062 === err.number) return accountError("Username already in use");
+							if(err && 1062 === err.number) return accountError("Username already in use");
 							var userID = userResult.insertId;
 							db.query("INSERT IGNORE INTO settings (userID) VALUES ($)", [userID]);
 							logSession(userID, query.userName);
@@ -736,7 +736,7 @@ root.api.session.user.video = bt.dispatch(function(query, session, user) {
 			"INSERT INTO videos (userID, youtubeID) VALUES ($, $)",
 			[user.info.userID, youtubeID],
 			function(err, result) {
-				if(1062 === err.number) return user.sendEvent("/videos/", {videoError: "Duplicate video"}, ticket);
+				if(err && 1062 === err.number) return user.sendEvent("/videos/", {videoError: "Duplicate video"}, ticket);
 				Group.sessions.sendEvent("/videos/", {old: false, videos: [{youtubeID: youtubeID, userName: user.info.userName, time: new Date().getTime()}]}, ticket);
 			}
 		);
