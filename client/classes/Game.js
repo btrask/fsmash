@@ -150,8 +150,8 @@ var Game = function(session, user, channel) {
 		});
 		memberNames.sort();
 		var labels = [
-			memberNames.join(", "),
 			user.config.matchTypes[game.info.matchTypeID].label,
+			memberNames.join(", "),
 			user.config.rules[game.info.ruleID].label
 		];
 		if(game.info.playersNeeded) labels.push(""+game.info.playersNeeded+" more needed");
