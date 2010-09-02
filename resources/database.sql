@@ -430,4 +430,4 @@ CREATE TABLE `whitelist` (
   `whitelistTime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`whitelistID`),
   UNIQUE KEY `userID` (`userID`)
-) ENGINE=MyISAM  DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
