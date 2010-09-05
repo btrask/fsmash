@@ -56,7 +56,7 @@ var VideosPage = function(session) {
 		var videos = bt.map(body.videos, function(videoInfo) {
 			var videoElems = {};
 			var video = DOM.clone("video", videoElems);
-			videoElems.anchor.href = "http://www.youtube.com/watch#!v=" + videoInfo.youtubeID;
+			videoElems.anchor.href = "http://www.youtube.com/watch?v=" + videoInfo.youtubeID;
 			DOM.fill(videoElems.submitterName, videoInfo.userName);
 			youtube.infoForVideoID(videoInfo.youtubeID, function(data) {
 				videoElems.thumbnail.src = (data.thumbnail || {}).sqDefault;
