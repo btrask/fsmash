@@ -186,7 +186,7 @@ Session.request = function(path, properties, callback) {
 		if(200 === req.status || 500 === req.status) callback(req.responseText ? JSON.parse(req.responseText) : false);
 		else setTimeout(bt.curry(Session.request, path, properties, callback), 1000 * 5);
 	};
-	req.setRequestHeader("Content-Type", "text/json");
+	req.setRequestHeader("Content-Type", "application/json");
 	req.send(JSON.stringify(properties || {}));
 };
 Session.all = [];

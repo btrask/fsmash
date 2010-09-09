@@ -134,7 +134,7 @@ wrapper.writeJSON = function(res, value) {
 	var body = JSON.stringify(value);
 	if(!body) body = "";
 	res.writeHead(200, {
-		"Content-Type": "text/json; charset=UTF-8",
+		"Content-Type": "application/json; charset=UTF-8",
 		"Content-Length": body.length,
 	});
 	res.end(body, "utf8");
