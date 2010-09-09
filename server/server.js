@@ -54,7 +54,8 @@ var config = {
 
 process.title = "fsmash-server";
 process.addListener("uncaughtException", function(err) {
-	sys.log(sys.inspect(err));
+	sys.log(err);
+	sys.log(err.stack);
 });
 
 var fileHandler = http.createFileHandler(__dirname+"/../public");
