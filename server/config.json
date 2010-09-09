@@ -1,4 +1,5 @@
 {
 	"port": 8001,
-	"host": null
+	"host": null,
+	"title": "fsmash-server"
 }

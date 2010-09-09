@@ -52,7 +52,7 @@ var config = {
 	startTime: new Date().getTime(),
 };
 
-process.title = "fsmash-server";
+process.title = config.server.title;
 process.addListener("uncaughtException", function(err) {
 	sys.log(err);
 	sys.log(err.stack);
