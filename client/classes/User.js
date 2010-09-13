@@ -77,7 +77,7 @@ var User = function(session, userID) {
 	user.event.channel = bt.dispatch(function(body) {
 		var channel, channels;
 		if(user.channelByID.hasOwnProperty(body.channelID)) channel = user.channelByID[body.channelID];
-		else channel = new Channel(session, user, Number(body.channelID), Number(body.parentID));
+		else channel = new Channel(session, user, body.channelID, body.parentID);
 		if(body.topic) {
 			channel.title = body.topic;
 			DOM.fill(channel.sidebarItem.title, channel.title);
