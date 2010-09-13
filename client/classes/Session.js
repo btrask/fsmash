@@ -97,7 +97,7 @@ var Session = function() {
 	session.event = bt.dispatch();
 	session.event.user = bt.dispatch(function(body) {
 		if(body.accountError) return body.accountError;
-		if(!session.user) session.user = new User(session, body.userID);
+		if(!session.user) session.user = new User(session, Number(body.userID));
 		session.user.info = body;
 		Session.byUserID[session.user.info.userID] = session;
 		session.user.updateWithInfo();

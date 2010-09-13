@@ -68,7 +68,7 @@ var User = function(session, userID) {
 	user.event.person = bt.dispatch(function(body) {
 		var person;
 		if(user.personByUserID.hasOwnProperty(body.userID)) person = user.personByUserID[body.userID];
-		else person = new Person(session, user, body.userID);
+		else person = new Person(session, user, Number(body.userID));
 		person.updateWithInfo(body);
 		person.setOnline(true);
 	}, null, function(body) {
@@ -77,7 +77,7 @@ var User = function(session, userID) {
 	user.event.channel = bt.dispatch(function(body) {
 		var channel, channels;
 		if(user.channelByID.hasOwnProperty(body.channelID)) channel = user.channelByID[body.channelID];
-		else channel = new Channel(session, user, body.channelID, body.parentID);
+		else channel = new Channel(session, user, Number(body.channelID), Number(body.parentID));
 		if(body.topic) {
 			channel.title = body.topic;
 			DOM.fill(channel.sidebarItem.title, channel.title);
@@ -115,7 +115,7 @@ var User = function(session, userID) {
 	};
 	user.getPerson = function(userID, userName) {
 		if(!user.personByUserID.hasOwnProperty(userID)) {
-			user.personByUserID[userID] = new Person(session, user, userID);
+			user.personByUserID[userID] = new Person(session, user, Number(userID));
 			if(userName) user.personByUserID[userID].updateWithInfo({userName: userName});
 		}
 		return user.personByUserID[userID];
