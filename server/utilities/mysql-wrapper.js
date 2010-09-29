@@ -23,7 +23,6 @@ var mysql = require("../external/mysql/");
 
 wrapper.connect = function(conf) {
 	var connection = new mysql.Client(conf);
-	connection.charsetNumber = 192/* utf8_unicode_ci */;
 	connection.connect();
 	connection.format = function(format, params) {
 		if(!Array.isArray(params)) params = Array.prototype.slice.call(arguments, 1);
