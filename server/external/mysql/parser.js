@@ -18,7 +18,7 @@ function Parser() {
 
   this._lengthCodedLength = null;
   this._lengthCodedStringLength = null;
-}
+};
 sys.inherits(Parser, EventEmitter);
 module.exports = Parser;
 
@@ -161,7 +161,7 @@ Parser.prototype.write = function(buffer) {
         break;
       case Parser.GREETING_FILLER_1:
         // 1 byte - 0x00
-        advance()
+        advance();
         break;
       case Parser.GREETING_SERVER_CAPABILITIES:
         if (packet.index == 0) {
@@ -208,7 +208,7 @@ Parser.prototype.write = function(buffer) {
         if (packet.index == 0) {
           if (c === 0xff) {
             packet.type = Parser.ERROR_PACKET;
-            advance(Parser.ERROR_NUMBER)
+            advance(Parser.ERROR_NUMBER);
             break;
           }
 
@@ -221,7 +221,7 @@ Parser.prototype.write = function(buffer) {
             // after the first OK PACKET, we are authenticated
             this.authenticated = true;
             packet.type = Parser.OK_PACKET;
-            advance(Parser.AFFECTED_ROWS)
+            advance(Parser.AFFECTED_ROWS);
             break;
           }
         }
@@ -515,10 +515,10 @@ Parser.prototype.write = function(buffer) {
         break;
       case Parser.COLUMN_VALUE_STRING:
         var remaining = packet.columnLength - packet.index, read;
-        if (i + remaining >= buffer.length) {
+        if (i + remaining > buffer.length) {
           read = buffer.length - i;
-          packet.emit('data', buffer.slice(i, buffer.length), remaining - read);
           packet.index += read;
+          packet.emit('data', buffer.slice(i, buffer.length), remaining - read);
           // the -1 offsets are because these values are also manipulated by the loop itself
           packet.received += read - 1;
           i = buffer.length;
