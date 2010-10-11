@@ -12,27 +12,36 @@ GNU Affero General Public License for more details.
 
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>. */
-DOM.id("resizer").onmousedown = function() {
-	var resizer = this;
+(function() {
+	var resizer = DOM.id("resizer");
 	var sidebar = DOM.id("sidebar");
 	var main = DOM.id("main");
-	document.onmousemove = function(event) {
-		if(!event) event = window.event;
-		var x = event.clientX;
+	var setWidth = function(x) {
+		if(undefined === x) return;
 		x = Math.min(x, document.body.offsetWidth - 323);
 		x = Math.max(x, 100);
 		sidebar.style.width = x + "px";
 		resizer.style.left = (x - 3) + "px";
 		main.style.left = (x + 1) + "px";
+	};
+	setWidth(cookie.get("SidebarWidth"));
+	resizer.onmousedown = function() {
+		var newWidth;
+		document.onmousemove = function(event) {
+			if(!event) event = window.event;
+			newWidth = event.clientX;
+			setWidth(newWidth);
+			return false;
+		};
+		document.onmouseup = function() {
+			document.onmousemove = null;
+			document.onmouseup = null;
+			if(undefined !== newWidth) cookie.set("SidebarWidth", newWidth);
+			return false;
+		};
 		return false;
 	};
-	document.onmouseup = function() {
-		document.onmousemove = null;
-		document.onmouseup = null;
-		return false;
-	};
-	return false;
-};
+})();
 document.onkeydown = document.onkeypress = function(event) {
 	if(!event) event = window.event;
 	if(8 != (event.keyCode || event.which)) return true;

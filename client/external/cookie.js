@@ -11,7 +11,6 @@ cookie.get = function(name) {
 		c = ca[i].replace(/^\s*/, "");
 		if(0 === c.indexOf(name)) return c.slice(name.length, c.length);
 	}
-	return null;
 };
 cookie.clear = function(name) {
 	cookie.set(name, "", -1);
