@@ -64,9 +64,11 @@ CREATE TABLE `channelMembers` (
   `channelID` int(11) NOT NULL,
   `userID` int(11) NOT NULL,
   `isCreator` tinyint(4) NOT NULL DEFAULT '0',
+  `invitedByUserID` int(11) DEFAULT NULL,
   `joinTime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`channelMemberID`),
-  UNIQUE KEY `channelID` (`channelID`,`userID`)
+  UNIQUE KEY `channelID` (`channelID`,`userID`),
+  KEY `invitedByUserID` (`invitedByUserID`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 -- --------------------------------------------------------
@@ -270,7 +272,7 @@ CREATE TABLE `reportMessages` (
   PRIMARY KEY (`reportMessageID`),
   KEY `reportID` (`reportID`),
   KEY `messageUserID` (`messageUserID`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 -- --------------------------------------------------------
 
@@ -289,7 +291,7 @@ CREATE TABLE `reports` (
   KEY `channelID` (`channelID`),
   KEY `isResolved` (`isResolved`),
   KEY `reportTime` (`reportTime`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 -- --------------------------------------------------------
 

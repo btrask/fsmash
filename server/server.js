@@ -557,7 +557,7 @@ root.api.session.user.channel.invite = bt.dispatch(function(query, session, user
 		if(!channel.game.info.playersNeeded) channel.game.stopBroadcasting();
 	}
 	channel.group.sendEvent("/user/channel/member/", {channelID: channel.info.channelID, memberUserID: invitedUser.info.userID, invitingUserID: user.info.userID, time: new Date().getTime()});
-	db.query("INSERT IGNORE INTO channelMembers (channelID, userID) VALUES ($, $)", [channel.info.channelID, invitedUser.info.userID]);
+	db.query("INSERT IGNORE INTO channelMembers (channelID, userID, invitedByUserID) VALUES ($, $, $)", [channel.info.channelID, invitedUser.info.userID, user.info.userID]);
 	return true;
 });
 root.api.session.user.channel.message = bt.dispatch(function(query, session, user, channel) {
