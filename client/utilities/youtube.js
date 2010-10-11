@@ -58,3 +58,17 @@ youtube.anchorForVideoURL = function(url) {
 	});
 	return anchor;
 };
+youtube.parseDate = function(str) {
+	if(!str) return null;
+	var a = str.match(/\d+/g);
+	var d = new Date();
+	d.setUTCFullYear(a.shift());
+	d.setUTCMonth(a.shift() - 1);
+	d.setUTCDate(a.shift());
+
+	d.setUTCHours(a.shift());
+	d.setUTCMinutes(a.shift());
+	d.setUTCSeconds(a.shift());
+	d.setUTCMilliseconds(a.shift());
+	return d;
+};

@@ -62,6 +62,7 @@ var VideosPage = function(session) {
 				videoElems.thumbnail.src = (data.thumbnail || {}).sqDefault;
 				DOM.fill(videoElems.anchor, data.title || "Unknown video");
 				DOM.fill(videoElems.uploaderName, data.uploader || "Unknown");
+				DOM.fill(videoElems.uploadDate, data.uploaded ? youtube.parseDate(data.uploaded).toLocaleDateString() : "Unknown");
 				videoElems.uploaderName.href = "http://www.youtube.com/user/"+data.uploader;
 				if(data.duration) DOM.fill(videoElems.duration, "" + Math.floor(data.duration / 60) + ":" + ("0" + (data.duration % 60)).slice(-2));
 			});
