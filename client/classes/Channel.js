@@ -226,7 +226,7 @@ var Channel = function(session, user, channelID, parentID) {
 		if(!item) item = channel.groups.members.itemByUserID[memberUserID];
 		if(undefined !== body.teamID) item.setTeamID(body.teamID);
 		if(channel.userIsMember && body.time) {
-			user.playSound("join");
+			channel.alert("join");
 			if(user.personByUserID.hasOwnProperty(body.invitingUserID)) invitingPerson = user.personByUserID[body.invitingUserID];
 			if(invitingPerson) channel.postNotification(member.info.userName+" was invited by "+invitingPerson.info.userName, new Date(body.time));
 			else channel.postNotification(member.info.userName+" joined", new Date(body.time));
@@ -236,14 +236,14 @@ var Channel = function(session, user, channelID, parentID) {
 		return func(body, channel.memberByUserID[body.memberUserID]);
 	});
 	channel.event.member.leave = bt.dispatch(function(body, member) {
-		if(member !== user.person && body.time) user.playSound("leave");
+		if(member !== user.person && body.time) channel.alert("leave");
 		channel.removeMember(member, body.time);
 	});
 	channel.event.message = bt.dispatch(function(body) {
 		if(!user.personByUserID.hasOwnProperty(body.userID)) return;
 		if(user.personByUserID[body.userID].ignored) return;
 		var incoming = body.userID != user.person.info.userID;
-		if(incoming) channel.incoming("message");
+		if(incoming) channel.alert("message");
 		DOM.scroll.preserve(channel.scrollBox, function() {
 			var msgElement = incomingMessage(body);
 			if(!incoming) DOM.changeClass(msgElement, "light");
@@ -291,11 +291,12 @@ var Channel = function(session, user, channelID, parentID) {
 			}
 			DOM.fill(channel.sidebarItem.counter, counter);
 		};
-		channel.incoming = function(type) {
-			if("message" != type || channel.game || channel.sidebarItem.selected) user.playSound(type);
+		channel.alert = function(type) {
+			if("challenge" == type || channel.game || channel.sidebarItem.selected) user.playSound(type);
 			if(!pane.hasOwnProperty(type)) return;
 			if(channel.sidebarItem.selected && pane[type].parentNode) return;
-			if(count.hasOwnProperty(type)) count[type]++;
+			if(!count.hasOwnProperty(type)) return;
+			count[type]++;
 			updateCounter();
 		};
 		channel.resetUnreadCounter = function(type) {

@@ -209,7 +209,7 @@ var Game = function(session, user, channel) {
 		game.applicantByUserID[applicantUserID] = applicant;
 		game.groups.applicants.addItem(channel.groups.nonMembers.removeItem(applicantUserID) || channel.groups.formerMembers.removeItem(applicantUserID), true);
 		if(body.time) {
-			if(channel.userIsMember) channel.incoming("challenge");
+			if(channel.userIsMember) channel.alert("challenge");
 			channel.postNotification(applicant.info.userName+" wants to join", new Date(body.time));
 		}
 		if(applicantUserID === user.info.userID) {
