@@ -145,7 +145,7 @@ root.api.session.terminate = bt.dispatch(function(query, session) {
 });
 root.api.session.watch = bt.dispatch(function(query, session) {
 	return function(req, res) {
-		session.setEventCallback(bt.curry(http.writeJSON, res));
+		session.setEventCallback(bt.curry(http.writeJSON, req, res));
 	};
 });
 

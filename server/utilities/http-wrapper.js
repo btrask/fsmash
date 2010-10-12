@@ -37,26 +37,25 @@ wrapper.createServer = function(dispatcher, unknownHandler/* (filename, callback
 			data += chunk;
 		});
 		req.addListener("end", function() {
-			var token = {};
-			var filename = url.parse(req.url).pathname;
-			var remoteAddress = req.socket.remoteAddress || null;
-			if("127.0.0.1" == remoteAddress) remoteAddress = null;
-			var query = bt.union((data ? JSON.parse(data) : {}), {remoteAddress: remoteAddress});
-			var result;
 			try {
-				result = dispatcher(token, bt.components(filename), query);
+				var filename = url.parse(req.url).pathname;
+				var remoteAddress = req.socket.remoteAddress || null;
+				if("127.0.0.1" == remoteAddress) remoteAddress = null;
+				var query = bt.union((data ? JSON.parse(data) : {}), {remoteAddress: remoteAddress});
+				var unknown = function(req, res, filename) {
+					return unknownHandler(filename, function(status, header, data, encoding) {
+						res.writeHead(status, header);
+						res.end(data, encoding);
+					});
+				};
+				var result = dispatcher(unknown, bt.components(filename), query);
+				if("function" === typeof result) result(req, res, filename);
+				else wrapper.writeJSON(req, res, result);
 			} catch(err) {
 				res.writeHead(500, {});
 				res.end();
 				sys.log(err);
-				return;
 			}
-			if(result === token) return unknownHandler(filename, function(status, header, data, encoding) {
-				res.writeHead(status, header);
-				res.end(data, encoding);
-			});
-			if(typeof result === "function") return result(req, res, filename);
-			return wrapper.writeJSON(res, result);
 		});
 	});
 };
@@ -129,7 +128,7 @@ wrapper.createFileHandler = function(rootdir) {
 	fileHandler.rescan();
 	return fileHandler;
 };
-wrapper.writeJSON = function(res, value) {
+wrapper.writeJSON = function(req, res, value) {
 //	sys.debug(value);
 	var body = JSON.stringify(value);
 	if(!body) body = "";
