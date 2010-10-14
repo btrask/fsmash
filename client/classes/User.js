@@ -68,7 +68,7 @@ var User = function(session, userID) {
 	user.event.person = bt.dispatch(function(body) {
 		var person;
 		if(user.personByUserID.hasOwnProperty(body.userID)) person = user.personByUserID[body.userID];
-		else person = new Person(session, user, Number(body.userID));
+		else person = new Person(session, user, body.userID);
 		person.updateWithInfo(body);
 		person.setOnline(true);
 	}, null, function(body) {
@@ -115,7 +115,7 @@ var User = function(session, userID) {
 	};
 	user.getPerson = function(userID, userName) {
 		if(!user.personByUserID.hasOwnProperty(userID)) {
-			user.personByUserID[userID] = new Person(session, user, Number(userID));
+			user.personByUserID[userID] = new Person(session, user, userID);
 			if(userName) user.personByUserID[userID].updateWithInfo({userName: userName});
 		}
 		return user.personByUserID[userID];

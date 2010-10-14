@@ -24,7 +24,7 @@ var SidebarItem = function(title) {
 			if(SidebarItem.selected) SidebarItem.selected.select(false);
 			SidebarItem.selected = item;
 		}
-		item.selected = !!flag;
+		item.selected = Boolean(flag);
 		DOM.changeClass(item.row, "selected", flag);
 		DOM.fill(DOM.id("main"), (flag ? item.content : undefined));
 		if(flag && item.onshow) item.onshow();

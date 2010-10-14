@@ -17,7 +17,7 @@ var Game = function(session, user, channel) {
 
 	var setBroadcasting = function(flag) {
 		if(flag == game.broadcasting) return;
-		game.broadcasting = !!flag;
+		game.broadcasting = Boolean(flag);
 		if(channel.userIsMember) user.setBroadcasting(game.broadcasting);
 	};
 	var updateIsBroadcasting = function() {

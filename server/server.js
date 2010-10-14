@@ -80,7 +80,7 @@ var configureSessions = (function configureSessions() {
 				if(Channel.byID.hasOwnProperty(channelRow.channelID)) channel = Channel.byID[channelRow.channelID];
 				else channel = new Channel(null, channelRow.channelID);
 				channel.info.topic = channelRow.topic;
-				channel.info.allowsGameChannels = !!Number(channelRow.allowsGameChannels);
+				channel.info.allowsGameChannels = Boolean(channelRow.allowsGameChannels);
 				Channel.public.byID[channelRow.channelID] = channel;
 			});
 		}
@@ -325,7 +325,7 @@ root.api.session.user = bt.dispatch(function(query, session) {
 						if(Channel.byID.hasOwnProperty(channelRow.channelID)) channel = Channel.byID[channelRow.channelID];
 						else {
 							channel = new Channel(channelRow.parentID, channelRow.channelID);
-							channel.info.allowsGameChannels = !!Number(channelRow.allowsGameChannels);
+							channel.info.allowsGameChannels = Boolean(channelRow.allowsGameChannels);
 							if(channelRow.topic) {
 								channel.info.topic = channelRow.topic;
 							} else {
@@ -393,10 +393,10 @@ root.api.session.user.remember = bt.dispatch(function(query, session, user) {
 root.api.session.user.settings = bt.dispatch(function(query, session, user) {
 	var settings = [];
 	if(undefined !== query.styleID) {
-		settings.push(db.format("styleID = $", Number(query.styleID)));
+		settings.push(db.format("styleID = $", parseInt(query.styleID)));
 	}
 	if(undefined !== query.soundsetID) {
-		settings.push(db.format("soundsetID = $", Number(query.soundsetID)));
+		settings.push(db.format("soundsetID = $", parseInt(query.soundsetID)));
 	}
 	if(settings.length) {
 		db.query("INSERT IGNORE INTO settings (userID) VALUES ($)", [user.info.userID]);
@@ -428,7 +428,7 @@ root.api.session.user.profile = bt.dispatch(function(query, session, user) {
 root.api.session.user.idle = bt.dispatch(function(query, session, user) {
 	if(!query.idle === !user.info.idle) return true;
 	return session.promise(function(ticket) {
-		user.info.idle = !!query.idle;
+		user.info.idle = Boolean(query.idle);
 		Group.users.sendEvent("/user/person/", user.info, ticket);
 	});
 });
@@ -446,7 +446,7 @@ root.api.session.user.admin.reconfigure = bt.dispatch(function(query, session, u
 	return true;
 });
 root.api.session.user.admin.signups = bt.dispatch(function(query, session, user) {
-	config.signup.allowed = !!query.signupAllowed;
+	config.signup.allowed = Boolean(query.signupAllowed);
 	return {signupAllowed: config.signup.allowed};
 });
 root.api.session.user.admin.rankings = bt.dispatch(function(query, session, user) {
@@ -465,8 +465,8 @@ root.api.session.user.admin.statistics = bt.dispatch(function(query, session, us
 	};
 });
 root.api.session.user.admin.ban = bt.dispatch(function(query, session, user) {
-	var personUserID = query.personUserID;
-	if(Number(personUserID) !== personUserID) return {error: "Invalid person user ID"};
+	var personUserID = parseInt(query.personUserID);
+	if(!personUserID) return {error: "Invalid person user ID"};
 	db.query("DELETE FROM whitelist WHERE userID = $", [personUserID]);
 	db.query("INSERT IGNORE INTO bannedSessions (modUserID, sessionID) SELECT $, sessionID FROM sessions WHERE userID = $", [user.info.userID, personUserID]);
 	if(Session.byUserID.hasOwnProperty(personUserID)) Session.byUserID[personUserID].terminate();
@@ -474,17 +474,17 @@ root.api.session.user.admin.ban = bt.dispatch(function(query, session, user) {
 });
 
 root.api.session.user.person = bt.dispatch(null, function(func, query, session, user) {
-	var personUserID = query.personUserID;
-	if(Number(personUserID) !== personUserID) return {error: "Invalid person user ID"};
+	var personUserID = parseInt(query.personUserID);
+	if(!personUserID) return {error: "Invalid person user ID"};
 	return func(query, session, user, personUserID);
 });
 root.api.session.user.person.block = bt.dispatch(function(query, session, user, personUserID) {
-	user.blockedByUserID[personUserID] = !!query.block;
+	user.blockedByUserID[personUserID] = Boolean(query.block);
 	return true;
 });
 root.api.session.user.person.rate = bt.dispatch(function(query, session, user, personUserID) {
-	var rating = query.rating;
-	if(Number(rating) !== rating) return {error: "Invalid rating"};
+	var rating = parseInt(query.rating);
+	if(!rating) return {error: "Invalid rating"};
 	if(query.rating < -1 || query.rating > 1) return {error: "Invalid rating"};
 	db.query("UPDATE ratings SET isContradicted = 0 WHERE fromUserID = $ AND toUserID = $", [personUserID, user.info.userID]);
 	db.query(
@@ -745,8 +745,8 @@ root.api.session.user.video = bt.dispatch(function(query, session, user) {
 });
 
 root.api.session.videos = bt.dispatch(function(query, session) {
-	var start = Math.round(Number(query.start)) || 0;
-	var count = Math.round(Number(query.count)) || 10;
+	var start = Math.round(parseInt(query.start)) || 0;
+	var count = Math.round(parseInt(query.count)) || 10;
 	return session.promise(function(ticket) {
 		db.query(
 			"SELECT v.youtubeID, u.userName, UNIX_TIMESTAMP(v.submitTime) * 1000 time"+

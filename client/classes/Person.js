@@ -76,7 +76,7 @@ var Person = function(session, user, userID) {
 		var i;
 		if(undefined !== info.friendCode) info.friendCode = brawl.friendCode(info.friendCode) || "(no friend code specified in profile)";
 		if(undefined !== info.idle) {
-			person.info.idle = !!info.idle;
+			person.info.idle = Boolean(info.idle);
 			for(i = 0; i < allItems.length; ++i) DOM.changeClass(allItems[i].element, "idle", person.info.idle);
 		}
 		if(undefined !== info.rank) info.rank = "Rank "+info.rank;
@@ -97,7 +97,7 @@ var Person = function(session, user, userID) {
 	};
 	person.setOnline = function(flag) {
 		if(flag == person.online) return;
-		person.online = !!flag;
+		person.online = Boolean(flag);
 		bt.map(nameElements, function(elem) {
 			DOM.changeClass(elem, "online", person.online);
 		});
