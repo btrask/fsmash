@@ -112,3 +112,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 .name.online {
 	color: #000;
 }
+.name.subscriber:after {
+	content: "✓";
+	color: #a00;
+}

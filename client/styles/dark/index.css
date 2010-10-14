@@ -151,6 +151,9 @@ a:active {
 .name.online {
 	color: #bbb;
 }
+.name.subscriber:after {
+	color: #b33;
+}
 
 /* Modal */
 

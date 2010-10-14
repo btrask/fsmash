@@ -39,16 +39,13 @@ wrapper.createServer = function(dispatcher, unknownHandler/* (filename, callback
 		req.addListener("end", function() {
 			try {
 				var filename = url.parse(req.url).pathname;
-				var remoteAddress = req.socket.remoteAddress || null;
-				if("127.0.0.1" == remoteAddress) remoteAddress = null;
-				var query = bt.union((data ? JSON.parse(data) : {}), {remoteAddress: remoteAddress});
 				var unknown = function(req, res, filename) {
 					return unknownHandler(filename, function(status, header, data, encoding) {
 						res.writeHead(status, header);
 						res.end(data, encoding);
 					});
 				};
-				var result = dispatcher(unknown, bt.components(filename), query);
+				var result = dispatcher(unknown, bt.components(filename), req, data);
 				if("function" === typeof result) result(req, res, filename);
 				else wrapper.writeJSON(req, res, result);
 			} catch(err) {
@@ -58,6 +55,9 @@ wrapper.createServer = function(dispatcher, unknownHandler/* (filename, callback
 			}
 		});
 	});
+};
+wrapper.createClient = function(arg1, arg2, etc) {
+	return http.createClient.apply(http, arguments);
 };
 wrapper.createFileHandler = function(rootdir) {
 	var pendingLookups = null;

@@ -1,5 +1,6 @@
 public/
 server/db.json
+server/paypal.json
 deps/node-crypt/build/
 .DS_Store
 .lock-wscript

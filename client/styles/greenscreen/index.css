@@ -178,6 +178,9 @@ select {
 .name.online {
 	color: #0f0;
 }
+.name.subscriber:after {
+	color: #f00;
+}
 
 /* Modal */
 

@@ -16,6 +16,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 var assert = require("assert");
 var fs = require("fs");
 var sys = require("sys");
+var url = require("url");
+var queryString = require("querystring");
 
 var crypt = require("./utilities/crypt-wrapper");
 var crypto = require("./utilities/crypto-wrapper");
@@ -33,6 +35,7 @@ var Game = require("./classes/Game").Game;
 var db = mysql.connect(JSON.parse(fs.readFileSync(__dirname+"/db.json", "utf8")));
 var config = {
 	server: JSON.parse(fs.readFileSync(__dirname+"/config.json", "utf8")),
+	paypal: JSON.parse(fs.readFileSync(__dirname+"/paypal.json", "utf8")),
 	signin: {
 		throttleMinutes: 15,
 		throttleAttempts: 50,
@@ -125,7 +128,12 @@ var updateRankings = function() {
 setInterval(updateRankings, config.rankings.interval);
 
 var root = bt.dispatch();
-root.api = bt.dispatch();
+root.api = bt.dispatch(null, function(func, req, data) {
+	var remoteAddress = req.socket.remoteAddress || null;
+	if("127.0.0.1" == remoteAddress) remoteAddress = null;
+	var query = bt.union((data ? JSON.parse(data) : {}), {remoteAddress: remoteAddress});
+	return func(query);
+});
 
 root.api.session = bt.dispatch(function(query) {
 	if(query.sessionID || query.sessionKey) return {error: "Session already exists"};
@@ -292,6 +300,14 @@ root.api.session.user = bt.dispatch(function(query, session) {
 				function(err, locationResult) {
 					if(!locationResult.length) return;
 					user.info.location = bt.array.unique([locationResult[0].region || undefined, locationResult[0].country || undefined]).join(", ");
+				}
+			);
+			db.query(
+				"SELECT donationID FROM donations"+
+				" WHERE userID = $ AND startTime <= NOW() AND expireTime > NOW() LIMIT 1",
+				[user.info.userID],
+				function(err, donationResult) {
+					if(donationResult.length) user.info.subscriber = true;
 				}
 			);
 			db.query(
@@ -758,6 +774,50 @@ root.api.session.videos = bt.dispatch(function(query, session) {
 				session.sendEvent("/videos/", {old: true, videos: mysql.rows(result)}, ticket);
 			}
 		);
+	});
+});
+
+root.paypal = bt.dispatch(function(req, data) {
+	var string = url.parse(req.url).query;
+	db.query(
+		"INSERT INTO donationAttempts (query)"+
+		" VALUES ($)",
+		[string]
+	);
+	var host = "www.sandbox.paypal.com";
+	var paypal = http.createClient(443, host, true);
+	var req = paypal.request("POST", "/cgi-bin/webscr?cmd=_notify-validate&" + string, {host: host});
+	req.addListener("response", function(res) {
+		var data = "";
+		if(200 != res.statusCode) return;
+		res.setEncoding("utf8");
+		res.addListener("data", function(chunk) {
+			data += chunk;
+		});
+		res.addListener("end", function() {
+			if("VERIFIED" != data) return;
+			var query = queryString.parse(string);
+			var custom = JSON.parse(query["custom"]);
+			var userID = parseInt(custom.userID);
+			if(!userID) return;
+			if(config.paypal.receiverEmail != query["receiver_email"]) return;
+			if(parseFloat(query["mc_gross"]) < config.paypal.minimumPayment) return;
+			if("Completed" != query["payment_status"]) return;;
+			if("subscr_payment" != query["txn_type"]) return;
+			db.query(
+				"INSERT IGNORE INTO donors (userID, payerID, transactionID, amount, startTime, expireTime)"+
+				" VALUES ($, $, $, $, NOW(), DATE_SUB(NOW(), INTERVAL 1 MONTH))",
+				[userID, query["payer_id"], query["txn_id"], query["mc_gross"]],
+				function(err, result) {
+					if(err && 1062 === err.number) return;
+					if(!Session.byUserID.hasOwnProperty(userID)) return;
+					var user = Session.byUserID[userID];
+					if(user.info.subscriber) return;
+					user.info.subscriber = true;
+					Group.users.sendEvent("/user/person/", user.info);
+				}
+			);
+		});
 	});
 });
 

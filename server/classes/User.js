@@ -26,6 +26,7 @@ var User = function(session, userID) {
 	user.info = {
 		userID: userID,
 		idle: false,
+		subscriber: false,
 	};
 	user.channelByID = {};
 	user.blockedByUserID = {};

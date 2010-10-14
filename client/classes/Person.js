@@ -59,6 +59,7 @@ var Person = function(session, user, userID) {
 	person.ignored = false;
 	person.rated = false;
 	person.online = false;
+	person.subscriber = false;
 
 	person.event = bt.dispatch();
 	person.event.signout = bt.dispatch(function(body) {
@@ -80,6 +81,11 @@ var Person = function(session, user, userID) {
 			for(i = 0; i < allItems.length; ++i) DOM.changeClass(allItems[i].element, "idle", person.info.idle);
 		}
 		if(undefined !== info.rank) info.rank = "Rank "+info.rank;
+		if(undefined !== info.subscriber) {
+			if(info.subscriber) info.memberType = "Subscriber";
+			else delete info.memberType;
+			person.setSubscriber(info.subscriber);
+		}
 
 		var keys, componentNeedsUpdate, string;
 		for(var component in Person.keysByComponent) if(Person.keysByComponent.hasOwnProperty(component)) {
@@ -102,17 +108,25 @@ var Person = function(session, user, userID) {
 			DOM.changeClass(elem, "online", person.online);
 		});
 	};
+	person.setSubscriber = function(flag) {
+		if(flag == person.subscriber) return;
+		person.subscriber = Boolean(flag);
+		bt.map(nameElements, function(elem) {
+			DOM.changeClass(elem, "subscriber", person.subscriber);
+		});
+	};
 	person.nameElement = function() {
 		var elem = document.createElement("span");
 		DOM.fill(elem, person.info.userName);
 		DOM.changeClass(elem, "name");
 		if(person.online) DOM.changeClass(elem, "online");
+		if(person.subscriber) DOM.changeClass(elem, "subscriber");
 		nameElements.push(elem);
 		return elem;
 	};
 };
 Person.keysByComponent = {
-	title: ["userName", "location", "rank"],
+	title: ["userName", "location", "rank", "memberType"],
 	brawlInfoContent: ["brawlName", "friendCode"],
 	bio: ["bio"]
 };
