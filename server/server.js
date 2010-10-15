@@ -129,7 +129,7 @@ setInterval(updateRankings, config.rankings.interval);
 
 var root = bt.dispatch();
 root.api = bt.dispatch(null, function(func, req, data) {
-	var remoteAddress = req.socket.remoteAddress || null;
+	var remoteAddress = (config.server.remoteAddressField ? req.headers[config.server.remoteAddressField] : req.socket.remoteAddress) || null;
 	if("127.0.0.1" == remoteAddress) remoteAddress = null;
 	var query = bt.union((data ? JSON.parse(data) : {}), {remoteAddress: remoteAddress});
 	return func(query);
