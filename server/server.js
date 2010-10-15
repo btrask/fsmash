@@ -17,7 +17,7 @@ var assert = require("assert");
 var fs = require("fs");
 var sys = require("sys");
 var url = require("url");
-var queryString = require("querystring");
+var querystring = require("querystring");
 
 var crypt = require("./utilities/crypt-wrapper");
 var crypto = require("./utilities/crypto-wrapper");
@@ -778,40 +778,43 @@ root.api.session.videos = bt.dispatch(function(query, session) {
 });
 
 root.paypal = bt.dispatch(function(req, data) {
-	var string = url.parse(req.url).query;
 	db.query(
 		"INSERT INTO donationAttempts (query)"+
 		" VALUES ($)",
-		[string]
+		[data]
 	);
-	var host = "www.sandbox.paypal.com";
-	var paypal = http.createClient(443, host, true);
-	var req = paypal.request("POST", "/cgi-bin/webscr?cmd=_notify-validate&" + string, {host: host});
+	var outgoing = "cmd=_notify-validate&" + data;
+	var paypal = http.createClient(443, config.paypal.host, true);
+	var req = paypal.request("POST", "/cgi-bin/webscr", {
+		"host": config.paypal.host,
+		"content-length": outgoing.length,
+	});
 	req.addListener("response", function(res) {
-		var data = "";
+		var confirm = "";
 		if(200 != res.statusCode) return;
 		res.setEncoding("utf8");
 		res.addListener("data", function(chunk) {
-			data += chunk;
+			confirm += chunk;
 		});
 		res.addListener("end", function() {
-			if("VERIFIED" != data) return;
-			var query = queryString.parse(string);
+			if("VERIFIED" != confirm) return;
+			var query = querystring.parse(data);
 			var custom = JSON.parse(query["custom"]);
 			var userID = parseInt(custom.userID);
 			if(!userID) return;
 			if(config.paypal.receiverEmail != query["receiver_email"]) return;
-			if(parseFloat(query["mc_gross"]) < config.paypal.minimumPayment) return;
-			if("Completed" != query["payment_status"]) return;;
-			if("subscr_payment" != query["txn_type"]) return;
+			var gross = parseFloat(query["mc_gross"] || query["mc_gross_1"]);
+			if(isNaN(gross) || config.paypal.minimumPayment > gross) return;
+			if("Completed" != query["payment_status"]) return;
+			// We shouldn't need to check the txn_type as long as the other conditions are met.
 			db.query(
-				"INSERT IGNORE INTO donors (userID, payerID, transactionID, amount, startTime, expireTime)"+
-				" VALUES ($, $, $, $, NOW(), DATE_SUB(NOW(), INTERVAL 1 MONTH))",
-				[userID, query["payer_id"], query["txn_id"], query["mc_gross"]],
-				function(err, result) {
+				"INSERT IGNORE INTO donations (userID, payerID, transactionID, amount, startTime, expireTime)"+
+				" VALUES ($, $, $, $, NOW(), DATE_SUB(NOW(), INTERVAL -1 MONTH))",
+				[userID, query["payer_id"], query["txn_id"], String(gross) + query["mc_currency"]],
+				function(err, donationResult) {
 					if(err && 1062 === err.number) return;
 					if(!Session.byUserID.hasOwnProperty(userID)) return;
-					var user = Session.byUserID[userID];
+					var user = Session.byUserID[userID].user;
 					if(user.info.subscriber) return;
 					user.info.subscriber = true;
 					Group.users.sendEvent("/user/person/", user.info);
@@ -819,6 +822,7 @@ root.paypal = bt.dispatch(function(req, data) {
 			);
 		});
 	});
+	req.end(outgoing, "utf8");
 });
 
 http.createServer(root, fileHandler).listen(config.server.port, config.server.host);
