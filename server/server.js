@@ -299,7 +299,9 @@ root.api.session.user = bt.dispatch(function(query, session) {
 				[query.remoteAddress],
 				function(err, locationResult) {
 					if(!locationResult.length) return;
-					user.info.location = bt.array.unique([locationResult[0].region || undefined, locationResult[0].country || undefined]).join(", ");
+					user.info.location = bt.map([locationResult[0].region, locationResult[0].country], function(part) {
+						return part || undefined;
+					}).join(", ");
 				}
 			);
 			db.query(

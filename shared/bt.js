@@ -101,8 +101,3 @@ bt.array.removeObject = function(array, val) {
 	var i = array.indexOf(val);
 	if(-1 !== i) array.splice(i, 1);
 };
-bt.array.unique = function(array) {
-	var results = [], i;
-	for(i = 0; i < array.length; ++i) if(-1 === results.indexOf(array[i])) results.push(array[i]);
-	return results;
-};
