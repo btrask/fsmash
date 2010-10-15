@@ -15,6 +15,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 var User = function(session, userID) {
 	var user = this;
 
+	var subscribeItem = new SidebarItem("Subscribe");
+	session.siteItem.children.appendChild(subscribeItem.element);
+	var subscribeElems = {};
+	subscribeItem.setContent(DOM.clone("subscribe", subscribeElems));
+	subscribeElems.custom.value = JSON.stringify({userID: userID});
+
 	var channelsItem = new SidebarItem("Channels");
 	var acctElems = {};
 

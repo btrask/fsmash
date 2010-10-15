@@ -65,10 +65,12 @@
 				</div>
 			</div>
 
-			<div id="about" class="about absolute full scroll">
+			<div id="about" class="about static absolute full scroll">
+				<div class="header">About</div>
+				<p>This website is a simple Wi-Fi friend finder for the game Super Smash Bros. Brawl. Please read the first link below for general information.</p>
 				<div class="header">Links</div>
 				<ol>
-					<li><a href="http://www.smashboards.com/showthread.php?t=208726" target="_blank">Smash World Forums thread + howto</a></li>
+					<li><a href="http://www.smashboards.com/showthread.php?t=208726" target="_blank">Smash World Forums thread + how-to</a></li>
 					<li><a href="http://www.smashboards.com/group.php?groupid=1056" target="_blank">Smash World Forums group</a></li>
 					<li><a href="http://allisbrawl.com/group.aspx?id=7485" target="_blank">All is Brawl group</a></li>
 					<li><a href="http://www.smashmods.com/" target="_blank">Smash Mods</a></li>
@@ -85,22 +87,51 @@
 				<p>Trolling is allowed as long as it follows the other rules.</p>
 				<p><b>If you believe someone has broken the rules</b>, please press the Report… button in the channel where it happened. No action will be taken immediately, but the last 50 messages in the channel will be saved for review. Please don’t abuse this feature.</p>
 				<p>If you submit a video that isn’t related to Brawl (or one that’s really bad), it will probably get deleted. No machinima.</p>
-				<div class="header">Donations</div>
-				<p>Please consider donating to offset the hosting costs I pay and (perhaps) the time I spend maintaining and improving this site.</p>
-				<div class="center padding">
-					<form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_blank">
-						<input type="hidden" name="cmd" value="_s-xclick">
-						<input type="hidden" name="hosted_button_id" value="7218103">
-						<input type="image" src="https://www.paypal.com/en_US/i/btn/btn_donate_LG.gif" name="submit" alt="PayPal - The safer, easier way to pay online!" class="link">
-						<img alt="" src="https://www.paypal.com/en_US/i/scr/pixel.gif" width="1" height="1">
-					</form>
-				</div>
-				<p>Thanks to everyone who donates. (When you donate, there is a field where you can specify your username. Please fill it out so that I can thank you personally.) <span class="signature nowrap">--Ben</span></p>
 				<div class="header">Legal Information</div>
 				<p>Messages and account information are the property of the User.</p>
 				<p>All characters appearing on this site are fictitious. Any resemblance to real persons, living or dead, is purely coincidental.</p>
 				<p>Minors should use this site with parent approval/supervision.</p>
 				<p>This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License. (<a href="http://bentrask.com/git/?p=fsmash.git" target="_blank">Source code</a>)</p>
+			</div>
+
+			<div id="subscribe" class="subscribe static absolute full scroll">
+				<div class="header">Subscribe</div>
+				<p>This website, <i>fsmash.org</i>, has an ongoing cost of time and money to run. In order to keep the quality of the site high, please consider contributing.</p>
+				<p><strong>Thank you!</strong> to everyone who helps out. <span class="signature nowrap">--Ben</span></p>
+				<form name="paypalSubscribe" action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_blank">
+					<table border="0" cellspacing="0" cellpadding="0">
+						<tr>
+							<td>
+								<select name="os0" class="padding">
+									<option value="Very Helpful">
+										Very Helpful - $5.00USD/mo.
+									</option>
+									<option value="Extremely Helpful">
+										Extremely Helpful - $10.00USD/mo.
+									</option>
+								</select>
+							</td>
+							<td>
+								<input type="image" src="https://www.paypal.com/en_US/i/btn/btn_subscribe_LG.gif" border="0" name="submit" alt="PayPal" class="padding">
+							</td>
+							<td>
+								(PayPal)
+							</td>
+						</tr>
+					</table>
+					<input type="hidden" name="cmd" value="_s-xclick">
+					<input type="hidden" name="hosted_button_id" value="WGX3H97WB3SQE">
+					<input type="hidden" name="on0" value="">
+					<input type="hidden" name="currency_code" value="USD">
+					<input type="hidden" name="custom" value="" data-id="custom">
+					<img alt="" border="0" src="https://www.paypal.com/en_US/i/scr/pixel.gif" width="1" height="1">
+				</form>
+				<div class="header">Fine Print</div>
+				<div class="light">
+					<p>Subscribers are thanked with the “Subscriber” title and a small <span class="name subscriber">icon</span> that may appear in their chat messages.</p>
+					<p>Subscribing does not grant any special rights or privileges. You must still follow all of the site rules. If you are banned, your subscription fee will not be refunded.</p>
+					<p>If you have donated at any time in the past, your donation will automatically be credited. If you donated, but for some reason you weren’t credited, please contact me.</p>
+				</div>
 			</div>
 
 			<div id="authenticate" class="authenticate absolute">
@@ -143,7 +174,7 @@
 
 			<div id="channel" class="channel">
 				<div class="commands panel absolute">
-					<table>
+					<table class="table">
 						<tbody>
 							<tr>
 								<td><input type="button" class="button" value="New Game" data-id="newGame"></td>
@@ -152,7 +183,7 @@
 							</tr>
 						</tbody>
 					</table>
-					<table class="tabs">
+					<table class="table tabs">
 						<tbody>
 							<tr>
 								<td><input type="button" class="button" value="Info" data-id="info"></td>
@@ -166,7 +197,7 @@
 
 			<div id="info" class="info absolute full scroll"></div>
 			<div id="game" class="game panel">
-				<table class="settings">
+				<table class="table settings">
 					<tbody>
 						<tr>
 							<td><select title="Match Type"><optgroup label="Match Type" data-id="matchType"></optgroup></select></td>
@@ -175,7 +206,7 @@
 						</tr>
 					</tbody>
 				</table>
-				<table class="commands">
+				<table class="table commands">
 					<tbody>
 						<tr>
 							<td><input type="button" class="button padding" value="" data-id="action"></td>

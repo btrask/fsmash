@@ -12,19 +12,22 @@ GNU Affero General Public License for more details.
 
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>. */
-#main > .about {
+#main > .static {
 	line-height: 1.5em;
 }
-#main > .about > .header {
+#main > .static > .header {
 	margin-bottom: 4px;
 }
-#main > .about ol {
+#main > .static ol {
 	margin-bottom: 4px;
 }
-#main > .about li {
+#main > .static li {
 	margin-left: 4em;
 }
-#main > .about p {
+#main > .static p {
 	text-indent: 1em;
 	padding: 0 4px 4px 4px;
+}
+#main > .static table {
+	margin-left: 1em;
 }
