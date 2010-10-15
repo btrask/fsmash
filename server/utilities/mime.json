@@ -64,7 +64,7 @@
 	"jnlp"  : "application/x-java-jnlp-file",
 	"jpeg"  : "image/jpeg",
 	"jpg"   : "image/jpeg",
-	"js"    : "application/javascript",
+	"js"    : "text/javascript",
 	"json"  : "application/json",
 	"log"   : "text/plain",
 	"m3u"   : "audio/x-mpegurl",
