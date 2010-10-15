@@ -89,6 +89,37 @@ CREATE TABLE `channels` (
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `donationAttempts`
+--
+
+CREATE TABLE `donationAttempts` (
+  `donationAttemptID` int(11) NOT NULL AUTO_INCREMENT,
+  `query` text COLLATE utf8_unicode_ci NOT NULL,
+  `attemptTime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`donationAttemptID`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `donations`
+--
+
+CREATE TABLE `donations` (
+  `donationID` int(11) NOT NULL AUTO_INCREMENT,
+  `userID` int(11) NOT NULL,
+  `payerID` varchar(13) COLLATE utf8_unicode_ci NOT NULL,
+  `transactionID` varchar(19) COLLATE utf8_unicode_ci NOT NULL,
+  `amount` varchar(40) COLLATE utf8_unicode_ci NOT NULL DEFAULT '0.00USD',
+  `startTime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `expireTime` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
+  PRIMARY KEY (`donationID`),
+  UNIQUE KEY `transactionID` (`transactionID`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `fips_regions`
 --
 
@@ -272,7 +303,7 @@ CREATE TABLE `reportMessages` (
   PRIMARY KEY (`reportMessageID`),
   KEY `reportID` (`reportID`),
   KEY `messageUserID` (`messageUserID`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 -- --------------------------------------------------------
 
@@ -291,7 +322,7 @@ CREATE TABLE `reports` (
   KEY `channelID` (`channelID`),
   KEY `isResolved` (`isResolved`),
   KEY `reportTime` (`reportTime`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 -- --------------------------------------------------------
 
