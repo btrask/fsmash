@@ -1,6 +1,6 @@
 if (global.GENTLY) require = GENTLY.hijack(require);
 
-var sys = require('sys'),
+var sys = require('./sys'),
     EventEmitter = require('events').EventEmitter,
     Parser = require('./parser'),
     Client;
@@ -60,7 +60,7 @@ Query.prototype._handlePacket = function(packet) {
 
       packet.on('data', function(buffer, remaining) {
         if (buffer) {
-          row[field.name] += buffer;
+          row[field.name] += buffer.toString('utf-8');
         } else {
           row[field.name] = null;
         }

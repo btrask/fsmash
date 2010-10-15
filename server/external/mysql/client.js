@@ -1,12 +1,13 @@
 if (global.GENTLY) require = GENTLY.hijack(require);
 
-var sys = require('sys'),
+var sys = require('./sys'),
     Stream = require('net').Stream,
     auth = require('./auth'),
     Parser = require('./parser'),
     OutgoingPacket = require('./outgoing_packet'),
     Query = require('./query'),
-    EventEmitter = require('events').EventEmitter;
+    EventEmitter = require('events').EventEmitter,
+    netBinding = process.binding('net');
 
 function Client(properties) {
   if (!(this instanceof Client)) {
@@ -26,6 +27,8 @@ function Client(properties) {
   this.maxPacketSize = 0x01000000;
   this.charsetNumber = Client.UTF8_UNICODE_CI;
   this.debug = false;
+  this.ending = false;
+  this.connected = false;
 
   this._greeting = null;
   this._queue = [];
@@ -48,10 +51,31 @@ Client.prototype.connect = function(cb) {
     connection.connect(self.port, self.host);
     connection
       .on('error', function(err) {
+        if (err.errno == netBinding.ECONNREFUSED) {
+          if (cb) {
+            cb(err);
+          }
+          return;
+        }
+
         self.emit('error', err);
       })
       .on('data', function(b) {
         parser.write(b);
+      })
+      .on('end', function() {
+        if (self.ending) {
+          self.connected = false;
+          self.ending = false;
+          return;
+        }
+
+        if (!self.connected) {
+          return;
+        }
+
+        self.connected = false;
+        self._prequeue(connect);
       });
 
     parser
@@ -97,7 +121,9 @@ Client.prototype.query = function(sql, params, cb) {
   } else {
     query
       .on('error', function(err) {
-        self.emit('error', err);
+        if (query.listeners('error').length <= 1) {
+          self.emit('error', err);
+        }
         self._dequeue();
       })
       .on('end', function(result) {
@@ -105,7 +131,7 @@ Client.prototype.query = function(sql, params, cb) {
       });
   }
 
-  this._enqueue(function() {
+  this._enqueue(function query() {
     var packet = new OutgoingPacket(1 + Buffer.byteLength(sql, 'utf-8'));
 
     packet.writeNumber(1, Client.COM_QUERY);
@@ -165,10 +191,59 @@ Client.prototype.escape = function(val) {
   return "'"+val+"'";
 };
 
-Client.prototype.end = function() {
-  this._connection.end();
+Client.prototype.ping = function(cb) {
+  var self = this;
+  this._enqueue(function ping() {
+    var packet = new OutgoingPacket(1);
+    packet.writeNumber(1, Client.COM_PING);
+    self.write(packet);
+  }, cb);
 };
 
+Client.prototype.statistics = function(cb) {
+  var self = this;
+  this._enqueue(function ping() {
+    var packet = new OutgoingPacket(1);
+    packet.writeNumber(1, Client.COM_STATISTICS);
+    self.write(packet);
+  }, cb);
+};
+
+Client.prototype.useDatabase = function(database, cb) {
+  var self = this;
+  this._enqueue(function ping() {
+    var packet = new OutgoingPacket(1 + Buffer.byteLength(database, 'utf-8'));
+    packet.writeNumber(1, Client.COM_INIT_DB);
+    packet.write(database, 'utf-8');
+    self.write(packet);
+  }, cb);
+};
+
+Client.prototype.destroy = function() {
+  this._connection.destroy();
+}
+
+Client.prototype.end = function(cb) {
+  var self = this;
+
+  this.ending = true;
+
+  this._enqueue(function end() {
+    var packet = new OutgoingPacket(1);
+    packet.writeNumber(1, Client.COM_QUIT);
+    self.write(packet);
+    if (cb) {
+      self._connection.on('end', cb);
+    }
+
+    self._dequeue();
+  });
+};
+
+Client.prototype._prequeue = function(fn, delegate) {
+  this._queue.unshift({fn: fn, delegate: delegate});
+  fn();
+};
 
 Client.prototype._enqueue = function(fn, delegate) {
   this._queue.push({fn: fn, delegate: delegate});
@@ -213,11 +288,12 @@ Client.prototype._handlePacket = function(packet) {
     return;
   }
 
-  if (type == Parser.OK_PACKET) {
+  if (type != Parser.ERROR_PACKET) {
+    this.connected = true;
     if (delegate) {
       delegate(null, Client._packetToUserObject(packet));
     }
-  } else if (type == Parser.ERROR_PACKET) {
+  } else {
     packet = Client._packetToUserObject(packet);
     if (delegate) {
       delegate(packet);

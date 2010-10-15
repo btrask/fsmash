@@ -2,9 +2,10 @@ if (global.GENTLY) require = GENTLY.hijack(require);
 
 // see: http://forge.mysql.com/wiki/MySQL_Internals_ClientServer_Protocol
 
-var sys = require('sys'),
+var sys = require('./sys'),
     Buffer = require('buffer').Buffer,
-    EventEmitter = require('events').EventEmitter;
+    EventEmitter = require('events').EventEmitter,
+    POWS = [1, 256, 65536, 16777216];
 
 function Parser() {
   EventEmitter.call(this);
@@ -55,7 +56,9 @@ Parser.prototype.write = function(buffer) {
           return 0;
         }
 
-        val += Math.pow(256, packet.index - 1) * c;
+        if (c) {
+          val += POWS[packet.index - 1] * c;
+        }
 
         if (packet.index === self._lengthCodedLength) {
           self._lengthCodedLength = null;
@@ -92,7 +95,7 @@ Parser.prototype.write = function(buffer) {
         }
 
           // 3 bytes - Little endian
-        packet.length += Math.pow(256, packet.index) * c;
+        packet.length += POWS[packet.index] * c;
 
         if (packet.index == 2) {
           advance();
@@ -141,7 +144,7 @@ Parser.prototype.write = function(buffer) {
         }
 
         // 4 bytes = probably Little endian, protocol docs are not clear
-        packet.threadId += Math.pow(256, packet.index) * c;
+        packet.threadId += POWS[packet.index] * c;
 
         if (packet.index == 3) {
           advance();
@@ -168,7 +171,7 @@ Parser.prototype.write = function(buffer) {
           packet.serverCapabilities = 0;
         }
         // 2 bytes = probably Little endian, protocol docs are not clear
-        packet.serverCapabilities += Math.pow(256, packet.index) * c;
+        packet.serverCapabilities += POWS[packet.index] * c;
 
         if (packet.index == 1) {
           advance();
@@ -184,7 +187,7 @@ Parser.prototype.write = function(buffer) {
         }
 
         // 2 bytes = probably Little endian, protocol docs are not clear
-        packet.serverStatus += Math.pow(256, packet.index) * c;
+        packet.serverStatus += POWS[packet.index] * c;
 
         if (packet.index == 1) {
           advance();
@@ -228,7 +231,7 @@ Parser.prototype.write = function(buffer) {
 
         this.receivingFieldPackets = true;
         packet.type = Parser.RESULT_SET_HEADER_PACKET;
-        packet.fieldCount = lengthCoded(packet.fieldCount, Parser.EXTRA);
+        packet.fieldCount = lengthCoded(packet.fieldCount, Parser.EXTRA_LENGTH);
 
         break;
 
@@ -239,7 +242,7 @@ Parser.prototype.write = function(buffer) {
         }
 
         // 2 bytes = Little endian
-        packet.errorNumber += Math.pow(256, packet.index) * c;
+        packet.errorNumber += POWS[packet.index] * c;
 
         if (packet.index == 1) {
           advance();
@@ -280,21 +283,38 @@ Parser.prototype.write = function(buffer) {
         }
 
         // 2 bytes - Little endian
-        packet.serverStatus += Math.pow(256, packet.index) * c;
+        packet.serverStatus += POWS[packet.index] * c;
 
         if (packet.index == 1) {
           advance();
         }
         break;
+      case Parser.WARNING_COUNT:
+        if (packet.index == 0) {
+          packet.warningCount = 0;
+        }
+
+        // 2 bytes - Little endian
+        packet.warningCount += POWS[packet.index] * c;
+
+        if (packet.index == 1) {
+          packet.message = '';
+          advance();
+        }
+        break;
       case Parser.MESSAGE:
         if (packet.received <= packet.length) {
-          packet.message = (packet.message || '') + String.fromCharCode(c);
+          packet.message += String.fromCharCode(c);
         }
         break;
 
       // RESULT_SET_HEADER_PACKET
-      case Parser.EXTRA:
-        packet.extra = lengthCoded(packet.extra);
+      case Parser.EXTRA_LENGTH:
+        packet.extra = '';
+        self._lengthCodedStringLength = lengthCoded(self._lengthCodedStringLength);
+        break;
+      case Parser.EXTRA_STRING:
+        packet.extra += String.fromCharCode(c);
         break;
 
       // FIELD_PACKET or EOF_PACKET
@@ -575,8 +595,10 @@ Parser.ERROR_MESSAGE                = s++;
 Parser.AFFECTED_ROWS                = s++;
 Parser.INSERT_ID                    = s++;
 Parser.SERVER_STATUS                = s++;
+Parser.WARNING_COUNT                = s++;
 Parser.MESSAGE                      = s++;
-Parser.EXTRA                        = s++;
+Parser.EXTRA_LENGTH                 = s++;
+Parser.EXTRA_STRING                 = s++;
 Parser.FIELD_CATALOG_LENGTH         = s++;
 Parser.FIELD_CATALOG_STRING         = s++;
 Parser.FIELD_DB_LENGTH              = s++;
