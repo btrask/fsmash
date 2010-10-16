@@ -11,9 +11,9 @@ SET SQL_MODE="NO_AUTO_VALUE_ON_ZERO";
 --
 
 CREATE TABLE `admins` (
-  `adminID` int(11) NOT NULL AUTO_INCREMENT,
+  `adminID` int(11) NOT NULL auto_increment,
   `userID` int(11) NOT NULL,
-  PRIMARY KEY (`adminID`),
+  PRIMARY KEY  (`adminID`),
   UNIQUE KEY `userID` (`userID`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
@@ -24,13 +24,13 @@ CREATE TABLE `admins` (
 --
 
 CREATE TABLE `bannedIPs` (
-  `bannedIPID` int(11) NOT NULL AUTO_INCREMENT,
+  `bannedIPID` int(11) NOT NULL auto_increment,
   `minIPAddress` bigint(20) unsigned NOT NULL,
   `maxIPAddress` bigint(20) unsigned NOT NULL,
   `modUserID` int(11) NOT NULL,
-  `reason` text COLLATE utf8_unicode_ci NOT NULL,
-  `bannedTime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`bannedIPID`),
+  `reason` text collate utf8_unicode_ci NOT NULL,
+  `bannedTime` timestamp NOT NULL default CURRENT_TIMESTAMP,
+  PRIMARY KEY  (`bannedIPID`),
   KEY `minIPAddress` (`minIPAddress`),
   KEY `maxIPAddress` (`maxIPAddress`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
@@ -42,13 +42,13 @@ CREATE TABLE `bannedIPs` (
 --
 
 CREATE TABLE `bannedSessions` (
-  `bannedSessionID` int(11) NOT NULL AUTO_INCREMENT,
+  `bannedSessionID` int(11) NOT NULL auto_increment,
   `sessionID` int(11) NOT NULL,
-  `modUserID` int(11) DEFAULT NULL,
-  `dependentSessionID` int(11) DEFAULT NULL,
-  `reason` text COLLATE utf8_unicode_ci,
-  `bannedTime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`bannedSessionID`),
+  `modUserID` int(11) default NULL,
+  `dependentSessionID` int(11) default NULL,
+  `reason` text collate utf8_unicode_ci,
+  `bannedTime` timestamp NOT NULL default CURRENT_TIMESTAMP,
+  PRIMARY KEY  (`bannedSessionID`),
   UNIQUE KEY `sessionID` (`sessionID`),
   KEY `modUserID` (`modUserID`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
@@ -60,13 +60,13 @@ CREATE TABLE `bannedSessions` (
 --
 
 CREATE TABLE `channelMembers` (
-  `channelMemberID` int(11) NOT NULL AUTO_INCREMENT,
+  `channelMemberID` int(11) NOT NULL auto_increment,
   `channelID` int(11) NOT NULL,
   `userID` int(11) NOT NULL,
-  `isCreator` tinyint(4) NOT NULL DEFAULT '0',
-  `invitedByUserID` int(11) DEFAULT NULL,
-  `joinTime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`channelMemberID`),
+  `isCreator` tinyint(4) NOT NULL default '0',
+  `invitedByUserID` int(11) default NULL,
+  `joinTime` timestamp NOT NULL default CURRENT_TIMESTAMP,
+  PRIMARY KEY  (`channelMemberID`),
   UNIQUE KEY `channelID` (`channelID`,`userID`),
   KEY `invitedByUserID` (`invitedByUserID`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
@@ -78,12 +78,12 @@ CREATE TABLE `channelMembers` (
 --
 
 CREATE TABLE `channels` (
-  `channelID` int(11) NOT NULL AUTO_INCREMENT,
-  `topic` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `parentID` int(11) DEFAULT NULL,
-  `allowsGameChannels` tinyint(4) NOT NULL DEFAULT '1',
-  `creationTime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`channelID`)
+  `channelID` int(11) NOT NULL auto_increment,
+  `topic` varchar(255) collate utf8_unicode_ci default NULL,
+  `parentID` int(11) default NULL,
+  `allowsGameChannels` tinyint(4) NOT NULL default '1',
+  `creationTime` timestamp NOT NULL default CURRENT_TIMESTAMP,
+  PRIMARY KEY  (`channelID`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 -- --------------------------------------------------------
@@ -93,10 +93,10 @@ CREATE TABLE `channels` (
 --
 
 CREATE TABLE `donationAttempts` (
-  `donationAttemptID` int(11) NOT NULL AUTO_INCREMENT,
-  `query` text COLLATE utf8_unicode_ci NOT NULL,
-  `attemptTime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`donationAttemptID`)
+  `donationAttemptID` int(11) NOT NULL auto_increment,
+  `query` text collate utf8_unicode_ci NOT NULL,
+  `attemptTime` timestamp NOT NULL default CURRENT_TIMESTAMP,
+  PRIMARY KEY  (`donationAttemptID`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 -- --------------------------------------------------------
@@ -106,14 +106,14 @@ CREATE TABLE `donationAttempts` (
 --
 
 CREATE TABLE `donations` (
-  `donationID` int(11) NOT NULL AUTO_INCREMENT,
+  `donationID` int(11) NOT NULL auto_increment,
   `userID` int(11) NOT NULL,
-  `payerID` varchar(13) COLLATE utf8_unicode_ci NOT NULL,
-  `transactionID` varchar(19) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `amount` varchar(40) COLLATE utf8_unicode_ci NOT NULL DEFAULT '0.00USD',
-  `startTime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `expireTime` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
-  PRIMARY KEY (`donationID`),
+  `payerID` varchar(13) collate utf8_unicode_ci NOT NULL,
+  `transactionID` varchar(19) collate utf8_unicode_ci default NULL,
+  `amount` varchar(40) collate utf8_unicode_ci NOT NULL default '0.00USD',
+  `startTime` timestamp NOT NULL default CURRENT_TIMESTAMP,
+  `expireTime` timestamp NOT NULL default '0000-00-00 00:00:00',
+  PRIMARY KEY  (`donationID`),
   UNIQUE KEY `transactionID` (`transactionID`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
@@ -124,11 +124,11 @@ CREATE TABLE `donations` (
 --
 
 CREATE TABLE `fips_regions` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id` int(11) NOT NULL auto_increment,
   `country_code` varchar(2) NOT NULL,
   `code` varchar(2) NOT NULL,
   `name` varchar(64) NOT NULL,
-  PRIMARY KEY (`id`),
+  PRIMARY KEY  (`id`),
   KEY `code2country` (`country_code`,`code`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
 
@@ -139,11 +139,11 @@ CREATE TABLE `fips_regions` (
 --
 
 CREATE TABLE `games` (
-  `gameID` int(11) NOT NULL AUTO_INCREMENT,
+  `gameID` int(11) NOT NULL auto_increment,
   `channelID` int(11) NOT NULL,
-  `matchTypeID` int(11) NOT NULL DEFAULT '0',
-  `ruleID` int(11) NOT NULL DEFAULT '0',
-  PRIMARY KEY (`gameID`),
+  `matchTypeID` int(11) NOT NULL default '0',
+  `ruleID` int(11) NOT NULL default '0',
+  PRIMARY KEY  (`gameID`),
   UNIQUE KEY `channelID` (`channelID`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
@@ -200,7 +200,7 @@ CREATE TABLE `locations` (
   `latitude` float NOT NULL,
   `longitude` float NOT NULL,
   `metrocode` varchar(3) NOT NULL,
-  PRIMARY KEY (`id`)
+  PRIMARY KEY  (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
@@ -210,12 +210,12 @@ CREATE TABLE `locations` (
 --
 
 CREATE TABLE `matchTypes` (
-  `matchTypeID` int(11) NOT NULL AUTO_INCREMENT,
-  `label` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+  `matchTypeID` int(11) NOT NULL auto_increment,
+  `label` varchar(255) collate utf8_unicode_ci NOT NULL,
   `hasTeams` tinyint(4) NOT NULL,
   `playerCount` int(11) NOT NULL,
   `sortOrder` int(11) NOT NULL,
-  PRIMARY KEY (`matchTypeID`),
+  PRIMARY KEY  (`matchTypeID`),
   UNIQUE KEY `sortOrder` (`sortOrder`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
@@ -226,12 +226,12 @@ CREATE TABLE `matchTypes` (
 --
 
 CREATE TABLE `profiles` (
-  `userProfileID` int(11) NOT NULL AUTO_INCREMENT,
+  `userProfileID` int(11) NOT NULL auto_increment,
   `userID` int(11) NOT NULL,
-  `brawlName` varchar(20) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
-  `friendCode` varchar(12) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
-  `bio` text COLLATE utf8_unicode_ci NOT NULL,
-  PRIMARY KEY (`userProfileID`),
+  `brawlName` varchar(20) collate utf8_unicode_ci NOT NULL default '',
+  `friendCode` varchar(12) collate utf8_unicode_ci NOT NULL default '',
+  `bio` text collate utf8_unicode_ci NOT NULL,
+  PRIMARY KEY  (`userProfileID`),
   UNIQUE KEY `userID` (`userID`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
@@ -242,11 +242,11 @@ CREATE TABLE `profiles` (
 --
 
 CREATE TABLE `publicChannels` (
-  `publicChannelID` int(11) NOT NULL AUTO_INCREMENT,
+  `publicChannelID` int(11) NOT NULL auto_increment,
   `channelID` int(11) NOT NULL,
-  `descriptionHTML` text COLLATE utf8_unicode_ci NOT NULL,
+  `descriptionHTML` text collate utf8_unicode_ci NOT NULL,
   `sortOrder` int(11) NOT NULL,
-  PRIMARY KEY (`publicChannelID`),
+  PRIMARY KEY  (`publicChannelID`),
   UNIQUE KEY `channelID` (`channelID`),
   UNIQUE KEY `sortOrder` (`sortOrder`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
@@ -258,12 +258,12 @@ CREATE TABLE `publicChannels` (
 --
 
 CREATE TABLE `rankings` (
-  `rankingID` int(11) NOT NULL AUTO_INCREMENT,
+  `rankingID` int(11) NOT NULL auto_increment,
   `userID` int(11) NOT NULL,
   `directPoints` int(11) NOT NULL,
   `indirectPoints` int(11) NOT NULL,
   `totalPoints` int(11) NOT NULL,
-  PRIMARY KEY (`rankingID`),
+  PRIMARY KEY  (`rankingID`),
   UNIQUE KEY `userID` (`userID`),
   KEY `totalPoints` (`totalPoints`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
@@ -275,13 +275,13 @@ CREATE TABLE `rankings` (
 --
 
 CREATE TABLE `ratings` (
-  `ratingID` int(11) NOT NULL AUTO_INCREMENT,
+  `ratingID` int(11) NOT NULL auto_increment,
   `fromUserID` int(11) NOT NULL,
   `toUserID` int(11) NOT NULL,
   `ratingType` int(11) NOT NULL,
-  `ratingTime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `isContradicted` tinyint(4) NOT NULL DEFAULT '0',
-  PRIMARY KEY (`ratingID`),
+  `ratingTime` timestamp NOT NULL default CURRENT_TIMESTAMP,
+  `isContradicted` tinyint(4) NOT NULL default '0',
+  PRIMARY KEY  (`ratingID`),
   UNIQUE KEY `fromUserID` (`fromUserID`,`toUserID`),
   KEY `ratingType` (`ratingType`),
   KEY `ratingTime` (`ratingTime`),
@@ -295,12 +295,12 @@ CREATE TABLE `ratings` (
 --
 
 CREATE TABLE `reportMessages` (
-  `reportMessageID` int(11) NOT NULL AUTO_INCREMENT,
+  `reportMessageID` int(11) NOT NULL auto_increment,
   `reportID` int(11) NOT NULL,
   `messageUserID` int(11) NOT NULL,
-  `messageText` text COLLATE utf8_unicode_ci NOT NULL,
-  `messageTime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`reportMessageID`),
+  `messageText` text collate utf8_unicode_ci NOT NULL,
+  `messageTime` timestamp NOT NULL default CURRENT_TIMESTAMP,
+  PRIMARY KEY  (`reportMessageID`),
   KEY `reportID` (`reportID`),
   KEY `messageUserID` (`messageUserID`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
@@ -312,12 +312,12 @@ CREATE TABLE `reportMessages` (
 --
 
 CREATE TABLE `reports` (
-  `reportID` int(11) NOT NULL AUTO_INCREMENT,
+  `reportID` int(11) NOT NULL auto_increment,
   `channelID` int(11) NOT NULL,
   `userID` int(11) NOT NULL,
-  `isResolved` tinyint(4) NOT NULL DEFAULT '0',
-  `reportTime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`reportID`),
+  `isResolved` tinyint(4) NOT NULL default '0',
+  `reportTime` timestamp NOT NULL default CURRENT_TIMESTAMP,
+  PRIMARY KEY  (`reportID`),
   KEY `userID` (`userID`),
   KEY `channelID` (`channelID`),
   KEY `isResolved` (`isResolved`),
@@ -331,10 +331,10 @@ CREATE TABLE `reports` (
 --
 
 CREATE TABLE `rules` (
-  `ruleID` int(11) NOT NULL AUTO_INCREMENT,
-  `label` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+  `ruleID` int(11) NOT NULL auto_increment,
+  `label` varchar(255) collate utf8_unicode_ci NOT NULL,
   `sortOrder` int(11) NOT NULL,
-  PRIMARY KEY (`ruleID`),
+  PRIMARY KEY  (`ruleID`),
   UNIQUE KEY `sortOrder` (`sortOrder`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
@@ -345,11 +345,11 @@ CREATE TABLE `rules` (
 --
 
 CREATE TABLE `sessions` (
-  `sessionID` int(11) NOT NULL AUTO_INCREMENT,
+  `sessionID` int(11) NOT NULL auto_increment,
   `userID` int(11) NOT NULL,
-  `ipAddress` bigint(20) unsigned DEFAULT NULL,
-  `creationTime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`sessionID`),
+  `ipAddress` bigint(20) unsigned default NULL,
+  `creationTime` timestamp NOT NULL default CURRENT_TIMESTAMP,
+  PRIMARY KEY  (`sessionID`),
   KEY `userID` (`userID`),
   KEY `ipAddress` (`ipAddress`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
@@ -361,11 +361,11 @@ CREATE TABLE `sessions` (
 --
 
 CREATE TABLE `settings` (
-  `settingsID` int(11) NOT NULL AUTO_INCREMENT,
+  `settingsID` int(11) NOT NULL auto_increment,
   `userID` int(11) NOT NULL,
-  `styleID` int(11) NOT NULL DEFAULT '1',
-  `soundsetID` int(11) NOT NULL DEFAULT '2',
-  PRIMARY KEY (`settingsID`),
+  `styleID` int(11) NOT NULL default '1',
+  `soundsetID` int(11) NOT NULL default '2',
+  PRIMARY KEY  (`settingsID`),
   UNIQUE KEY `userID` (`userID`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
@@ -376,11 +376,11 @@ CREATE TABLE `settings` (
 --
 
 CREATE TABLE `signinAttempts` (
-  `signinAttemptID` int(11) NOT NULL AUTO_INCREMENT,
-  `ipAddress` bigint(20) unsigned DEFAULT NULL,
-  `userName` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
-  `signinTime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`signinAttemptID`),
+  `signinAttemptID` int(11) NOT NULL auto_increment,
+  `ipAddress` bigint(20) unsigned default NULL,
+  `userName` varchar(255) collate utf8_unicode_ci NOT NULL,
+  `signinTime` timestamp NOT NULL default CURRENT_TIMESTAMP,
+  PRIMARY KEY  (`signinAttemptID`),
   KEY `signinTime` (`signinTime`),
   KEY `ipAddress` (`ipAddress`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
@@ -392,15 +392,15 @@ CREATE TABLE `signinAttempts` (
 --
 
 CREATE TABLE `soundsets` (
-  `soundsetID` int(11) NOT NULL AUTO_INCREMENT,
-  `label` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
-  `path` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `challenge` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `join` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `leave` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `message` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `soundsetID` int(11) NOT NULL auto_increment,
+  `label` varchar(255) collate utf8_unicode_ci NOT NULL,
+  `path` varchar(255) collate utf8_unicode_ci default NULL,
+  `challenge` varchar(255) collate utf8_unicode_ci default NULL,
+  `join` varchar(255) collate utf8_unicode_ci default NULL,
+  `leave` varchar(255) collate utf8_unicode_ci default NULL,
+  `message` varchar(255) collate utf8_unicode_ci default NULL,
   `sortOrder` int(11) NOT NULL,
-  PRIMARY KEY (`soundsetID`),
+  PRIMARY KEY  (`soundsetID`),
   UNIQUE KEY `sortOrder` (`sortOrder`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
@@ -411,10 +411,10 @@ CREATE TABLE `soundsets` (
 --
 
 CREATE TABLE `tokens` (
-  `tokenID` int(11) NOT NULL AUTO_INCREMENT,
+  `tokenID` int(11) NOT NULL auto_increment,
   `userID` int(11) NOT NULL,
-  `token` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
-  PRIMARY KEY (`tokenID`),
+  `token` varchar(50) collate utf8_unicode_ci NOT NULL,
+  PRIMARY KEY  (`tokenID`),
   UNIQUE KEY `userID` (`userID`),
   KEY `token` (`token`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
@@ -426,12 +426,12 @@ CREATE TABLE `tokens` (
 --
 
 CREATE TABLE `users` (
-  `userID` int(11) NOT NULL AUTO_INCREMENT,
-  `userName` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
-  `passHash` varchar(40) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `passHash2` varchar(60) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `registerTime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`userID`),
+  `userID` int(11) NOT NULL auto_increment,
+  `userName` varchar(255) collate utf8_unicode_ci NOT NULL,
+  `passHash` varchar(40) collate utf8_unicode_ci default NULL,
+  `passHash2` varchar(60) collate utf8_unicode_ci default NULL,
+  `registerTime` timestamp NOT NULL default CURRENT_TIMESTAMP,
+  PRIMARY KEY  (`userID`),
   UNIQUE KEY `name` (`userName`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
@@ -442,11 +442,11 @@ CREATE TABLE `users` (
 --
 
 CREATE TABLE `videos` (
-  `videoID` int(11) NOT NULL AUTO_INCREMENT,
+  `videoID` int(11) NOT NULL auto_increment,
   `userID` int(11) NOT NULL,
-  `youtubeID` varchar(11) COLLATE utf8_unicode_ci NOT NULL,
-  `submitTime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`videoID`),
+  `youtubeID` varchar(11) collate utf8_unicode_ci NOT NULL,
+  `submitTime` timestamp NOT NULL default CURRENT_TIMESTAMP,
+  PRIMARY KEY  (`videoID`),
   UNIQUE KEY `youtubeID` (`youtubeID`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
@@ -457,10 +457,10 @@ CREATE TABLE `videos` (
 --
 
 CREATE TABLE `whitelist` (
-  `whitelistID` int(11) NOT NULL AUTO_INCREMENT,
+  `whitelistID` int(11) NOT NULL auto_increment,
   `userID` int(11) NOT NULL,
-  `modID` int(11) DEFAULT NULL,
-  `whitelistTime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`whitelistID`),
+  `modID` int(11) default NULL,
+  `whitelistTime` timestamp NOT NULL default CURRENT_TIMESTAMP,
+  PRIMARY KEY  (`whitelistID`),
   UNIQUE KEY `userID` (`userID`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
