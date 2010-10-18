@@ -57,8 +57,10 @@ var config = {
 
 process.title = config.server.title;
 process.addListener("uncaughtException", function(err) {
-	sys.log(err);
 	sys.log(err.stack);
+});
+process.addListener("SIGPIPE", function() {
+	sys.log("SIGPIPE"); // Catch random SIGPIPEs that seem to occur due to NFS's proxy setup.
 });
 
 var fileHandler = http.createFileHandler(__dirname+"/../public");
