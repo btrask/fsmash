@@ -1,20 +1,29 @@
 fsmash.org site software
 ========================
 
-fsmash is the software that powers http://fsmash.org. It requires node.js and MySQL.
+fsmash is the software that powers <http://fsmash.org/>. It requires node.js and MySQL.
 
 Installation
 ------------
 
-1. Install node-crypt on the server (see below)
-2. `cd` to the `fsmash` directory
-3. Run `make gzip-only`
-4. Upload `/public`, `/server`, and `/shared` to the server
-5. On the server:
-6. Edit `/server/config.json`
-7. Create `/server/db.json` and `/server/paypal.json` (see samples below)
-8. Configure the MySQL database (see below)
+1. `cd` to the `fsmash` directory
+2. Run `make gzip-only`
+3. Upload `/public`, `/server`, and `/shared` to the server
+4. On the server:
+5. Edit `/server/config.json`
+6. Create `/server/db.json` and `/server/paypal.json` (see samples below)
+7. Configure the MySQL database (see below)
+8. Install `node-crypt` (see below)
 9. Run `./server/server.js`
+
+MySQL database configuration
+----------------------------
+
+1. Create the database schema using `/resources/database.sql`
+2. Install up-to-date IP geolocation tables from <http://ipinfodb.com/ip_database.php> (use the multi-table "Complete (City)" version)
+3. Create some `channels` and add them to `publicChannels`
+4. Add `matchTypes`, `rules`, and `soundsets`
+5. Configure your account as an `admin`
 
 Installing node-crypt
 ---------------------
@@ -27,15 +36,6 @@ Installing node-crypt
 4. Run `node-waf configure`
 5. Run `node-waf build`
 6. Run `node-waf install`
-
-MySQL database configuration
-----------------------------
-
-1. Create the database schema using `/resources/database.sql`
-2. Install up-to-date IP geolocation tables from `http://ipinfodb.com/ip_database.php` (use the multi-table "Complete (City)" version)
-3. Create some `channels` and add them to `publicChannels`
-4. Add `matchTypes`, `rules`, and `soundsets`
-5. Configure your account as an `admin`
 
 Sample /server/db.json
 ----------------------
