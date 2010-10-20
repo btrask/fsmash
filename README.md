@@ -11,7 +11,7 @@ Installation
 5. Create `/server/db.json` and `/server/paypal.json`
 6. Run `./server/server.js`
 
-db.json
+Sample /server/db.json
 -------
 
 	{
@@ -22,7 +22,7 @@ db.json
 		"database": "fsmash"
 	}
 
-paypal.json
+Sample /server/paypal.json
 -----------
 
 	{
