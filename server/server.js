@@ -42,6 +42,9 @@ var config = {
 	},
 	signup: {
 		allowed: true,
+		minUsernameLength: 3,
+		maxUsernameLength: 16,
+		minPasswordLength: 5,
 	},
 	channel: {
 		maxTopicLength: 40,
@@ -172,7 +175,9 @@ root.api.session.user = bt.dispatch(function(query, session) {
 			if(!config.signup.allowed) return accountError("Account creation is temporarily disabled");
 			if(!query.userName.length) return accountError("Enter a name & pass, then click “Sign Up”");
 			if(/^\s|\s\s+|\s$/.test(query.userName)) return accountError("Invalid whitespace in user name");
-			if(query.password.length < 5) return accountError("Passwords must be at least 5 characters");
+			if(query.userName.length < config.signup.minUsernameLength) return accountError("User names must be at least " + config.signup.minUsernameLength + " characters");
+			if(query.userName.length > config.signup.maxUsernameLength) return accountError("User names must be at most " + config.signup.maxUsernameLength + " characters");
+			if(query.password.length < config.signup.minPasswordLength) return accountError("Passwords must be at least " + config.signup.minPasswordLength + " characters");
 			db.query(
 				"SELECT * FROM sessions WHERE ipAddress = INET_ATON($) LIMIT 1",
 				[query.remoteAddress],
