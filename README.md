@@ -10,7 +10,7 @@ Installation
 2. Run `make gzip-only`
 3. Upload `/public`, `/server`, and `/shared` to the server
 4. On the server:
-5. Edit `/server/config.json`
+5. Edit `/server/server.json`
 6. Create `/server/db.json` and `/server/paypal.json` (see samples below)
 7. Configure the MySQL database (see below)
 8. Install `node-crypt` (see below)

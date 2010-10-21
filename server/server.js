@@ -34,7 +34,7 @@ var Game = require("./classes/Game").Game;
 
 var db = mysql.connect(JSON.parse(fs.readFileSync(__dirname+"/db.json", "utf8")));
 var config = {
-	server: JSON.parse(fs.readFileSync(__dirname+"/config.json", "utf8")),
+	server: JSON.parse(fs.readFileSync(__dirname+"/server.json", "utf8")),
 	paypal: JSON.parse(fs.readFileSync(__dirname+"/paypal.json", "utf8")),
 	signin: {
 		throttleMinutes: 15,
