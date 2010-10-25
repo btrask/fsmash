@@ -129,7 +129,7 @@ var Game = function(session, user, channel) {
 		});
 
 		DOM.fill(game.playersNeeded);
-		for(i = 0; i < user.config.matchTypes[game.info.matchTypeID].playerCount; ++i) {
+		for(var i = 0; i < user.config.matchTypes[game.info.matchTypeID].playerCount; ++i) {
 			game.playersNeeded.appendChild(DOM.select.option(""+i+" more needed", i));
 		}
 
