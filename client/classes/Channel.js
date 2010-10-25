@@ -415,5 +415,5 @@ Channel.updateSubchannels = function(parentChannel, channelByID, element, compar
 	for(var id in channelByID) if(channelByID.hasOwnProperty(id)) channels.push(channelByID[id]);
 	channels.sort(compare);
 	DOM.fill(element);
-	for(i = 0; i < channels.length; ++i) element.appendChild(channels[i].sidebarItem.element);
+	for(var i = 0; i < channels.length; ++i) element.appendChild(channels[i].sidebarItem.element);
 };
