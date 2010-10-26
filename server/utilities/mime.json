@@ -65,7 +65,7 @@
 	"jpeg"  : "image/jpeg",
 	"jpg"   : "image/jpeg",
 	"js"    : "text/javascript",
-	"json"  : "application/json",
+	"json"  : "text/json",
 	"log"   : "text/plain",
 	"m3u"   : "audio/x-mpegurl",
 	"m4v"   : "video/mp4",

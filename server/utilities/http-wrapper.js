@@ -29,7 +29,7 @@ var MIMEForExtension = (function() {
 	};
 })();
 
-wrapper.createServer = function(dispatcher, unknownHandler/* (filename, callback (status, header, data, encoding)) */) {
+wrapper.createServer = function(dispatcher, unknownHandler/* (filename, write (status, header, data, encoding)) */) {
 	return http.createServer(function(req, res) {
 		var data = "";
 		req.setEncoding("utf8");
@@ -37,20 +37,24 @@ wrapper.createServer = function(dispatcher, unknownHandler/* (filename, callback
 			data += chunk;
 		});
 		req.addListener("end", function() {
+			var filename = url.parse(req.url).pathname;
+			var write = function(status, header, data, encoding) {
+				res.writeHead(status, header);
+				res.end(data, encoding);
+			};
+			var unknown = function(req, res, filename) {
+				return unknownHandler(filename, write);
+			};
 			try {
-				var filename = url.parse(req.url).pathname;
-				var unknown = function(req, res, filename) {
-					return unknownHandler(filename, function(status, header, data, encoding) {
-						res.writeHead(status, header);
-						res.end(data, encoding);
-					});
-				};
 				var result = dispatcher(unknown, bt.components(filename), req, data);
 				if("function" === typeof result) result(req, res, filename);
 				else wrapper.writeJSON(req, res, result);
 			} catch(err) {
-				res.writeHead(500, {});
-				res.end();
+				var msg = "500 Internal Server Error";
+				write(500, {
+					"Content-Type": "text/plain; charset=UTF-8",
+					"Content-Length": msg.length,
+				}, msg, "utf8");
 				sys.log(err);
 			}
 		});
@@ -103,13 +107,17 @@ wrapper.createFileHandler = function(rootdir) {
 			callback();
 		});
 	};
-	var fileHandler = function(filename, callback) {
+	var fileHandler = function(filename, write/* (status, header, data, encoding) */) {
 		if("/" === filename[filename.length - 1]) filename += "index.html";
 		var lookup = cacheByDisplayName.hasOwnProperty(filename) ? function() {
 			var cache = cacheByDisplayName[filename];
-			callback(cache.status, cache.header, cache.body);
+			write(cache.status, cache.header, cache.body, cache.encoding);
 		} : function() {
-			callback(404, {});
+			var msg = "404 File Not Found";
+			write(404, {
+				"Content-Type": "text/plain; charset=UTF-8",
+				"Content-Length": msg.length,
+			}, msg, "utf8");
 		};
 		if(null === pendingLookups) lookup();
 		else pendingLookups.push(lookup);
@@ -129,11 +137,10 @@ wrapper.createFileHandler = function(rootdir) {
 	return fileHandler;
 };
 wrapper.writeJSON = function(req, res, value) {
-//	sys.debug(value);
 	var body = JSON.stringify(value);
 	if(!body) body = "";
 	res.writeHead(200, {
-		"Content-Type": "application/json; charset=UTF-8",
+		"Content-Type": "text/json; charset=UTF-8",
 		"Content-Length": body.length,
 	});
 	res.end(body, "utf8");
