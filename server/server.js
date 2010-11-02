@@ -65,6 +65,7 @@ process.addListener("uncaughtException", function(err) {
 process.addListener("SIGPIPE", function() {
 	sys.log("SIGPIPE"); // Catch random SIGPIPEs that seem to occur due to NFS's proxy setup.
 });
+sys.log("Starting " + process.title);
 
 var fileHandler = http.createFileHandler(__dirname+"/../public");
 var configureSessions = (function configureSessions() {
