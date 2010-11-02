@@ -509,7 +509,7 @@ root.api.session.user.person.block = bt.dispatch(function(query, session, user, 
 });
 root.api.session.user.person.rate = bt.dispatch(function(query, session, user, personUserID) {
 	var rating = parseInt(query.rating);
-	if(!rating) return {error: "Invalid rating"};
+	if(isNaN(rating)) return {error: "Invalid rating"};
 	if(query.rating < -1 || query.rating > 1) return {error: "Invalid rating"};
 	db.query("UPDATE ratings SET isContradicted = 0 WHERE fromUserID = $ AND toUserID = $", [personUserID, user.info.userID]);
 	db.query(

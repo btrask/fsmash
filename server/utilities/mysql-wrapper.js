@@ -30,7 +30,7 @@ wrapper.connect = function(conf) {
 			var arg = params.shift();
 			assert.ok(undefined !== arg, "Format arguments must not be undefined");
 			if(null === arg) return "NULL";
-			if(Number === arg.constructor && isNaN(arg)) return 0;
+			if(isNaN(arg)) return 0;
 			if(String === arg.constructor) {
 				if("#" === type) return arg;
 				return connection.escape(arg);
