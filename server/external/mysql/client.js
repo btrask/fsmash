@@ -48,14 +48,13 @@ Client.prototype.connect = function(cb) {
     var connection = self._connection = new Stream(),
         parser = self._parser = new Parser();
 
-    connection.connect(self.port, self.host);
     connection
       .on('error', function(err) {
-        if (err.errno == netBinding.ECONNREFUSED) {
+        if (err.errno & (netBinding.ECONNREFUSED | netBinding.ENOTFOUND)) {
           if (cb) {
             cb(err);
+            return;
           }
-          return;
         }
 
         self.emit('error', err);
@@ -77,6 +76,7 @@ Client.prototype.connect = function(cb) {
         self.connected = false;
         self._prequeue(connect);
       });
+    connection.connect(self.port, self.host);
 
     parser
       .on('packet', function(packet) {
