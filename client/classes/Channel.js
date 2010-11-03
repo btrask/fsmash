@@ -236,7 +236,7 @@ var Channel = function(session, user, channelID, parentID) {
 		return func(body, channel.memberByUserID[body.memberUserID]);
 	});
 	channel.event.member.leave = bt.dispatch(function(body, member) {
-		if(member !== user.person && body.time) channel.alert("leave");
+		if(member !== user.person && channel.userIsMember && body.time) channel.alert("leave");
 		channel.removeMember(member, body.time);
 	});
 	channel.event.message = bt.dispatch(function(body) {
