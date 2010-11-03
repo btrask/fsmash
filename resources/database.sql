@@ -56,6 +56,20 @@ CREATE TABLE `bannedSessions` (
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `channelAncestors`
+--
+
+CREATE TABLE `channelAncestors` (
+  `channelAncestorID` int(11) NOT NULL auto_increment,
+  `channelID` int(11) NOT NULL,
+  `ancestorID` int(11) NOT NULL,
+  PRIMARY KEY  (`channelAncestorID`),
+  UNIQUE KEY `channelID` (`channelID`,`ancestorID`)
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `channelMembers`
 --
 

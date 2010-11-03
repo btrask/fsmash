@@ -55,10 +55,12 @@ var Channel = function(parentID, channelID) {
 	channel.subchannelByID = {};
 	channel.broadcastingSubchannelByID = {};
 	channel.history = [];
+	channel.ancestors = [];
 	if(parentID) {
 		assert.ok(Channel.byID.hasOwnProperty(parentID), "Invalid channel parent");
 		channel.parent = Channel.byID[parentID];
 		channel.parent.subchannelByID[channelID] = channel;
+		channel.ancestors = [channel.parent].concat(channel.parent.ancestors);
 	}
 	channel.sendMessage = function(user, message, ticket) {
 		var body = {

@@ -479,6 +479,29 @@ root.api.session.user.admin.rankings = bt.dispatch(function(query, session, user
 	updateRankings();
 	return true;
 });
+root.api.session.user.admin.channelAncestors = bt.dispatch(function(query, session, user) {
+	db.query("LOCK TABLES channelAncestors WRITE, channelAncestors ca1 READ, channelAncestors ca2 READ, channels c READ");
+	db.query("DELETE FROM channelAncestors WHERE 1");
+	db.query("ALTER TABLE channelAncestors AUTO_INCREMENT = 0");
+	db.query(
+		"INSERT IGNORE INTO channelAncestors"+
+		" (channelID, ancestorID) SELECT channelID, parentID"+
+		" FROM channels c WHERE parentID IS NOT NULL"
+	);
+	(function recursivelyAddAncestors() {
+		db.query(
+			"INSERT IGNORE INTO channelAncestors"+
+			" (channelID, ancestorID) SELECT ca1.channelID, ca2.ancestorID"+
+			" FROM channelAncestors ca1"+
+			" LEFT JOIN channelAncestors ca2 ON (ca1.ancestorID = ca2.channelID)"+
+			" WHERE ca2.ancestorID IS NOT NULL",
+			function(err, ancestorsResult) {
+				if(ancestorsResult.affectedRows) recursivelyAddAncestors();
+				else db.query("UNLOCK TABLES")
+			}
+		);
+	})();
+});
 root.api.session.user.admin.statistics = bt.dispatch(function(query, session, user) {
 	return {
 		memory: process.memoryUsage(),
@@ -521,7 +544,7 @@ root.api.session.user.person.rate = bt.dispatch(function(query, session, user, p
 			db.query(
 				"REPLACE ratings (fromUserID, toUserID, ratingType, isContradicted)"+
 				" VALUES ($, $, $, $)",
-				[user.info.userID, personUserID, rating, (contradictedResult.affected_rows ? 1 : 0)]
+				[user.info.userID, personUserID, rating, (contradictedResult.affectedRows ? 1 : 0)]
 			);
 		}
 	);
@@ -550,6 +573,9 @@ root.api.session.user.channel.spawn = bt.dispatch(function(query, session, user,
 				var channelID = channelResult.insertId;
 				assert.ok(!Channel.byID[channelID], "New channels must have unique IDs");
 				var channel = new Channel(parentChannel.info.channelID, channelID);
+				var ancestorValues = bt.map(channel.ancestors, function(ancestor) {
+					return db.format("($, $)", channelID, ancestor.info.channelID);
+				});
 				var game;
 				if(topic) {
 					channel.info.topic = topic;
@@ -557,6 +583,10 @@ root.api.session.user.channel.spawn = bt.dispatch(function(query, session, user,
 					game = new Game(channel);
 				}
 				channel.addUser(user, ticket);
+				if(ancestorValues.length) db.query(
+					"INSERT IGNORE INTO channelAncestors (channelID, ancestorID)"+
+					" VALUES #", [ancestorValues.join(", ")]
+				);
 				db.query(
 					"INSERT IGNORE INTO channelMembers (channelID, userID, isCreator)"+
 					" VALUES ($, $, 1)", [channelID, user.info.userID]

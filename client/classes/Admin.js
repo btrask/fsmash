@@ -59,6 +59,9 @@ var Admin = function(session, user, signupAllowed) {
 	adminElems.updateRankings.onclick = function() {
 		admin.request("/rankings/");
 	};
+	adminElems.updateChannelAncestors.onclick = function() {
+		admin.request("/channelAncestors/");
+	};
 	adminElems.updateStatistics.onclick = function() {
 		admin.request("/statistics/", {}, function(result) {
 			DOM.fill(adminElems.statistics, JSON.stringify(result, undefined, "\t"));
