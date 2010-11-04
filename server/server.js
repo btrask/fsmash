@@ -62,10 +62,38 @@ process.title = config.server.title;
 process.addListener("uncaughtException", function(err) {
 	sys.log(err.stack);
 });
-process.addListener("SIGPIPE", function() {
-	sys.log("SIGPIPE"); // Catch random SIGPIPEs that seem to occur due to NFS's proxy setup.
-});
 sys.log("Starting " + process.title);
+
+(function signalHandling() {
+	if(!config.server.catchSignals) return;
+	var signals = [
+		"SIGABRT",
+		"SIGALRM",
+		"SIGFPE",
+		"SIGHUP",
+		"SIGILL",
+		"SIGINT",
+		"SIGKILL",
+		"SIGPIPE",
+		"SIGQUIT",
+		"SIGSEGV",
+		"SIGTERM",
+		"SIGUSR1",
+		"SIGUSR2",
+		"SIGCHLD",
+		"SIGCONT",
+		"SIGSTOP",
+		"SIGTSTP",
+		"SIGTTIN",
+		"SIGTTOU",
+		"SIGBUS",
+		"SIGPOLL",
+		"SIGPROF",
+		"SIGSYS",
+		"SIGTRAP",
+	];
+	for(var i = 0; i < signals.length; ++i) process.addListener(signals[i], bt.curry(sys.log, signals[i]));
+})();
 
 var fileHandler = http.createFileHandler(__dirname+"/../public");
 var configureSessions = (function configureSessions() {
