@@ -119,6 +119,7 @@ var configureSessions = (function configureSessions() {
 				channel.info.topic = channelRow.topic;
 				channel.info.allowsGameChannels = Boolean(channelRow.allowsGameChannels);
 				Channel.public.byID[channelRow.channelID] = channel;
+				channel.autosave();
 			});
 		}
 	);
@@ -387,6 +388,7 @@ root.api.session.user = bt.dispatch(function(query, session) {
 								game.info.matchTypeID = channelRow.matchTypeID || 0;
 								game.info.ruleID = channelRow.ruleID || 0;
 							}
+							channel.autosave();
 						}
 						channel.addUser(user);
 						channel.group.sendEvent("/user/channel/member/", {channelID: channel.info.channelID, memberUserID: user.info.userID}, undefined, [user]);
@@ -639,6 +641,7 @@ root.api.session.user.channel.spawn = bt.dispatch(function(query, session, user,
 				} else {
 					game = new Game(channel);
 				}
+				channel.autosave();
 				channel.addUser(user, ticket);
 				if(ancestorValues.length) db.query(
 					"INSERT IGNORE INTO channelAncestors (channelID, ancestorID)"+
