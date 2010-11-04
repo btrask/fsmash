@@ -100,7 +100,7 @@ var Channel = function(parentID, channelID) {
 		if(channel.game && channel.game.broadcasting) user.broadcastCount--;
 		if(!bt.hasOwnProperties(channel.memberByUserID)) {
 			if(channel.game) channel.game.stopBroadcasting();
-			uncache();
+			channel.uncache();
 		}
 	};
 	channel.leaveRecursively = function(user, callback/* channelID */) {
