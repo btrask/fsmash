@@ -1,7 +1,7 @@
 public/
 server/db.json
 server/paypal.json
-server/classes/channels/
+channels/
 deps/node-crypt/build/
 .DS_Store
 .lock-wscript

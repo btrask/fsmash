@@ -29,14 +29,14 @@ var config = {
 	cacheTimeout: 1000 * 60 * 60 * 24 * 7,
 	autosave: {
 		timeout: 1000 * 10,
-		path: __dirname+"/channels",
+		path: __dirname+"/../../channels",
 	},
 };
 
 var Channel = function(parentID, channelID) {
 	var channel = this;
 	var cacheTimeout = null;
-	var autosavePath = path.join(config.autosave.path, channel.info.channelID+".json");
+	var autosavePath = path.join(config.autosave.path, channelID+".json");
 
 	Channel.byID[channelID] = channel;
 	Channel.count.active++;
