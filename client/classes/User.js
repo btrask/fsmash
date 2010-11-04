@@ -71,6 +71,9 @@ var User = function(session, userID) {
 		if(undefined !== body.styleID) user.setStyleID(body.styleID);
 		if(undefined !== body.soundsetID) user.setSoundsetID(body.soundsetID);
 	});
+	user.event.password = bt.dispatch(function(body) {
+		return body;
+	});
 	user.event.person = bt.dispatch(function(body) {
 		var person;
 		if(user.personByUserID.hasOwnProperty(body.userID)) person = user.personByUserID[body.userID];
@@ -127,6 +130,48 @@ var User = function(session, userID) {
 		return user.personByUserID[userID];
 	};
 
+	acctElems.password.onclick = function() {
+		var delay = false;
+		var elems = {};
+		var passwordPanel = DOM.clone("password", elems);
+		DOM.fill(elems.title, "Change Password");
+		elems.save.onclick = function() {
+			if(delay) return;
+			if(elems.newPassword1.value !== elems.newPassword2.value) {
+				DOM.fill(elems.title, "Please re-enter new password");
+				DOM.field.focus(elems.newPassword2);
+				return;
+			}
+			DOM.input.enable(elems.save, false);
+			user.request("/password/", {
+				"oldPassword": elems.oldPassword.value,
+				"newPassword": elems.newPassword1.value
+			}, function(result) {
+				if(result.passwordError) {
+					DOM.fill(elems.title, result.passwordError);
+					DOM.field.focus(elems.oldPassword);
+				} else DOM.remove(passwordPanel);
+				setTimeout(function() {
+					delay = false;
+					DOM.input.enable(elems.save, true);
+				}, 1000 * 1);
+			});
+		};
+		elems.cancel.onclick = function() {
+			DOM.remove(passwordPanel);
+		};
+		elems.oldPassword.onkeypress = function(event) {
+			if(DOM.event.isReturn(event)) DOM.field.focus(elems.newPassword1);
+		};
+		elems.newPassword1.onkeypress = function(event) {
+			if(DOM.event.isReturn(event)) DOM.field.focus(elems.newPassword2);
+		};
+		elems.newPassword2.onkeypress = function(event) {
+			if(DOM.event.isReturn(event)) elems.save.onclick();
+		};
+		session.showModal(passwordPanel);
+		DOM.field.focus(elems.oldPassword);
+	};
 	(function rememberMeButton() {
 		acctElems.remember.value = cookie.get("userName") ? "Forget Me" : "Remember Me";
 		acctElems.remember.onclick = function() {

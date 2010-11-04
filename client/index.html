@@ -163,7 +163,7 @@
 			<div id="account" class="account absolute full scroll">
 				<div class="profile panel overflow">
 					<div class="bio wrapper"><input type="text" class="text padding" maxlength="141" title="Player Bio" data-id="bio"></div>
-					<div class="wrap alignTop"><input type="text" class="brawlName text padding" maxlength="5" title="Name" data-id="brawlName"><input type="text" class="friendCode text padding" maxlength="14" title="Friend Code" data-id="friendCode"><select class="style" title="Style"><optgroup label="Style" data-id="styles"><option>Default</option></optgroup></select><select class="sound" title="Soundset"><optgroup label="Soundset" data-id="soundsets"><option>Default</option></optgroup></select><input type="button" class="button padding remember" data-id="remember"><input type="button" class="button padding signout" value="Sign Out" data-id="signout"></div>
+					<div class="wrap alignTop"><input type="text" class="brawlName text padding" maxlength="5" title="Name" data-id="brawlName"><input type="text" class="friendCode text padding" maxlength="14" title="Friend Code" data-id="friendCode"><select class="style" title="Style"><optgroup label="Style" data-id="styles"><option>Default</option></optgroup></select><select class="sound" title="Soundset"><optgroup label="Soundset" data-id="soundsets"><option>Default</option></optgroup></select><input type="button" class="button padding password" value="Change Password" data-id="password"><input type="button" class="button padding remember" data-id="remember"><input type="button" class="button padding signout" value="Sign Out" data-id="signout"></div>
 				</div>
 				<div class="channels" data-id="publicChannels"></div>
 			</div>
@@ -280,6 +280,35 @@
 					<input type="button" class="button" value="I won a lot of games" data-id="neutral">
 					<input type="button" class="button" value="I won a few games" data-id="down">
 					<input type="button" class="button cancel" value="Cancel" data-id="cancel">
+				</div>
+			</div>
+			<div id="password" class="absolute full shield password">
+				<div class="absolute padding content">
+					<div class="title center" data-id="title"></div>
+					<div class="step">
+						<div class="line">
+							<label class="padding right absolute">Old password:</label>
+							<input type="password" class="text padding absolute" data-id="oldPassword">
+						</div>
+					</div>
+					<div class="step">
+						<div class="line">
+							<label class="padding right absolute">New password:</label>
+							<input type="password" class="text padding absolute" data-id="newPassword1">
+						</div>
+						<div class="line">
+							<label class="padding right absolute">Confirm:</label>
+							<input type="password" class="text padding absolute" data-id="newPassword2">
+						</div>
+					</div>
+					<div class="step">
+						<div class="line">
+							<input type="button" class="button absolute" value="Save" data-id="save">
+						</div>
+						<div class="line">
+							<input type="button" class="button cancel absolute" value="Cancel" data-id="cancel">
+						</div>
+					</div>
 				</div>
 			</div>
 

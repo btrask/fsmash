@@ -65,3 +65,39 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 	left: 275px;
 	width: 60px;
 }
+
+#modal > .password > .content {
+	height: 165px;
+	width: 276px;
+	left: 50%;
+	top: 50%;
+	margin-left: -142px;
+	margin-top: -86px;
+}
+#modal > .password > .content > .step {
+	overflow: visible;
+}
+#modal > .password > .content > .step + .step {
+	margin-top: 6px;
+}
+#modal > .password > .content > .step > .line {
+	height: 27px;
+	position: relative;
+	overflow: visible;
+}
+#modal > .password > .content > .title {
+	height: 20px;
+}
+#modal > .password > .content label {
+	width: 100px;
+	left: 0;
+	top: 0;
+}
+#modal > .password > .content .text {
+	top: 0;
+	width: 150px;
+	right: 0;
+}
+#modal > .password > .content .button {
+	width: 100%;
+}

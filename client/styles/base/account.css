@@ -35,9 +35,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 #main > .account > .profile > .wrap > .sound {
 	width: 150px;
 }
-#main > .account > .profile > .wrap > .button {
-	width: 110px;
-}
 #main > .account > .profile > .bio.wrapper {
 	height: 25px;
 	margin: 0 2px 2px 2px;

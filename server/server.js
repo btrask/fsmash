@@ -176,9 +176,9 @@ root.api.session.user = bt.dispatch(function(query, session) {
 			if(!config.signup.allowed) return accountError("Account creation is temporarily disabled");
 			if(!query.userName.length) return accountError("Enter a name & pass, then click “Sign Up”");
 			if(/^\s|\s\s+|\s$/.test(query.userName)) return accountError("Invalid whitespace in user name");
-			if(query.userName.length < config.signup.minUsernameLength) return accountError("User names must be at least " + config.signup.minUsernameLength + " characters");
-			if(query.userName.length > config.signup.maxUsernameLength) return accountError("User names must be at most " + config.signup.maxUsernameLength + " characters");
-			if(query.password.length < config.signup.minPasswordLength) return accountError("Passwords must be at least " + config.signup.minPasswordLength + " characters");
+			if(query.userName.length < config.signup.minUsernameLength) return accountError("User name must be at least " + config.signup.minUsernameLength + " characters");
+			if(query.userName.length > config.signup.maxUsernameLength) return accountError("User name must be at most " + config.signup.maxUsernameLength + " characters");
+			if(query.password.length < config.signup.minPasswordLength) return accountError("Password must be at least " + config.signup.minPasswordLength + " characters");
 			db.query(
 				"SELECT * FROM sessions WHERE ipAddress = INET_ATON($) LIMIT 1",
 				[query.remoteAddress],
@@ -225,14 +225,14 @@ root.api.session.user = bt.dispatch(function(query, session) {
 					} else {
 						var legacyPassHash = crypto.SHA1(query.password);
 						db.query(
-							"SELECT userID, userName, passHash2 passHash FROM users"+
+							"SELECT userID, userName, passHash2 FROM users"+
 							" WHERE userName = $ AND (passHash2 IS NOT NULL OR passHash = $) LIMIT 1",
 							[query.userName, legacyPassHash],
 							function(err, userResult) {
 								if(!userResult.length) return accountError("Incorrect username or password");
 								var userRow = mysql.rows(userResult)[0];
-								if(userRow.passHash) {
-									if(!crypt.check(query.password, userRow.passHash)) return accountError("Incorrect username or password");
+								if(userRow.passHash2) {
+									if(!crypt.check(query.password, userRow.passHash2)) return accountError("Incorrect username or password");
 								} else {
 									db.query(
 										"UPDATE users SET passHash = NULL, passHash2 = $"+
@@ -410,6 +410,35 @@ root.api.session.user = bt.dispatch(function(query, session) {
 }, function(func, query, session) {
 	if(!session.user) return {error: "Session not signed in"};
 	return func(query, session, session.user);
+});
+root.api.session.user.password = bt.dispatch(function(query, session, user) {
+	if(undefined === query.oldPassword) return {error: "No old password specified"};
+	if(undefined === query.newPassword) return {error: "No new password specified"};
+	if(query.newPassword.length < config.signup.minPasswordLength) return {passwordError: "Password must be at least " + config.signup.minPasswordLength + " characters"};
+	return session.promise(function(ticket) {
+		var legacyPassHash = crypto.SHA1(query.oldPassword);
+		db.query(
+			"SELECT * FROM users"+
+			" WHERE userID = $ AND (passHash2 IS NOT NULL OR passHash = $)"+
+			" LIMIT 1",
+			[user.info.userID, legacyPassHash],
+			function(err, userResult) {
+				var incorrectPassword = function() {
+					user.sendEvent("/user/password/", {passwordError: "Incorrect password"}, ticket);
+				};
+				if(!userResult.length) return incorrectPassword();
+				var userRow = mysql.rows(userResult)[0];
+				if(null !== userRow.passHash2 && !crypt.check(query.oldPassword, userRow.passHash2)) return incorrectPassword();
+				db.query(
+					"UPDATE users"+
+					" SET passHash = NULL, passHash2 = $"+
+					" WHERE userID = $ AND passHash = $ LIMIT 1",
+					[crypt.hash(query.newPassword), user.info.userID, legacyPassHash]
+				);
+				user.sendEvent("/user/password/", {}, ticket);
+			}
+		);
+	});
 });
 root.api.session.user.remember = bt.dispatch(function(query, session, user) {
 	var token = crypt.randomString(50);
