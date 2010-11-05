@@ -163,7 +163,9 @@ Channel.count = {
 	} catch(e) {
 		if(process.EEXIST !== e.errno) sys.log(e);
 	}
-	var filenames = fs.readdirSync(config.autosave.path);
+	var filenames = fs.readdirSync(config.autosave.path).sort(function(a, b) {
+		return parseInt(a) - parseInt(b);
+	});
 	for(var i = 0; i < filenames.length; ++i) {
 		var obj = JSON.parse(fs.readFileSync(path.join(config.autosave.path, filenames[i]), "utf8"));
 		if(obj.info.parentID && !Channel.byID.hasOwnProperty(obj.info.parentID)) continue;
