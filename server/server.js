@@ -462,8 +462,8 @@ root.api.session.user.password = bt.dispatch(function(query, session, user) {
 				db.query(
 					"UPDATE users"+
 					" SET passHash = NULL, passHash2 = $"+
-					" WHERE userID = $ AND passHash = $ LIMIT 1",
-					[crypt.hash(query.newPassword), user.info.userID, legacyPassHash]
+					" WHERE userID = $ LIMIT 1",
+					[crypt.hash(query.newPassword), user.info.userID]
 				);
 				user.sendEvent("/user/password/", {}, ticket);
 			}
