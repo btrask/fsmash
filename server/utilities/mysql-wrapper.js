@@ -15,7 +15,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 var wrapper = exports;
 
 var assert = require("assert");
-var sys = require("sys");
+var util = require("util");
 
 var bt = require("../../shared/bt");
 

@@ -13,9 +13,10 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 var assert = require("assert");
+var constants = require("constants");
 var fs = require("fs");
 var path = require("path");
-var sys = require("sys");
+var util = require("util");
 
 var bt = require("../../shared/bt");
 
@@ -161,9 +162,10 @@ Channel.count = {
 	try {
 		fs.mkdirSync(config.autosave.path, 0777);
 	} catch(e) {
-		if(process.EEXIST !== e.errno) sys.log(e);
+		if(constants.EEXIST !== e.errno) util.log(e);
 	}
-	var filenames = fs.readdirSync(config.autosave.path).sort(function(a, b) {
+	var filenames = fs.readdirSync(config.autosave.path);
+	filenames.sort(function(a, b) {
 		return parseInt(a) - parseInt(b);
 	});
 	for(var i = 0; i < filenames.length; ++i) {

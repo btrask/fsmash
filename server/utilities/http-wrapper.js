@@ -14,11 +14,12 @@ You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 var wrapper = exports;
 
+var constants = require("constants");
 var fs = require("fs");
 var http = require("http");
 var path = require("path");
-var sys = require("sys");
 var url = require("url");
+var util = require("util");
 
 var bt = require("../../shared/bt");
 
@@ -28,6 +29,13 @@ var MIMEForExtension = (function() {
 		return MIMEByExt[ext.slice(1)] || "application/octet-stream";
 	};
 })();
+var writeError = function(status, message, write/* (status, header, data, encoding) */) {
+	var msg = new Buffer("" + status + " " + message, "utf8");
+	write(status, {
+		"Content-Type": "text/plain; charset=UTF-8",
+		"Content-Length": msg.length,
+	}, msg);
+};
 
 wrapper.createServer = function(dispatcher, unknownHandler/* (filename, write (status, header, data, encoding)) */) {
 	return http.createServer(function(req, res) {
@@ -50,12 +58,8 @@ wrapper.createServer = function(dispatcher, unknownHandler/* (filename, write (s
 				if("function" === typeof result) result(req, res, filename);
 				else wrapper.writeJSON(req, res, result);
 			} catch(err) {
-				var msg = "500 Internal Server Error";
-				write(500, {
-					"Content-Type": "text/plain; charset=UTF-8",
-					"Content-Length": msg.length,
-				}, msg, "utf8");
-				sys.log(err);
+				writeError(500, "Internal Server Error", write);
+				util.log(err);
 			}
 		});
 	});
@@ -69,7 +73,7 @@ wrapper.createFileHandler = function(rootdir) {
 	var scandir = function(dirname, callback) {
 		fs.readdir(dirname, function(err, filenames) {
 			if(err) {
-				if(err.errno != process.ENOTDIR) return callback();
+				if(err.errno != constants.ENOTDIR) return callback();
 				return scanfile(dirname, callback);
 			}
 			(function recurseOverFilenames(i) {
@@ -113,11 +117,7 @@ wrapper.createFileHandler = function(rootdir) {
 			var cache = cacheByDisplayName[filename];
 			write(cache.status, cache.header, cache.body, cache.encoding);
 		} : function() {
-			var msg = "404 File Not Found";
-			write(404, {
-				"Content-Type": "text/plain; charset=UTF-8",
-				"Content-Length": msg.length,
-			}, msg, "utf8");
+			writeError(404, "File Not Found", write);
 		};
 		if(null === pendingLookups) lookup();
 		else pendingLookups.push(lookup);
@@ -137,11 +137,11 @@ wrapper.createFileHandler = function(rootdir) {
 	return fileHandler;
 };
 wrapper.writeJSON = function(req, res, value) {
-	var body = JSON.stringify(value);
+	var body = new Buffer(JSON.stringify(value/*, undefined, "\t"*/), "utf8");
 	if(!body) body = "";
 	res.writeHead(200, {
 		"Content-Type": "text/json; charset=UTF-8",
 		"Content-Length": body.length,
 	});
-	res.end(body, "utf8");
+	res.end(body);
 };

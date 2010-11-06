@@ -15,9 +15,9 @@ You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 var assert = require("assert");
 var fs = require("fs");
-var sys = require("sys");
-var url = require("url");
 var querystring = require("querystring");
+var url = require("url");
+var util = require("util");
 
 var crypt = require("./utilities/crypt-wrapper");
 var crypto = require("./utilities/crypto-wrapper");
@@ -60,9 +60,9 @@ var config = {
 
 process.title = config.server.title;
 process.addListener("uncaughtException", function(err) {
-	sys.log(err.stack);
+	util.log(err.stack);
 });
-sys.log("Starting " + process.title);
+util.log("Starting " + process.title);
 
 (function signalHandling() {
 	if(!config.server.catchSignals) return;
@@ -92,7 +92,7 @@ sys.log("Starting " + process.title);
 		"SIGSYS",
 		"SIGTRAP",
 	];
-	for(var i = 0; i < signals.length; ++i) process.addListener(signals[i], bt.curry(sys.log, signals[i]));
+	for(var i = 0; i < signals.length; ++i) process.addListener(signals[i], bt.curry(util.log, signals[i]));
 })();
 
 var fileHandler = http.createFileHandler(__dirname+"/../public");
@@ -883,7 +883,7 @@ root.paypal = bt.dispatch(function(req, data) {
 		" VALUES ($)",
 		[data]
 	);
-	var outgoing = "cmd=_notify-validate&" + data;
+	var outgoing = new Buffer("cmd=_notify-validate&" + data, "utf8");
 	var paypal = http.createClient(443, config.paypal.host, true);
 	var req = paypal.request("POST", "/cgi-bin/webscr", {
 		"host": config.paypal.host,
@@ -922,7 +922,7 @@ root.paypal = bt.dispatch(function(req, data) {
 			);
 		});
 	});
-	req.end(outgoing, "utf8");
+	req.end(outgoing);
 });
 
 http.createServer(root, fileHandler).listen(config.server.port, config.server.host);
