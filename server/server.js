@@ -405,7 +405,7 @@ root.api.session.user = bt.dispatch(function(query, session) {
 			user.sendEvent("/user/config/", Session.config);
 			Group.users.sendEvent("/user/person/", user.info);
 			bt.map(Session.byUserID, function(otherSession, otherUserID) {
-				if(otherUserID === user.info.userID) return;
+				if(parseInt(otherUserID) === user.info.userID) return;
 				session.sendEvent("/user/person/", otherSession.user.info);
 			});
 			db.query(
