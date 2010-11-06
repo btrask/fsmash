@@ -33,9 +33,7 @@ Installing node-crypt
 1. Upload `/deps/node-crypt` to the server
 2. On the server:
 3. `cd` to the `node-crypt` directory
-4. Run `node-waf configure`
-5. Run `node-waf build`
-6. Run `node-waf install`
+4. Run `node-waf configure build install`
 
 Sample /server/db.json
 ----------------------
