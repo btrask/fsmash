@@ -110,14 +110,18 @@ var configureSessions = (function configureSessions() {
 		" LEFT JOIN channels c ON (pc.channelID = c.channelID)"+
 		" WHERE 1 ORDER BY pc.sortOrder ASC",
 		function(err, channelsResult) {
-			var channelRows = mysql.rows(channelsResult), channel;
+			var channel;
+			var channelRows = mysql.rows(channelsResult).map(function(channelRow) {
+				channelRow.allowsGameChannels = Boolean(channelRow.allowsGameChannels);
+				return channelRow;
+			});
 			Session.config.publicChannels = channelRows;
 			Channel.public.byID = {};
 			channelRows.map(function(channelRow) {
 				if(Channel.byID.hasOwnProperty(channelRow.channelID)) channel = Channel.byID[channelRow.channelID];
 				else channel = new Channel(null, channelRow.channelID);
 				channel.info.topic = channelRow.topic;
-				channel.info.allowsGameChannels = Boolean(channelRow.allowsGameChannels);
+				channel.info.allowsGameChannels = channelRow.allowsGameChannels;
 				Channel.public.byID[channelRow.channelID] = channel;
 				channel.autosave();
 			});
