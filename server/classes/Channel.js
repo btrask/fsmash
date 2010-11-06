@@ -62,13 +62,12 @@ var Channel = function(parentID, channelID) {
 	}
 	channel.sendMessage = function(user, message, ticket) {
 		var body = {
-			channelID: channel.info.channelID,
 			userID: user.info.userID,
 			userName: user.info.userName,
 			text: message.slice(0, config.maxMessageLength),
 			time: new Date().getTime(),
 		};
-		channel.privateGroup.sendEvent("/user/channel/message/", body, ticket);
+		channel.privateGroup.sendEvent("/user/channel/message/", bt.union(body, {channelID: channel.info.channelID}), ticket);
 		channel.history.push(body);
 		while(channel.history.length > config.maxHistoryLength) channel.history.shift();
 		channel.autosave();
