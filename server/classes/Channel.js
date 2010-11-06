@@ -119,7 +119,7 @@ var Channel = function(parentID, channelID) {
 		if(channel.game) channel.game.sendInfoToTarget(target);
 
 		bt.map(channel.memberByUserID, function(member, memberUserID) {
-			target.sendEvent("/user/channel/member/", {channelID: channel.info.channelID, memberUserID: memberUserID, teamID: channel.teamIDByUserID[memberUserID]});
+			target.sendEvent("/user/channel/member/", {channelID: channel.info.channelID, memberUserID: parseInt(memberUserID), teamID: channel.teamIDByUserID[memberUserID]});
 		});
 
 		if(!isMember) return;
