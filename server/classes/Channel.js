@@ -134,7 +134,7 @@ var Channel = function(parentID, channelID) {
 		if(cacheTimeout) return;
 		Channel.count.active--;
 		Channel.count.inactive++;
-		if(time) timeout = Math.max(1000 * 1, new Date().getTime() - (time + config.cacheTimeout));
+		if(time) timeout = Math.max(1000 * 1, (time + config.cacheTimeout) - new Date().getTime());
 		cacheTimeout = setTimeout(bt.curry(function forgetSubchannels(c) {
 			bt.map(c.subchannelByID, forgetSubchannels);
 			if(Channel.byID.hasOwnProperty(c.info.channelID)) Channel.count.inactive--;
