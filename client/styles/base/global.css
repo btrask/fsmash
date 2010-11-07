@@ -167,9 +167,6 @@ td > .button, td > select {
 	box-sizing: border-box;
 }
 
-.invisible {
-	display: none;
-}
 .absolute {
 	position: absolute;
 }
