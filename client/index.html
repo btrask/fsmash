@@ -161,10 +161,15 @@
 			</div>
 
 			<div id="account" class="account absolute full scroll">
-				<div class="profile panel overflow">
-					<div class="bio wrapper"><input type="text" class="text padding" maxlength="141" title="Player Bio" data-id="bio"></div>
-					<div class="wrap alignTop"><input type="text" class="brawlName text padding" maxlength="5" title="Name" data-id="brawlName"><input type="text" class="friendCode text padding" maxlength="14" title="Friend Code" data-id="friendCode"><select class="style" title="Style"><optgroup label="Style" data-id="styles"><option>Default</option></optgroup></select><select class="sound" title="Soundset"><optgroup label="Soundset" data-id="soundsets"><option>Default</option></optgroup></select><input type="button" class="button padding password" value="Change Password" data-id="password"><input type="button" class="button padding remember" data-id="remember"><input type="button" class="button padding signout" value="Sign Out" data-id="signout"></div>
+				<div class="profile panel wrap overflow">
+					<div class="line">
+						<div class="bio wrapper"><input type="text" class="text padding" maxlength="141" title="Player Bio" data-id="bio"></div>
+					</div>
+					<div class="line alignTop overflow">
+						<input type="text" class="brawlName text padding" maxlength="5" title="Name" data-id="brawlName"><input type="text" class="friendCode text padding" maxlength="14" title="Friend Code" data-id="friendCode"><select class="style" title="Style"><optgroup label="Style" data-id="styles"><option>Default</option></optgroup></select><select class="sound" title="Soundset"><optgroup label="Soundset" data-id="soundsets"><option>Default</option></optgroup></select><input type="button" class="button padding password" value="Change Password" data-id="password"><input type="button" class="button padding remember" data-id="remember"><input type="button" class="button padding signout" value="Sign Out" data-id="signout">
+					</div>
 				</div>
+				<div class="header">Channels</div>
 				<div class="channels" data-id="publicChannels"></div>
 			</div>
 			<div id="publicChannel" class="channel padding overflow">
@@ -255,15 +260,24 @@
 				<div class="title" data-id="title"></div>
 			</div>
 
-			<div id="admin" class="absolute full padding scroll admin">
-				<input type="button" class="button padding" data-id="signupAllowed">
-				<input type="button" class="button padding" value="Rescan files" data-id="rescan">
-				<input type="button" class="button padding" value="Reconfigure" data-id="reconfigure">
-				<input type="button" class="button padding" value="Update rankings" data-id="updateRankings">
-				<input type="button" class="button padding" value="Update channel ancestors" data-id="updateChannelAncestors">
-				<input type="button" class="button padding" value="Update statistics" data-id="updateStatistics">
-				<pre data-id="statistics"></pre>
-				<pre data-id="reports"></pre>
+			<div id="admin" class="absolute full scroll admin">
+				<div class="panel wrap alignTop">
+					<div class="line">
+						<input type="button" class="button padding" data-id="signupAllowed">
+					</div>
+					<div class="line">
+						<input type="button" class="button padding" value="Update files" data-id="rescan"><input type="button" class="button padding" value="Update state" data-id="reconfigure"><input type="button" class="button padding" value="Update rankings" data-id="updateRankings"><input type="button" class="button padding" value="Update channel ancestors" data-id="updateChannelAncestors">
+					</div>
+				</div>
+				<div class="header">Statistics</div>
+				<div class="padding">
+					<input type="button" class="button padding" value="Update statistics" data-id="updateStatistics">
+					<pre data-id="statistics"></pre>
+				</div>
+				<div class="header">Reports</div>
+				<div class="padding">
+					<pre data-id="reports"></pre>
+				</div>
 			</div>
 
 			<div id="discussion" class="absolute full shield discussion">

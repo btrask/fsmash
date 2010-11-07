@@ -12,25 +12,6 @@ GNU Affero General Public License for more details.
 
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>. */
-#main > .account > .profile {
+#main > .admin > .panel {
 	border-bottom-width: 1px;
-}
-#main > .account > .profile > .line > .bio.wrapper {
-	height: 25px;
-}
-#main > .account > .profile > .line > .text.brawlName {
-	width: 80px;
-}
-#main > .account > .profile > .line > .text.friendCode {
-	width: 140px;
-}
-#main > .account > .profile > .line > .style {
-	width: 150px;
-}
-#main > .account > .profile > .line > .sound {
-	width: 150px;
-}
-
-#main > .account > .channels > .channel + .channel {
-	border-top-width: 1px;
 }
