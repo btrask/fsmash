@@ -103,6 +103,18 @@ var Channel = function(parentID, channelID) {
 			channel.uncache();
 		}
 	};
+	channel.removeAllUsers = function(ticket) {
+		// TODO: Test this (pending client-side support).
+		bt.map(channel.memberByUserID, function(user) {
+			if(channel.game && channel.game.broadcasting) user.broadcastCount--;
+			user.sendEvent("/user/channel/member/leave/", {channelID: channel.info.channelID, memberUserID: user.info.userID}, ticket);
+			delete user.channelByID[channel.info.channelID];
+		});
+		channel.memberByUserID = {};
+		channel.privateGroup.objects = [];
+		if(channel.game) channel.game.stopBroadcasting();
+		channel.uncache();
+	};
 	channel.leaveRecursively = function(user, callback/* channelID */) {
 		if(-1 === channel.privateGroup.objects.indexOf(user)) return;
 		bt.map(channel.subchannelByID, function(subchannel) {

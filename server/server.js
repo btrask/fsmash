@@ -584,6 +584,24 @@ root.api.session.user.admin.ban = bt.dispatch(function(query, session, user) {
 	if(Session.byUserID.hasOwnProperty(personUserID)) Session.byUserID[personUserID].terminate();
 	return true;
 });
+root.api.session.user.admin.channel = bt.dispatch(null, function(func, query, session, user) {
+	var channelID = query.channelID;
+	if(undefined === channelID) return {error: "No channel ID specified"};
+	if(!user.channelByID.hasOwnProperty(channelID)) return false;
+	return func(query, session, user, user.channelByID[channelID]);
+});
+root.api.session.user.admin.channel.empty = bt.dispatch(function(query, session, user, channel) {
+	// TODO: Test this (pending client-side support).
+	return session.promise(function(ticket) {
+		channel.removeAllUsers(ticket);
+		db.query(
+			"DELETE FROM channelMembers"+
+			" WHERE channelID = $ OR channelID IN"+
+				" (SELECT channelID FROM channelAncestors WHERE ancestorID = $)"
+			[channel.info.channelID, channel.info.channelID]
+		);
+	});
+});
 
 root.api.session.user.person = bt.dispatch(null, function(func, query, session, user) {
 	var personUserID = parseInt(query.personUserID);
