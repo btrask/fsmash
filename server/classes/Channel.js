@@ -104,7 +104,6 @@ var Channel = function(parentID, channelID) {
 		}
 	};
 	channel.removeAllUsers = function(ticket) {
-		// TODO: Test this (pending client-side support).
 		bt.map(channel.memberByUserID, function(user) {
 			if(channel.game && channel.game.broadcasting) user.broadcastCount--;
 			user.sendEvent("/user/channel/member/leave/", {channelID: channel.info.channelID, memberUserID: user.info.userID}, ticket);

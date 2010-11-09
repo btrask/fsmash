@@ -132,16 +132,16 @@ a:active {
 
 /* Channel */
 
-#main > .channel > .content > .info > .group > .children > .person.idle {
+#main > .channel > .content > .info > .groups > .group > .children > .person.idle {
 	background: #555;
 }
-#main > .channel > .content > .info > .group > .children > .person.teamRed > .title {
+#main > .channel > .content > .info > .groups > .group > .children > .person.teamRed > .title {
 	color: #f55;
 }
-#main > .channel > .content > .info > .group > .children > .person.teamGreen > .title {
+#main > .channel > .content > .info > .groups > .group > .children > .person.teamGreen > .title {
 	color: #5f5;
 }
-#main > .channel > .content > .info > .group > .children > .person.teamBlue > .title {
+#main > .channel > .content > .info > .groups > .group > .children > .person.teamBlue > .title {
 	color: #77f;
 }
 #main > .channel > .content > .chat > .input {

@@ -39,28 +39,28 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 	bottom: 0;
 }
 
-#main > .channel > .content > .info > .game {
+#main > .channel > .content > .info > .panels > .panel {
 	border-bottom-width: 1px;
 }
-#main > .channel > .content > .info > .game > .commands {
+#main > .channel > .content > .info > .panels > .game > .commands {
 	margin-top: -2px;
 }
 
-#main > .channel > .content > .info > .group > .children > .person + .person {
+#main > .channel > .content > .info > .groups > .group > .children > .person + .person {
 	border-top-width: 1px;
 }
-#main > .channel > .content > .info > .group > .children > .person.idle {
+#main > .channel > .content > .info > .groups > .group > .children > .person.idle {
 	background: #ddd;
 	color: #777;
 }
 
-#main > .channel > .content > .info > .group > .children > .person.teamRed > .title {
+#main > .channel > .content > .info > .groups > .group > .children > .person.teamRed > .title {
 	color: #a00;
 }
-#main > .channel > .content > .info > .group > .children > .person.teamGreen > .title {
+#main > .channel > .content > .info > .groups > .group > .children > .person.teamGreen > .title {
 	color: #0a0;
 }
-#main > .channel > .content > .info > .group > .children > .person.teamBlue > .title {
+#main > .channel > .content > .info > .groups > .group > .children > .person.teamBlue > .title {
 	color: #00d;
 }
 

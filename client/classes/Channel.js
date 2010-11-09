@@ -15,18 +15,19 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 var Channel = function(session, user, channelID, parentID) {
 	var channel = this;
 
-	var chnlElems = {}, chatElems = {};
-	var infoPane = DOM.clone("info"), chatPane = DOM.clone("chat", chatElems);
+	var chnlElems = {}, infoElems = {}, chatElems = {};
+	var infoPane = DOM.clone("info", infoElems), chatPane = DOM.clone("chat", chatElems);
 
 	var updateUserIsMember = function() {
 		var flag = channel.memberByUserID.hasOwnProperty(user.info.userID);
 		if(flag !== channel.userIsMember) {
 			channel.userIsMember = flag;
 			if(channel.game && channel.game.broadcasting) user.setBroadcasting(channel.userIsMember);
-			chnlElems.info.onclick();
 			if(channel.removeIfNecessary()) return;
+			chnlElems.info.onclick();
 		}
 		DOM.input.enable(chnlElems.leave, chnlElems.chat, channel.userIsMember);
+		DOM.changeClass(infoElems.admin, "invisible", !user.admin || !channel.userIsMember);
 		channel.groups.members.update();
 		channel.groups.formerMembers.update();
 		channel.groups.nonMembers.update();
@@ -148,7 +149,7 @@ var Channel = function(session, user, channelID, parentID) {
 		};
 	})();
 
-	DOM.fill(infoPane, channel.groups.members.element, channel.groups.formerMembers.element, channel.groups.nonMembers.element);
+	DOM.fill(infoElems.groups, channel.groups.members.element, channel.groups.formerMembers.element, channel.groups.nonMembers.element);
 
 	channel.request = function(path, properties, callback) {
 		return user.request("/channel" + path, bt.union(properties, {channelID: channel.info.channelID}), callback);
@@ -199,6 +200,9 @@ var Channel = function(session, user, channelID, parentID) {
 	};
 	channel.setAllowsGameChannels = function(flag) {
 		DOM.input.enable(chnlElems.newGame, flag && !channel.game);
+	};
+	channel.updateAdmin = function() {
+		updateUserIsMember();
 	};
 
 	channel.event = bt.dispatch();
@@ -263,8 +267,8 @@ var Channel = function(session, user, channelID, parentID) {
 	channel.event.game = bt.dispatch(function(body) {
 		if(!channel.game) {
 			channel.game = new Game(session, user, channel);
-			infoPane.insertBefore(channel.game.groups.applicants.element, infoPane.firstChild);
-			infoPane.insertBefore(channel.game.element, infoPane.firstChild);
+			infoElems.panels.insertBefore(channel.game.element, infoElems.panels.firstChild);
+			infoElems.groups.insertBefore(channel.game.groups.applicants.element, infoElems.groups.firstChild);
 			DOM.input.enable(chnlElems.newGame, chnlElems.newDiscussion, false);
 		}
 		channel.game.updateSettings(body);
@@ -391,6 +395,12 @@ var Channel = function(session, user, channelID, parentID) {
 			DOM.field.focus(elems.topic);
 		};
 	})();
+
+	infoElems.empty.onclick = function() {
+		DOM.button.confirm(this, function() {
+			user.admin.request("/channel/empty/", {channelID: channel.info.channelID});
+		});
+	};
 
 	chnlElems.leave.onclick = function() {
 		DOM.button.confirm(this, function() {

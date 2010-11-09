@@ -591,13 +591,12 @@ root.api.session.user.admin.channel = bt.dispatch(null, function(func, query, se
 	return func(query, session, user, user.channelByID[channelID]);
 });
 root.api.session.user.admin.channel.empty = bt.dispatch(function(query, session, user, channel) {
-	// TODO: Test this (pending client-side support).
 	return session.promise(function(ticket) {
 		channel.removeAllUsers(ticket);
 		db.query(
 			"DELETE FROM channelMembers"+
 			" WHERE channelID = $ OR channelID IN"+
-				" (SELECT channelID FROM channelAncestors WHERE ancestorID = $)"
+				" (SELECT channelID FROM channelAncestors WHERE ancestorID = $)",
 			[channel.info.channelID, channel.info.channelID]
 		);
 	});

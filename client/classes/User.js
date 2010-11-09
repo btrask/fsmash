@@ -102,7 +102,11 @@ var User = function(session, userID) {
 		return user.channelByID.hasOwnProperty(body.channelID) ? user.channelByID[body.channelID].event : null;
 	});
 	user.event.admin = bt.dispatch(function(body) {
-		if(!user.admin) user.admin = new Admin(session, user, body.signupAllowed);
+		if(user.admin) return;
+		user.admin = new Admin(session, user, body.signupAllowed);
+		bt.map(user.channelByID, function(channel) {
+			channel.updateAdmin();
+		});
 	}, null, function(body) {
 		return user.admin.event;
 	});

@@ -152,23 +152,23 @@ select {
 #main > .channel > .commands > .tabs .button {
 	border-color: #0f0;
 }
-#main > .channel > .content > .info > .group > .children > .person + .person {
+#main > .channel > .content > .info > .groups > .group > .children > .person + .person {
 	border-color: #090;
 }
-#main > .channel > .content > .info > .group > .children > .person.idle {
+#main > .channel > .content > .info > .groups > .group > .children > .person.idle {
 	background: #050;
 	color: #090;
 }
-#main > .channel > .content > .info > .group > .children > .person.teamNone.idle > .title {
+#main > .channel > .content > .info > .groups > .group > .children > .person.teamNone.idle > .title {
 	color: #090;
 }
-#main > .channel > .content > .info > .group > .children > .person.teamRed > .title {
+#main > .channel > .content > .info > .groups > .group > .children > .person.teamRed > .title {
 	color: #faa;
 }
-#main > .channel > .content > .info > .group > .children > .person.teamGreen > .title {
+#main > .channel > .content > .info > .groups > .group > .children > .person.teamGreen > .title {
 	color: #afa;
 }
-#main > .channel > .content > .info > .group > .children > .person.teamBlue > .title {
+#main > .channel > .content > .info > .groups > .group > .children > .person.teamBlue > .title {
 	color: #aaf;
 }
 #main > .channel > .content > .chat > .content > .messages > .history {
