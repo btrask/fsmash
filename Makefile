@@ -35,11 +35,11 @@ public/compiled.js: $(CLIENT_SCRIPTS)
 
 public/styles/base/index.css: $(addprefix client/styles/base/,$(STYLE_BASE_COMPONENTS))
 	-mkdir -p $(dir $@)
-	cat $+ | java -jar deps/yuicompressor-2.4.2/build/yuicompressor-2.4.2.jar --type css -o $@
+	cat $+ | java -jar deps/yuicompressor-2.4.2/build/yuicompressor-2.4.2.jar --type css --charset utf-8 -o $@
 
 public/styles/%/index.css: client/styles/%/index.css
 	-mkdir -p $(dir $@)
-	cat $+ | java -jar deps/yuicompressor-2.4.2/build/yuicompressor-2.4.2.jar --type css -o $@
+	cat $+ | java -jar deps/yuicompressor-2.4.2/build/yuicompressor-2.4.2.jar --type css --charset utf-8 -o $@
 
 public/%: client/%
 	-mkdir -p $(dir $@)
