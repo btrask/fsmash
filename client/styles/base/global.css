@@ -63,9 +63,10 @@ noscript {
 }
 
 #resizer {
+	background: url("resources/splitter.png") repeat-y center;
 	left: 122px;
 	top: 0;
-	height: 100%;
+	bottom: 0;
 	width: 8px;
 	cursor: col-resize;
 }
@@ -73,7 +74,7 @@ noscript {
 	background: #aaa;
 	left: 3px;
 	top: 0;
-	height: 100%;
+	bottom: 0;
 	width: 1px;
 	cursor: col-resize;
 }
