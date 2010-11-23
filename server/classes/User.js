@@ -16,10 +16,6 @@ var bt = require("../../shared/bt");
 
 var Group = require("./Group").Group;
 
-var config = {
-	maxBioLength: 141,
-};
-
 var User = function(session, userID) {
 	var user = this;
 
@@ -45,9 +41,6 @@ var User = function(session, userID) {
 		bt.array.removeObject(Group.admins.objects, user);
 		delete session.user;
 		delete session.constructor.byUserID[user.info.userID];
-	};
-	user.setBio = function(string) {
-		user.info.bio = string.slice(0, config.maxBioLength);
 	};
 };
 

@@ -1,0 +1,6 @@
+{
+	"process": {
+		"title": "fsmash-server",
+		"faultTolerant": false
+	}
+}

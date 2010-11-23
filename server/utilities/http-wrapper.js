@@ -22,13 +22,11 @@ var url = require("url");
 var util = require("util");
 
 var bt = require("../../shared/bt");
+var config = require("../config/");
 
-var MIMEForExtension = (function() {
-	var MIMEByExt = JSON.parse(fs.readFileSync(__dirname+"/mime.json", "utf8"));
-	return function(ext) {
-		return MIMEByExt[ext.slice(1)] || "application/octet-stream";
-	};
-})();
+var MIMEForExtension = function(ext) {
+	return config.mime[ext.slice(1)] || "application/octet-stream";
+};
 var writeError = function(status, message, write/* (status, header, data, encoding) */) {
 	var msg = new Buffer("" + status + " " + message, "utf8");
 	write(status, {

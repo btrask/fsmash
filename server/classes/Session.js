@@ -17,14 +17,10 @@ var util = require("util");
 
 var bt = require("../../shared/bt");
 var crypt = require("../utilities/crypt-wrapper");
+var config = require("../config/");
 
 var Group = require("./Group").Group;
 var User = require("./User").User;
-
-var config = {
-	activeTimeout: 1000 * 30,
-	inactiveTimeout: 1000 * 60 * 1,
-};
 
 var Session = function(remoteAddress) {
 	var session = this;
@@ -38,7 +34,7 @@ var Session = function(remoteAddress) {
 			events = [];
 		}
 		clearTimeout(timeout);
-		timeout = setTimeout(session.terminate, config.inactiveTimeout);
+		timeout = setTimeout(session.terminate, config.Session.inactive.timeout);
 	};
 
 	session.remoteAddress = remoteAddress;
@@ -77,7 +73,7 @@ var Session = function(remoteAddress) {
 		eventCallback = func;
 		if(events.length) return sendEvents();
 		clearTimeout(timeout);
-		timeout = setTimeout(sendEvents, config.activeTimeout);
+		timeout = setTimeout(sendEvents, config.Session.active.timeout);
 	}
 
 	session.promise = function(func) {

@@ -26,46 +26,21 @@ var mysql = require("./utilities/mysql-wrapper");
 
 var bt = require("../shared/bt");
 var brawl = require("../shared/brawl");
+var config = require("./config/");
 
 var Group = require("./classes/Group").Group;
 var Session = require("./classes/Session").Session;
 var Channel = require("./classes/Channel").Channel;
 var Game = require("./classes/Game").Game;
 
-var db = mysql.connect(JSON.parse(fs.readFileSync(__dirname+"/db.json", "utf8")));
-var config = {
-	server: JSON.parse(fs.readFileSync(__dirname+"/server.json", "utf8")),
-	paypal: JSON.parse(fs.readFileSync(__dirname+"/paypal.json", "utf8")),
-	signin: {
-		throttleMinutes: 15,
-		throttleAttempts: 50,
-	},
-	signup: {
-		allowed: true,
-		minUsernameLength: 3,
-		maxUsernameLength: 16,
-		minPasswordLength: 5,
-	},
-	channel: {
-		maxTopicLength: 40,
-	},
-	broadcast: {
-		timeout: 1000 * 60 * 5,
-	},
-	rankings: {
-		interval: 1000 * 60 * 60 * 1,
-	},
-	startTime: new Date().getTime(),
-};
+var db = mysql.connect(config.database);
+var startTime = new Date().getTime();
 
-process.title = config.server.title;
-process.addListener("uncaughtException", function(err) {
-	util.log(err.stack);
-});
+process.title = config.process.title;
 util.log("Starting " + process.title);
 
 (function signalHandling() {
-	if(!config.server.catchSignals) return;
+	if(!config.process.faultTolerant) return;
 	var signals = [
 		"SIGABRT",
 		"SIGALRM",
@@ -93,6 +68,9 @@ util.log("Starting " + process.title);
 		"SIGTRAP",
 	];
 	for(var i = 0; i < signals.length; ++i) process.addListener(signals[i], bt.curry(util.log, signals[i]));
+	process.addListener("uncaughtException", function(err) {
+		util.log(err.stack);
+	});
 })();
 
 var fileHandler = http.createFileHandler(__dirname+"/../public");
@@ -164,7 +142,7 @@ var updateRankings = function() {
 	);
 	db.query("UNLOCK TABLES");
 };
-setInterval(updateRankings, config.rankings.interval);
+setInterval(updateRankings, config.rankings.update.interval);
 
 var root = bt.dispatch();
 root.api = bt.dispatch(null, function(func, req, data) {
@@ -209,9 +187,10 @@ root.api.session.user = bt.dispatch(function(query, session) {
 			if(!config.signup.allowed) return accountError("Account creation is temporarily disabled");
 			if(!query.userName.length) return accountError("Enter a name & pass, then click “Sign Up”");
 			if(/^\s|\s\s+|\s$/.test(query.userName)) return accountError("Invalid whitespace in user name");
-			if(query.userName.length < config.signup.minUsernameLength) return accountError("User name must be at least " + config.signup.minUsernameLength + " characters");
-			if(query.userName.length > config.signup.maxUsernameLength) return accountError("User name must be at most " + config.signup.maxUsernameLength + " characters");
-			if(query.password.length < config.signup.minPasswordLength) return accountError("Password must be at least " + config.signup.minPasswordLength + " characters");
+			if(query.userName.length < config.signup.username.length.min) return accountError("User name must be at least " + config.signup.username.length.min + " characters");
+			if(query.userName.length > config.signup.username.length.max) return accountError("User name must be at most " + config.signup.username.length.max + " characters");
+			if(query.password.length < config.signup.password.length.min) return accountError("Password must be at least " + config.signup.password.length.min + " characters");
+			if(query.password.length > config.signup.password.length.max) return accountError("Password must be at most " + config.signup.password.length.max + " characters");
 			db.query(
 				"SELECT * FROM sessions WHERE ipAddress = INET_ATON($) LIMIT 1",
 				[query.remoteAddress],
@@ -239,9 +218,9 @@ root.api.session.user = bt.dispatch(function(query, session) {
 			db.query(
 				"SELECT COUNT(*) count FROM signinAttempts"+
 				" WHERE ipAddress = $ AND signinTime > DATE_SUB(NOW(), INTERVAL $ MINUTE)",
-				[query.remoteAddress, config.signin.throttleMinutes],
+				[query.remoteAddress, config.signin.throttle.minutes],
 				function(err, signinResult) {
-					if(signinResult[0].count > config.signin.throttleAttempts) return accountError("Too many signin attempts");
+					if(signinResult[0].count > config.signin.throttle.attempts) return accountError("Too many signin attempts");
 					if(query.userToken) {
 						db.query(
 							"SELECT u.userID, u.userName"+
@@ -448,7 +427,8 @@ root.api.session.user = bt.dispatch(function(query, session) {
 root.api.session.user.password = bt.dispatch(function(query, session, user) {
 	if(undefined === query.oldPassword) return {error: "No old password specified"};
 	if(undefined === query.newPassword) return {error: "No new password specified"};
-	if(query.newPassword.length < config.signup.minPasswordLength) return {passwordError: "Password must be at least " + config.signup.minPasswordLength + " characters"};
+	if(query.newPassword.length < config.signup.password.length.min) return {passwordError: "Password must be at least " + config.signup.password.length.min + " characters"};
+	if(query.newPassword.length > config.signup.password.length.max) return {passwordError: "Password must be at most " + config.signup.password.length.max + " characters"};
 	return session.promise(function(ticket) {
 		var legacyPassHash = crypto.SHA1(query.oldPassword);
 		db.query(
@@ -504,7 +484,7 @@ root.api.session.user.profile = bt.dispatch(function(query, session, user) {
 		fields.push(db.format("friendCode = $", user.info.friendCode));
 	}
 	if(undefined !== query.bio) {
-		user.setBio(query.bio.toString());
+		user.info.bio = query.bio.toString().slice(0, config.User.bio.length.max);
 		fields.push(db.format("bio = $", user.info.bio));
 	}
 	if(!fields.length) return false;
@@ -526,23 +506,48 @@ root.api.session.user.admin = bt.dispatch(null, function(func, query, session, u
 	if(!user.admin) return {error: "Admin permissions required"};
 	return func(query, session, user);
 });
-root.api.session.user.admin.rescan = bt.dispatch(function(query, session, user) {
-	fileHandler.rescan();
-	return true;
-});
-root.api.session.user.admin.reconfigure = bt.dispatch(function(query, session, user) {
-	configureSessions();
-	return true;
-});
 root.api.session.user.admin.signups = bt.dispatch(function(query, session, user) {
 	config.signup.allowed = Boolean(query.signupAllowed);
 	return {signupAllowed: config.signup.allowed};
 });
-root.api.session.user.admin.rankings = bt.dispatch(function(query, session, user) {
+root.api.session.user.admin.statistics = bt.dispatch(function(query, session, user) {
+	return {
+		memory: process.memoryUsage(),
+		platform: process.platform,
+		version: process.version,
+		sessions: Group.sessions.objects.length,
+		users: Group.users.objects.length,
+		channels: Channel.count,
+		uptime: (new Date().getTime() - startTime) / (1000 * 60 * 60 * 24),
+	};
+});
+root.api.session.user.admin.ban = bt.dispatch(function(query, session, user) {
+	var personUserID = parseInt(query.personUserID);
+	if(!personUserID) return {error: "Invalid person user ID"};
+	db.query("DELETE FROM whitelist WHERE userID = $", [personUserID]);
+	db.query("INSERT IGNORE INTO bannedSessions (modUserID, sessionID) SELECT $, sessionID FROM sessions WHERE userID = $", [user.info.userID, personUserID]);
+	if(Session.byUserID.hasOwnProperty(personUserID)) Session.byUserID[personUserID].terminate();
+	return true;
+});
+
+root.api.session.user.admin.update = bt.dispatch();
+root.api.session.user.admin.update.files = bt.dispatch(function(query, session, user) {
+	fileHandler.rescan();
+	return true;
+});
+root.api.session.user.admin.update.config = bt.dispatch(function(query, session, user) {
+	config.update();
+	return true;
+});
+root.api.session.user.admin.update.database = bt.dispatch(function(query, session, user) {
+	configureSessions();
+	return true;
+});
+root.api.session.user.admin.update.rankings = bt.dispatch(function(query, session, user) {
 	updateRankings();
 	return true;
 });
-root.api.session.user.admin.channelAncestors = bt.dispatch(function(query, session, user) {
+root.api.session.user.admin.update.channelAncestors = bt.dispatch(function(query, session, user) {
 	db.query("LOCK TABLES channelAncestors WRITE, channelAncestors ca1 READ, channelAncestors ca2 READ, channels c READ");
 	db.query("DELETE FROM channelAncestors WHERE 1");
 	db.query("ALTER TABLE channelAncestors AUTO_INCREMENT = 0");
@@ -565,25 +570,7 @@ root.api.session.user.admin.channelAncestors = bt.dispatch(function(query, sessi
 		);
 	})();
 });
-root.api.session.user.admin.statistics = bt.dispatch(function(query, session, user) {
-	return {
-		memory: process.memoryUsage(),
-		platform: process.platform,
-		version: process.version,
-		sessions: Group.sessions.objects.length,
-		users: Group.users.objects.length,
-		channels: Channel.count,
-		uptime: (new Date().getTime() - config.startTime) / (1000 * 60 * 60 * 24),
-	};
-});
-root.api.session.user.admin.ban = bt.dispatch(function(query, session, user) {
-	var personUserID = parseInt(query.personUserID);
-	if(!personUserID) return {error: "Invalid person user ID"};
-	db.query("DELETE FROM whitelist WHERE userID = $", [personUserID]);
-	db.query("INSERT IGNORE INTO bannedSessions (modUserID, sessionID) SELECT $, sessionID FROM sessions WHERE userID = $", [user.info.userID, personUserID]);
-	if(Session.byUserID.hasOwnProperty(personUserID)) Session.byUserID[personUserID].terminate();
-	return true;
-});
+
 root.api.session.user.admin.channel = bt.dispatch(null, function(func, query, session, user) {
 	var channelID = query.channelID;
 	if(undefined === channelID) return {error: "No channel ID specified"};
@@ -639,7 +626,7 @@ root.api.session.user.channel = bt.dispatch(null, function(func, query, session,
 });
 root.api.session.user.channel.spawn = bt.dispatch(function(query, session, user, parentChannel) {
 	if(parentChannel.game) return {error: "Subchannels cannot be spawned from game channels"};
-	var topic = (query.topic || "").toString().replace(/^\s*|\s\s+|\s*$/g, "").slice(0, config.channel.maxTopicLength);
+	var topic = (query.topic || "").toString().replace(/^\s*|\s\s+|\s*$/g, "").slice(0, config.Channel.topic.length.max);
 	if(!topic) {
 		if(!parentChannel.info.allowsGameChannels) return false;
 		topic = null;
@@ -793,7 +780,7 @@ root.api.session.user.channel.game.broadcast = bt.dispatch(function(query, sessi
 	if(user.broadcastCount && !game.broadcasting) return {error: "User is already a member of a broadcasting channel"};
 	if(!(game.info.playersNeeded > 0)) return false;
 	clearTimeout(game.broadcastTimeout);
-	game.broadcastTimeout = setTimeout(game.stopBroadcasting, config.broadcast.timeout);
+	game.broadcastTimeout = setTimeout(game.stopBroadcasting, config.Game.broadcast.timeout);
 	if(game.broadcasting) return true;
 	return session.promise(function(ticket) {
 		bt.map(channel.memberByUserID, function(member) {
@@ -905,9 +892,9 @@ root.paypal = bt.dispatch(function(req, data) {
 		[data]
 	);
 	var outgoing = new Buffer("cmd=_notify-validate&" + data, "utf8");
-	var paypal = http.createClient(443, config.paypal.host, true);
+	var paypal = http.createClient(443, config.PayPal.host, true);
 	var req = paypal.request("POST", "/cgi-bin/webscr", {
-		"host": config.paypal.host,
+		"host": config.PayPal.host,
 		"content-length": outgoing.length,
 	});
 	req.addListener("response", function(res) {
@@ -918,14 +905,26 @@ root.paypal = bt.dispatch(function(req, data) {
 			confirm += chunk;
 		});
 		res.addListener("end", function() {
+			function verify(good, unknown) {
+				for(var prop in good) if(good.hasOwnProperty(prop)) {
+					if(good[prop] != unknown[prop]) return false;
+				}
+				return true;
+			}
+			function parsePennies(string) {
+				var match = /(\d+)\.(\d{2})/.exec(string);
+				if(!match) return 0;
+				return parseInt(match[1]) * 100 + parseInt(match[2]);
+			}
 			if("VERIFIED" != confirm) return;
 			var query = querystring.parse(data);
 			var custom = JSON.parse(query["custom"]);
 			var userID = parseInt(custom.userID);
 			if(!userID) return;
-			if(config.paypal.receiverEmail != query["receiver_email"]) return;
-			var gross = parseFloat(query["mc_gross"] || query["mc_gross_1"]);
-			if(isNaN(gross) || config.paypal.minimumPayment > gross) return;
+			if(!verify(config.PayPal.verify, query)) return;
+			var grossPennies = parsePennies(query["mc_gross"] || query["mc_gross_1"]);
+			if(config.PayPal.payment.pennies.min > gross) return;
+			if(config.PayPal.payment.pennies.max < gross) return;
 			if("Completed" != query["payment_status"]) return;
 			// We shouldn't need to check the txn_type as long as the other conditions are met.
 			db.query(

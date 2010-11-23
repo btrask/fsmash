@@ -1,0 +1,7 @@
+{
+	"Game": {
+		"broadcast": {
+			"timeout": 300000
+		}
+	}
+}

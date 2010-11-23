@@ -11,10 +11,30 @@ Installation
 3. Upload `/public`, `/server`, and `/shared` to the server
 4. On the server:
 5. Edit `/server/server.json`
-6. Create `/server/db.json` and `/server/paypal.json` (see samples below)
+6. Configure the server
 7. Configure the MySQL database (see below)
 8. Install `node-crypt` (see below)
 9. Run `./server/server.js`
+
+Configuring the server
+----------------------
+
+Configuration files are stored in `/server/config/`. JSON files in this folder are read (in order of Array.sort) and deep-merged to produce a single config object. Values in later files overwrite values for the same property in earlier files. Instead of changing the existing files, it is recommended to create an additional file that overrides any necessary default values. This file should be named such that it appears last when sorted.
+
+Example `zz01-secret.json`
+	{
+		"PayPal": {
+			"verify": {
+				"receiver_email": "you@example.com"
+			}
+		},
+		"server": {
+			"port": 8001
+		},
+		"database": {
+			"password": ""
+		}
+	}
 
 MySQL database configuration
 ----------------------------
@@ -34,23 +54,3 @@ Installing node-crypt
 2. On the server:
 3. `cd` to the `node-crypt` directory
 4. Run `node-waf configure build install`
-
-Sample /server/db.json
-----------------------
-
-	{
-		"host": "localhost",
-		"port": 3306,
-		"user": "root",
-		"password": "root",
-		"database": "fsmash"
-	}
-
-Sample /server/paypal.json
---------------------------
-
-	{
-		"host": "www.paypal.com",
-		"receiverEmail": "you@email.com",
-		"minimumPayment": 5.00
-	}

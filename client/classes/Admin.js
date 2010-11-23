@@ -41,26 +41,29 @@ var Admin = function(session, user, signupAllowed) {
 	session.siteItem.children.appendChild(adminItem.element);
 	adminItem.setContent(DOM.clone("admin", adminElems));
 
-	adminElems.signupAllowed.value = "Signup allowed: "+signupAllowed;
+	adminElems.signupAllowed.value = signupAllowed ? "Turn Signup Off" : "Turn Signup On";
 	adminElems.signupAllowed.onclick = function() {
 		admin.request("/signups/", {signupAllowed: !signupAllowed}, function(result) {
 			if(!result) return;
 			signupAllowed = result.signupAllowed;
-			adminElems.signupAllowed.value = "Signup allowed: "+signupAllowed;
+			adminElems.signupAllowed.value = signupAllowed ? "Turn Signup Off" : "Turn Signup On";
 		});
 	};
 
-	adminElems.rescan.onclick = function() {
-		admin.request("/rescan/");
+	adminElems.updateFiles.onclick = function() {
+		admin.request("/update/files/");
 	};
-	adminElems.reconfigure.onclick = function() {
-		admin.request("/reconfigure/");
+	adminElems.updateConfig.onclick = function() {
+		admin.request("/update/config/");
+	};
+	adminElems.updateDatabase.onclick = function() {
+		admin.request("/update/database/");
 	};
 	adminElems.updateRankings.onclick = function() {
-		admin.request("/rankings/");
+		admin.request("/update/rankings/");
 	};
 	adminElems.updateChannelAncestors.onclick = function() {
-		admin.request("/channelAncestors/");
+		admin.request("/update/channelAncestors/");
 	};
 	adminElems.updateStatistics.onclick = function() {
 		admin.request("/statistics/", {}, function(result) {

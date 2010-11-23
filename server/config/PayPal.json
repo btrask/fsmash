@@ -1,0 +1,12 @@
+{
+	"PayPal": {
+		"host": "www.sandbox.paypal.com",
+		"verify": {},
+		"payment": {
+			"pennies": {
+				"min": 100,
+				"max": 50000
+			}
+		}
+	}
+}

@@ -1,0 +1,7 @@
+{
+	"rankings": {
+		"update": {
+			"interval": 3600000
+		}
+	}
+}

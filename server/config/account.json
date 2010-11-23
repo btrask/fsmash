@@ -1,0 +1,23 @@
+{
+	"signin": {
+		"throttle": {
+			"attempts": 15,
+			"minutes": 5
+		}
+	},
+	"signup": {
+		"allowed": true,
+		"username": {
+			"length": {
+				"min": 3,
+				"max": 16
+			}
+		},
+		"password": {
+			"length": {
+				"min": 5,
+				"max": 63
+			}
+		}
+	}
+}

@@ -1,0 +1,29 @@
+{
+	"Channel": {
+		"topic": {
+			"length": {
+				"min": 1,
+				"max": 40
+			}
+		},
+		"history": {
+			"length": {
+				"min": 0,
+				"max": 50
+			}
+		},
+		"message": {
+			"lenght": {
+				"min": 1,
+				"max": 500
+			}
+		},
+		"cache": {
+			"timeout": 604800000
+		},
+		"autosave": {
+			"timeout": 60000,
+			"relativePath": "/../../channels"
+		}
+	}
+}

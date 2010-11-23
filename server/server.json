@@ -1,7 +1,0 @@
-{
-	"port": 80,
-	"host": null,
-	"remoteAddressField": "x-forwarded-for",
-	"catchSignals": false,
-	"title": "fsmash-server"
-}

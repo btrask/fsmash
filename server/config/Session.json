@@ -1,0 +1,10 @@
+{
+	"Session": {
+		"active": {
+			"timeout": 30000
+		},
+		"inactive": {
+			"timeout": 60000
+		}
+	}
+}

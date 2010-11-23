@@ -19,25 +19,16 @@ var path = require("path");
 var util = require("util");
 
 var bt = require("../../shared/bt");
+var config = require("../config/");
 
 var Autosave = require("./Autosave").Autosave;
 var Group = require("./Group").Group;
 var Game = require("./Game").Game;
 
-var config = {
-	maxHistoryLength: 50,
-	maxMessageLength: 500,
-	cacheTimeout: 1000 * 60 * 60 * 24 * 7,
-	autosave: {
-		timeout: 1000 * 10,
-		path: __dirname+"/../../channels",
-	},
-};
-
 var Channel = function(parentID, channelID) {
 	var channel = this;
 	var cacheTimeout = null;
-	var autosavePath = path.join(config.autosave.path, channelID+".json");
+	var autosavePath = path.join(__dirname, config.Channel.autosave.relativePath, channelID+".json");
 
 	Channel.byID[channelID] = channel;
 	Channel.count.active++;
@@ -64,12 +55,12 @@ var Channel = function(parentID, channelID) {
 		var body = {
 			userID: user.info.userID,
 			userName: user.info.userName,
-			text: message.slice(0, config.maxMessageLength),
+			text: message.slice(0, config.Channel.message.length.max),
 			time: new Date().getTime(),
 		};
 		channel.privateGroup.sendEvent("/user/channel/message/", bt.union(body, {channelID: channel.info.channelID}), ticket);
 		channel.history.push(body);
-		while(channel.history.length > config.maxHistoryLength) channel.history.shift();
+		while(channel.history.length > config.Channel.history.length.max) channel.history.shift();
 		channel.autosave();
 	};
 	channel.addUser = function(user, ticket) {
@@ -139,12 +130,12 @@ var Channel = function(parentID, channelID) {
 		});
 	};
 	channel.uncache = function(time) {
-		var timeout = config.cacheTimeout;
+		var timeout = config.Channel.cache.timeout;
 		if(!channel.parent) return;
 		if(cacheTimeout) return;
 		Channel.count.active--;
 		Channel.count.inactive++;
-		if(time) timeout = Math.max(1000 * 1, (time + config.cacheTimeout) - new Date().getTime());
+		if(time) timeout = Math.max(1000 * 1, (time + config.Channel.cache.timeout) - new Date().getTime());
 		cacheTimeout = setTimeout(bt.curry(function forgetSubchannels(c) {
 			bt.map(c.subchannelByID, forgetSubchannels);
 			if(Channel.byID.hasOwnProperty(c.info.channelID)) Channel.count.inactive--;
@@ -159,7 +150,7 @@ var Channel = function(parentID, channelID) {
 			history: channel.history,
 			isGameChannel: Boolean(channel.game),
 		}), "utf8");
-	}, config.autosave.timeout);
+	}, config.Channel.autosave.timeout);
 };
 Channel.byID = {};
 Channel.public = {byID: {}};
@@ -169,17 +160,18 @@ Channel.count = {
 };
 
 (function loadFromAutosave() {
+	var autosavePath = path.join(__dirname, config.Channel.autosave.relativePath);
 	try {
-		fs.mkdirSync(config.autosave.path, 0777);
+		fs.mkdirSync(autosavePath, 0777);
 	} catch(e) {
 		if(constants.EEXIST !== e.errno) util.log(e);
 	}
-	var filenames = fs.readdirSync(config.autosave.path);
+	var filenames = fs.readdirSync(autosavePath);
 	filenames.sort(function(a, b) {
 		return parseInt(a) - parseInt(b);
 	});
 	for(var i = 0; i < filenames.length; ++i) {
-		var obj = JSON.parse(fs.readFileSync(path.join(config.autosave.path, filenames[i]), "utf8"));
+		var obj = JSON.parse(fs.readFileSync(path.join(autosavePath, filenames[i]), "utf8"));
 		if(obj.info.parentID && !Channel.byID.hasOwnProperty(obj.info.parentID)) continue;
 		var channel = new Channel(obj.info.parentID, obj.info.channelID);
 		bt.mixin(channel.info, obj.info);
