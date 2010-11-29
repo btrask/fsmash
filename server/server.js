@@ -73,7 +73,17 @@ util.log("Starting " + process.title);
 	});
 })();
 
-var fileHandler = http.createFileHandler(__dirname+"/../public");
+var remoteAddressOfRequest = function(req) {
+	var remoteAddress = (config.server.remoteAddressField ? req.headers[config.server.remoteAddressField] : req.socket.remoteAddress) || null;
+	return "127.0.0.1" == remoteAddress ? null : remoteAddress;
+};
+var fileHandler = (function() {
+	var handler = http.createFileHandler(__dirname+"/../public");
+	return function(req, filename, write/* (status, header, data, encoding) */) {
+		db.query("INSERT INTO httpRequests (ipAddress, filename, referer, userAgent) VALUES (INET_ATON($), $, $, $)", [remoteAddressOfRequest(req), filename, req.headers["referer"] || null, req.headers["user-agent"] || null]);
+		return handler(req, filename, write);
+	};
+})();
 var configureSessions = (function configureSessions() {
 	db.query(
 		"SELECT soundsetID, label, path, challenge, `join`, `leave`, message"+
@@ -146,9 +156,7 @@ setInterval(updateRankings, config.rankings.update.interval);
 
 var root = bt.dispatch();
 root.api = bt.dispatch(null, function(func, req, data) {
-	var remoteAddress = (config.server.remoteAddressField ? req.headers[config.server.remoteAddressField] : req.socket.remoteAddress) || null;
-	if("127.0.0.1" == remoteAddress) remoteAddress = null;
-	var query = bt.union((data ? JSON.parse(data) : {}), {remoteAddress: remoteAddress});
+	var query = bt.union((data ? JSON.parse(data) : {}), {remoteAddress: remoteAddressOfRequest(req)});
 	return func(query);
 });
 

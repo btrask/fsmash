@@ -37,7 +37,7 @@ var writeError = function(status, message, write/* (status, header, data, encodi
 	}, msg);
 };
 
-wrapper.createServer = function(dispatcher, unknownHandler/* (filename, write (status, header, data, encoding)) */) {
+wrapper.createServer = function(dispatcher, unknownHandler/* (req, filename, write (status, header, data, encoding)) */) {
 	return http.createServer(function(req, res) {
 		var data = "";
 		req.setEncoding("utf8");
@@ -51,7 +51,7 @@ wrapper.createServer = function(dispatcher, unknownHandler/* (filename, write (s
 				res.end(data, encoding);
 			};
 			var unknown = function(req, res, filename) {
-				return unknownHandler(filename, write);
+				return unknownHandler(req, filename, write);
 			};
 			try {
 				var result = dispatcher(unknown, bt.components(filename), req, data);
@@ -110,7 +110,7 @@ wrapper.createFileHandler = function(rootdir) {
 			callback();
 		});
 	};
-	var fileHandler = function(filename, write/* (status, header, data, encoding) */) {
+	var fileHandler = function(req, filename, write/* (status, header, data, encoding) */) {
 		if("/" === filename[filename.length - 1]) filename += "index.html";
 		var lookup = cacheByDisplayName.hasOwnProperty(filename) ? function() {
 			var cache = cacheByDisplayName[filename];

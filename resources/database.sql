@@ -164,6 +164,24 @@ CREATE TABLE `games` (
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `httpRequests`
+--
+
+CREATE TABLE `httpRequests` (
+  `requestID` int(11) NOT NULL auto_increment,
+  `ipAddress` bigint(20) unsigned default NULL,
+  `filename` varchar(255) collate utf8_unicode_ci NOT NULL,
+  `referer` text collate utf8_unicode_ci,
+  `userAgent` text collate utf8_unicode_ci,
+  `requestTime` timestamp NOT NULL default CURRENT_TIMESTAMP,
+  PRIMARY KEY  (`requestID`),
+  KEY `ipAddress` (`ipAddress`),
+  KEY `filename` (`filename`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `ip_group_city`
 --
 
@@ -317,7 +335,7 @@ CREATE TABLE `reportMessages` (
   PRIMARY KEY  (`reportMessageID`),
   KEY `reportID` (`reportID`),
   KEY `messageUserID` (`messageUserID`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 -- --------------------------------------------------------
 
@@ -336,7 +354,7 @@ CREATE TABLE `reports` (
   KEY `channelID` (`channelID`),
   KEY `isResolved` (`isResolved`),
   KEY `reportTime` (`reportTime`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 -- --------------------------------------------------------
 
