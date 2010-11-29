@@ -24,8 +24,10 @@ var util = require("util");
 var bt = require("../../shared/bt");
 var config = require("../config/");
 
-var MIMEForExtension = function(ext) {
-	return config.mime[ext.slice(1)] || "application/octet-stream";
+var MIMEForExtension = function(ext, charset) {
+	var type = config.mime[ext.slice(1)] || "application/octet-stream";
+	if(charset && "text/" === type.slice(0, 5)) type += "; charset=" + charset;
+	return type;
 };
 var writeError = function(status, message, write/* (status, header, data, encoding) */) {
 	var msg = new Buffer("" + status + " " + message, "utf8");
@@ -94,8 +96,7 @@ wrapper.createFileHandler = function(rootdir) {
 				compression = "identity";
 				break;
 		}
-		type = MIMEForExtension(ext);
-		if("text/" === type.slice(0, 5)) type += "; charset=UTF-8";
+		type = MIMEForExtension(ext, "UTF-8");
 		fs.readFile(filename, function(err, data) {
 			if(!err) cacheByDisplayName[displayName] = {
 				status: 200,
