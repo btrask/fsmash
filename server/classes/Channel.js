@@ -21,9 +21,9 @@ var util = require("util");
 var bt = require("../../shared/bt");
 var config = require("../config/");
 
-var Autosave = require("./Autosave").Autosave;
-var Group = require("./Group").Group;
-var Game = require("./Game").Game;
+var Autosave = require("./Autosave");
+var Group = require("./Group");
+var Game = require("./Game");
 
 var Channel = function(parentID, channelID) {
 	var channel = this;
@@ -181,4 +181,4 @@ Channel.count = {
 	}
 })();
 
-exports.Channel = Channel;
+module.exports = Channel;

@@ -14,7 +14,7 @@ You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 var bt = require("../../shared/bt");
 
-var Group = require("./Group").Group;
+var Group = require("./Group");
 
 var User = function(session, userID) {
 	var user = this;
@@ -44,4 +44,4 @@ var User = function(session, userID) {
 	};
 };
 
-exports.User = User;
+module.exports = User;

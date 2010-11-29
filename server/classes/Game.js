@@ -52,4 +52,4 @@ var Game = function(channel) {
 	};
 };
 
-exports.Game = Game;
+module.exports = Game;

@@ -22,4 +22,4 @@ var Autosave = function(func, delay) {
 	};
 };
 
-exports.Autosave = Autosave;
+module.exports = Autosave;

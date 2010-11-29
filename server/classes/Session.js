@@ -19,8 +19,8 @@ var bt = require("../../shared/bt");
 var crypt = require("../utilities/crypt-wrapper");
 var config = require("../config/");
 
-var Group = require("./Group").Group;
-var User = require("./User").User;
+var Group = require("./Group");
+var User = require("./User");
 
 var Session = function(remoteAddress) {
 	var session = this;
@@ -89,4 +89,4 @@ Session.byID = {};
 Session.byUserID = {};
 Session.config = {};
 
-exports.Session = Session;
+module.exports = Session;

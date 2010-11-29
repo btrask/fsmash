@@ -28,10 +28,10 @@ var bt = require("../shared/bt");
 var brawl = require("../shared/brawl");
 var config = require("./config/");
 
-var Group = require("./classes/Group").Group;
-var Session = require("./classes/Session").Session;
-var Channel = require("./classes/Channel").Channel;
-var Game = require("./classes/Game").Game;
+var Group = require("./classes/Group");
+var Session = require("./classes/Session");
+var Channel = require("./classes/Channel");
+var Game = require("./classes/Game");
 
 var db = mysql.connect(config.database);
 var startTime = new Date().getTime();

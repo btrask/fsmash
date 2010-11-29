@@ -26,4 +26,4 @@ Group.sessions = new Group();
 Group.users = new Group();
 Group.admins = new Group();
 
-exports.Group = Group;
+module.exports = Group;
