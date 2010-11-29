@@ -35,6 +35,7 @@ var Game = require("./classes/Game");
 
 var db = mysql.connect(config.database);
 var startTime = new Date().getTime();
+var signinLimitForIP = {};
 
 process.title = config.process.title;
 util.log("Starting " + process.title);
@@ -218,54 +219,49 @@ root.api.session.user = bt.dispatch(function(query, session) {
 			);
 		};
 		var signin = function() {
-			db.query(
-				"INSERT INTO signinAttempts (ipAddress, userName)"+
-				" VALUES (INET_ATON($), $)",
-				[query.remoteAddress, query.userName]
-			);
-			db.query(
-				"SELECT COUNT(*) count FROM signinAttempts"+
-				" WHERE ipAddress = $ AND signinTime > DATE_SUB(NOW(), INTERVAL $ MINUTE)",
-				[query.remoteAddress, config.signin.throttle.minutes],
-				function(err, signinResult) {
-					if(signinResult[0].count > config.signin.throttle.attempts) return accountError("Too many signin attempts");
-					if(query.userToken) {
-						db.query(
-							"SELECT u.userID, u.userName"+
-							" FROM users u"+
-							" LEFT JOIN tokens t ON (u.userID = t.userID)"+
-							" WHERE u.userName = $ AND t.token = $ LIMIT 1",
-							[query.userName, query.userToken],
-							function(err, userResult) {
-								if(!userResult.length) return accountError("Invalid token");
-								var userRow = mysql.rows(userResult)[0];
-								logSession(userRow.userID, userRow.userName);
-							}
-						);
-					} else {
-						var legacyPassHash = crypto.SHA1(query.password);
-						db.query(
-							"SELECT userID, userName, passHash2 FROM users"+
-							" WHERE userName = $ AND (passHash2 IS NOT NULL OR passHash = $) LIMIT 1",
-							[query.userName, legacyPassHash],
-							function(err, userResult) {
-								if(!userResult.length) return accountError("Incorrect username or password");
-								var userRow = mysql.rows(userResult)[0];
-								if(userRow.passHash2) {
-									if(!crypt.check(query.password, userRow.passHash2)) return accountError("Incorrect username or password");
-								} else {
-									db.query(
-										"UPDATE users SET passHash = NULL, passHash2 = $"+
-										" WHERE userID = $ AND passHash = $ LIMIT 1",
-										[crypt.hash(query.password), userRow.userID, legacyPassHash]
-									);
-								}
-								logSession(userRow.userID, userRow.userName);
-							}
-						);
-					}
+			if(query.remoteAddress) {
+				if(!signinLimitForIP.hasOwnProperty(query.remoteAddress)) {
+					signinLimitForIP[query.remoteAddress] = bt.limit(config.signin.rate, function() {
+						delete signinLimitForIP[query.remoteAddress];
+					});
 				}
-			);
+				if(signinLimitForIP[query.remoteAddress]()) return accountError("Too many signin attempts");
+			}
+			if(query.userToken) {
+				db.query(
+					"SELECT u.userID, u.userName"+
+					" FROM users u"+
+					" LEFT JOIN tokens t ON (u.userID = t.userID)"+
+					" WHERE u.userName = $ AND t.token = $ LIMIT 1",
+					[query.userName, query.userToken],
+					function(err, userResult) {
+						if(!userResult.length) return accountError("Invalid token");
+						var userRow = mysql.rows(userResult)[0];
+						logSession(userRow.userID, userRow.userName);
+					}
+				);
+			} else {
+				var legacyPassHash = crypto.SHA1(query.password);
+				db.query(
+					"SELECT userID, userName, passHash2 FROM users"+
+					" WHERE userName = $ AND (passHash2 IS NOT NULL OR passHash = $) LIMIT 1",
+					[query.userName, legacyPassHash],
+					function(err, userResult) {
+						if(!userResult.length) return accountError("Incorrect username or password");
+						var userRow = mysql.rows(userResult)[0];
+						if(userRow.passHash2) {
+							if(!crypt.check(query.password, userRow.passHash2)) return accountError("Incorrect username or password");
+						} else {
+							db.query(
+								"UPDATE users SET passHash = NULL, passHash2 = $"+
+								" WHERE userID = $ AND passHash = $ LIMIT 1",
+								[crypt.hash(query.password), userRow.userID, legacyPassHash]
+							);
+						}
+						logSession(userRow.userID, userRow.userName);
+					}
+				);
+			}
 		};
 		var logSession = function(userID, userName) {
 			db.query("INSERT INTO sessions (userID, ipAddress) VALUES ($, INET_ATON($))", [userID, query.remoteAddress]);
@@ -673,6 +669,7 @@ root.api.session.user.channel.spawn = bt.dispatch(function(query, session, user,
 });
 root.api.session.user.channel.invite = bt.dispatch(function(query, session, user, channel) {
 	var invitedUser;
+	if(user.inviteLimit()) return false;
 	if(undefined === query.invitedUserID) return {error: "No invited userID specified"};
 	if(!channel.parent) return {error: "Cannot invite to a root channel"};
 	if(channel.memberByUserID.hasOwnProperty(query.invitedUserID)) return false;
@@ -694,6 +691,7 @@ root.api.session.user.channel.invite = bt.dispatch(function(query, session, user
 });
 root.api.session.user.channel.message = bt.dispatch(function(query, session, user, channel) {
 	var text = query.text;
+	if(user.messageLimit()) return false;
 	if(undefined === text) return {error: "No message text specified"};
 	text = text.toString().replace(/^\s*|\s*$/g, "");
 	if(!text.length) return {error: "Message text has zero length (whitespace trimmed)"};
@@ -702,6 +700,7 @@ root.api.session.user.channel.message = bt.dispatch(function(query, session, use
 	});
 });
 root.api.session.user.channel.leave = bt.dispatch(function(query, session, user, channel) {
+	if(user.channelLimit()) return false;
 	channel.leaveRecursively(user, function(channelID) {
 		db.query("DELETE FROM channelMembers WHERE userID = $ AND channelID = $ LIMIT 1", [user.info.userID, channelID]);
 	});
@@ -784,6 +783,7 @@ root.api.session.user.channel.game.member.team = bt.dispatch(function(query, ses
 });
 
 root.api.session.user.channel.game.broadcast = bt.dispatch(function(query, session, user, channel, game) {
+	if(user.channelLimit()) return false;
 	if(!channel.parent) return {error: "Root channels cannot be broadcast"};
 	if(user.broadcastCount && !game.broadcasting) return {error: "User is already a member of a broadcasting channel"};
 	if(!(game.info.playersNeeded > 0)) return false;
@@ -845,6 +845,7 @@ root.api.session.user.broadcastChannel = bt.dispatch(null, function(func, query,
 	return {error: "Specified channel not found"};
 });
 root.api.session.user.broadcastChannel.application = bt.dispatch(function(query, session, user, channel, game) {
+	if(user.channelLimit()) return false;
 	return session.promise(function(ticket) {
 		game.applicantByUserID[user.info.userID] = user;
 		channel.group.sendEvent("/user/channel/game/broadcast/application/", {channelID: channel.info.channelID, applicantUserID: user.info.userID, time: new Date().getTime()}, ticket);
@@ -862,6 +863,7 @@ root.api.session.user.broadcastChannel.application.stop = bt.dispatch(function(q
 
 root.api.session.user.video = bt.dispatch(function(query, session, user) {
 	var youtubeID = query.youtubeID;
+	if(user.videoLimit()) return false;
 	if(!youtubeID) return {error: "No YouTube ID specified"};
 	if(youtubeID.length != 11) return false;
 	return session.promise(function(ticket) {

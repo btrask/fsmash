@@ -5,6 +5,30 @@
 				"min": 0,
 				"max": 141
 			}
+		},
+		"message": {
+			"rate": {
+				"rise": 5,
+				"run": 10000
+			}
+		},
+		"invite": {
+			"rate": {
+				"rise": 4,
+				"run": 240000
+			}
+		},
+		"channel": {
+			"rate": {
+				"rise": 8,
+				"run": 120000
+			}
+		},
+		"video": {
+			"rate": {
+				"rise": 5,
+				"run": 600000
+			}
 		}
 	}
 }

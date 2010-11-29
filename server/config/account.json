@@ -1,8 +1,8 @@
 {
 	"signin": {
-		"throttle": {
-			"attempts": 15,
-			"minutes": 5
+		"rate": {
+			"rise": 10,
+			"run": 300000
 		}
 	},
 	"signup": {

@@ -50,7 +50,7 @@ bt.components = function(path) {
 	if(!stripped) return [];
 	return stripped[0].split("/");
 };
-bt.dispatch = function(leaf/* args... */, branch/* func, args... */, lookup/* args... */) {
+bt.dispatch = function(leaf/* (args...) */, branch/* (func, args...) */, lookup/* (args...) */) {
 	return function(unknown, components, arg1, arg2, etc) {
 		var args = Array.prototype.slice.call(arguments, 2);
 		var obj, component, func;
@@ -67,8 +67,19 @@ bt.dispatch = function(leaf/* args... */, branch/* func, args... */, lookup/* ar
 		return unknown;
 	};
 };
+bt.limit = function(rate/* {rise, run} */, zero) {
+	var count = 0;
+	return function() {
+		if(count > rate.rise) return true;
+		count++;
+		setTimeout(function() {
+			if(!--count && zero) zero();
+		}, rate.run);
+		return count > rate.rise;
+	};
+};
 
-bt.map = function(obj, callback/* value, key, obj */) {
+bt.map = function(obj, callback/* (value, key, obj) */) {
 	var result, i, key, value;
 	if(obj.length >= 0) {
 		result = [];
