@@ -13,7 +13,7 @@
 			}
 		},
 		"message": {
-			"lenght": {
+			"length": {
 				"min": 1,
 				"max": 500
 			}
