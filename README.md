@@ -10,11 +10,10 @@ Installation
 2. Run `make gzip-only`
 3. Upload `/public`, `/server`, and `/shared` to the server
 4. On the server:
-5. Edit `/server/server.json`
-6. Configure the server
-7. Configure the MySQL database (see below)
-8. Install `node-crypt` (see below)
-9. Run `./server/server.js`
+5. Configure the server
+6. Configure the MySQL database (see below)
+7. Install `node-crypt` (see below)
+8. Run `./server/server.js`
 
 Configuring the server
 ----------------------
