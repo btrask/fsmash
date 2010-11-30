@@ -8,7 +8,7 @@
 		},
 		"message": {
 			"rate": {
-				"rise": 5,
+				"rise": 4,
 				"run": 10000
 			}
 		},
