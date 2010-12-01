@@ -20,7 +20,7 @@ var path = require("path");
 
 var deepMerge = function(obj1, obj2, etc) {
 	var r = arguments[0], i, obj, prop;
-	if(Object !== r.constructor) return false;
+	if(!(r instanceof Object)) return false;
 	for(i = 1; i < arguments.length; ++i) {
 		obj = arguments[i];
 		for(prop in obj) if(obj.hasOwnProperty(prop)) {
