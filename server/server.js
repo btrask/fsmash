@@ -80,10 +80,14 @@ var remoteAddressOfRequest = function(req) {
 };
 var fileHandler = (function() {
 	var handler = http.createFileHandler(__dirname+"/../public");
-	return function(req, filename, write/* (status, header, data, encoding) */) {
+	var wrapper = function(req, filename, write/* (status, header, data, encoding) */) {
 		db.query("INSERT INTO httpRequests (ipAddress, filename, referer, userAgent) VALUES (INET_ATON($), $, $, $)", [remoteAddressOfRequest(req), filename, req.headers["referer"] || null, req.headers["user-agent"] || null]);
 		return handler(req, filename, write);
 	};
+	wrapper.rescan = function() {
+		handler.rescan();
+	};
+	return wrapper;
 })();
 var configureSessions = (function configureSessions() {
 	db.query(
