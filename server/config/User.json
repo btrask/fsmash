@@ -20,8 +20,8 @@
 		},
 		"channel": {
 			"rate": {
-				"rise": 8,
-				"run": 120000
+				"rise": 3,
+				"run": 30000
 			}
 		},
 		"video": {
