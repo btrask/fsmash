@@ -51,7 +51,7 @@ CREATE TABLE `bannedSessions` (
   PRIMARY KEY  (`bannedSessionID`),
   UNIQUE KEY `sessionID` (`sessionID`),
   KEY `modUserID` (`modUserID`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 -- --------------------------------------------------------
 
@@ -177,7 +177,7 @@ CREATE TABLE `httpRequests` (
   PRIMARY KEY  (`requestID`),
   KEY `ipAddress` (`ipAddress`),
   KEY `filename` (`filename`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 -- --------------------------------------------------------
 
@@ -399,22 +399,6 @@ CREATE TABLE `settings` (
   `soundsetID` int(11) NOT NULL default '2',
   PRIMARY KEY  (`settingsID`),
   UNIQUE KEY `userID` (`userID`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
-
--- --------------------------------------------------------
-
---
--- Table structure for table `signinAttempts`
---
-
-CREATE TABLE `signinAttempts` (
-  `signinAttemptID` int(11) NOT NULL auto_increment,
-  `ipAddress` bigint(20) unsigned default NULL,
-  `userName` varchar(255) collate utf8_unicode_ci NOT NULL,
-  `signinTime` timestamp NOT NULL default CURRENT_TIMESTAMP,
-  PRIMARY KEY  (`signinAttemptID`),
-  KEY `signinTime` (`signinTime`),
-  KEY `ipAddress` (`ipAddress`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 -- --------------------------------------------------------
