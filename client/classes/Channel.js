@@ -15,6 +15,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 var Channel = function(session, user, channelID, parentID) {
 	var channel = this;
 
+	var memberCount = 0;
 	var chnlElems = {}, infoElems = {}, chatElems = {};
 	var infoPane = DOM.clone("info", infoElems), chatPane = DOM.clone("chat", chatElems);
 
@@ -172,6 +173,7 @@ var Channel = function(session, user, channelID, parentID) {
 
 		delete channel.memberByUserID[member.info.userID];
 		updateUserIsMember();
+		memberCount--;
 
 		if(channel.userIsMember && time) channel.postNotification(member.info.userName+" left", new Date(time));
 	};
@@ -226,6 +228,7 @@ var Channel = function(session, user, channelID, parentID) {
 
 			channel.memberByUserID[memberUserID] = member;
 			updateUserIsMember();
+			memberCount++;
 		}
 		if(!item) item = channel.groups.members.itemByUserID[memberUserID];
 		if(undefined !== body.teamID) item.setTeamID(body.teamID);
@@ -296,7 +299,7 @@ var Channel = function(session, user, channelID, parentID) {
 			DOM.fill(channel.sidebarItem.counter, counter);
 		};
 		channel.alert = function(type) {
-			if("challenge" == type || channel.game || channel.sidebarItem.selected) user.playSound(type);
+			if("challenge" == type || channel.game || channel.sidebarItem.selected || (channel.userIsMember && memberCount <= 2)) user.playSound(type);
 			if(!pane.hasOwnProperty(type)) return;
 			if(channel.sidebarItem.selected && pane[type].parentNode) return;
 			if(!count.hasOwnProperty(type)) return;
