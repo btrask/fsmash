@@ -28,20 +28,10 @@ var Channel = function(session, user, channelID, parentID) {
 			chnlElems.info.onclick();
 		}
 		DOM.input.enable(chnlElems.leave, chnlElems.chat, channel.userIsMember);
-		DOM.changeClass(infoElems.admin, "invisible", !user.admin || !channel.userIsMember);
 		channel.groups.members.update();
 		channel.groups.formerMembers.update();
 		channel.groups.nonMembers.update();
 		if(channel.game) channel.game.update();
-	};
-	var incomingMessage = function(info) {
-		if(!channel.userIsMember) throw "Non-members should not be able to receive messages";
-		var msgElems = {};
-		var elem = DOM.clone("message", msgElems);
-		DOM.fill(msgElems.date, new Date(info.time).toLocaleTimeString());
-		DOM.fill(msgElems.name, user.getPerson(info.userID, info.userName).nameElement());
-		DOM.fill(msgElems.text, DOM.inputify(info.text));
-		return elem;
 	};
 	var focusMessageInput = function() {
 		DOM.field.focus(chatElems.input);
@@ -203,9 +193,6 @@ var Channel = function(session, user, channelID, parentID) {
 	channel.setAllowsGameChannels = function(flag) {
 		DOM.input.enable(chnlElems.newGame, flag && !channel.game);
 	};
-	channel.updateAdmin = function() {
-		updateUserIsMember();
-	};
 
 	channel.event = bt.dispatch();
 	channel.event.member = bt.dispatch(function(body) {
@@ -246,27 +233,65 @@ var Channel = function(session, user, channelID, parentID) {
 		if(member !== user.person && channel.userIsMember && body.time) channel.alert("leave");
 		channel.removeMember(member, body.time);
 	});
-	channel.event.message = bt.dispatch(function(body) {
-		if(!user.personByUserID.hasOwnProperty(body.userID)) return;
-		if(user.personByUserID[body.userID].ignored) return;
-		var incoming = body.userID != user.person.info.userID;
-		if(incoming) channel.alert("message");
-		DOM.scroll.preserve(channel.scrollBox, function() {
-			var msgElement = incomingMessage(body);
-			if(!incoming) DOM.changeClass(msgElement, "light");
-			chatElems.messages.appendChild(msgElement);
+	(function messaging() {
+		var censorHistory = [];
+		var incomingMessage = function(info) {
+			if(!channel.userIsMember) throw "Non-members should not be able to receive messages";
+			var msgElems = {};
+			var elem = DOM.clone("message", msgElems);
+			DOM.fill(msgElems.date, new Date(info.time).toLocaleTimeString());
+			DOM.fill(msgElems.name, user.getPerson(info.userID, info.userName).nameElement());
+			DOM.fill(msgElems.text, DOM.inputify(info.text));
+			(function censoring() {
+				var censored = false;
+				var censor = function(censorText, replacementText) {
+					if(!censorText || !replacementText) return;
+					if(censorText !== info.text) return;
+					DOM.fill(msgElems.text, DOM.inputify(replacementText));
+					DOM.changeClass(msgElems.text, "censored");
+					censored = true;
+				};
+				censorHistory.push(censor);
+				while(censorHistory.length > 50) censorHistory.shift(); // FIXME: We should somehow get this number from the server config.
+				if(info.censored) {
+					DOM.changeClass(msgElems.text, "censored");
+					censored = true;
+				}
+				msgElems.censor.onclick = function() {
+					if(censored) return;
+					if(!user.admin) throw "Admin-only action";
+					user.admin.request("/channel/censor", {channelID: channel.info.channelID, censorText: info.text, replacementText: "Message removed by moderator"});
+				};
+			})();
+			return elem;
+		};
+		channel.event.message = bt.dispatch(function(body) {
+			if(!user.personByUserID.hasOwnProperty(body.userID)) return;
+			if(user.personByUserID[body.userID].ignored) return;
+			var incoming = body.userID != user.person.info.userID;
+			if(incoming) channel.alert("message");
+			DOM.scroll.preserve(channel.scrollBox, function() {
+				var msgElement = incomingMessage(body);
+				if(!incoming) DOM.changeClass(msgElement, "light");
+				chatElems.messages.appendChild(msgElement);
+			});
 		});
-	});
-	channel.event.history = bt.dispatch(function(body) {
-		if(!body.history || !body.history.length) return;
-		var history = DOM.clone("history"), i;
-		bt.map(body.history, function(info) {
-			history.appendChild(incomingMessage(info));
+		channel.event.history = bt.dispatch(function(body) {
+			if(!body.history || !body.history.length) return;
+			var history = DOM.clone("history"), i;
+			bt.map(body.history, function(info) {
+				history.appendChild(incomingMessage(info));
+			});
+			DOM.scroll.preserve(channel.scrollBox, function() {
+				DOM.fill(chatElems.messages, history);
+			});
 		});
-		DOM.scroll.preserve(channel.scrollBox, function() {
-			DOM.fill(chatElems.messages, history);
+		channel.event.censor = bt.dispatch(function(body) {
+			bt.map(censorHistory, function(censor) {
+				censor(body.censorText, body.replacementText);
+			});
 		});
-	});
+	})();
 	channel.event.game = bt.dispatch(function(body) {
 		if(!channel.game) {
 			channel.game = new Game(session, user, channel);

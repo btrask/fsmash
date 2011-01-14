@@ -416,10 +416,21 @@ root.api.session.user = bt.dispatch(function(query, session) {
 						" FROM reports r"+
 						" LEFT JOIN users u ON (r.userID = u.userID)"+
 						" LEFT JOIN channels c ON (r.channelID = c.channelID)"+
-						" WHERE r.reportTime > DATE_SUB(NOW(), INTERVAL 7 DAY) AND r.isResolved = 0"+
+						" WHERE r.reportTime > DATE_SUB(NOW(), INTERVAL 3 DAY) AND r.isResolved = 0"+
 						" ORDER BY r.reportTime DESC",
 						function(err, reportResults) {
 							user.sendEvent("/user/admin/reports/", mysql.rows(reportResults));
+						}
+					);
+					db.query(
+						"SELECT u.userName modUserName, c.topic, cm.censorText, cm.replacementText, UNIX_TIMESTAMP(cm.censorTime) * 1000 time"+
+						" FROM censoredMessages cm"+
+						" LEFT JOIN users u ON (cm.modUserID = u.userID)"+
+						" LEFT JOIN channels c ON (cm.channelID = c.channelID)"+
+						" WHERE cm.censorTime > DATE_SUB(NOW(), INTERVAL 3 DAY)"+
+						" ORDER BY cm.censorTime DESC",
+						function(err, censorResults) {
+							user.sendEvent("/user/admin/censored/", mysql.rows(censorResults));
 						}
 					);
 				}
@@ -594,6 +605,22 @@ root.api.session.user.admin.channel.empty = bt.dispatch(function(query, session,
 				" (SELECT channelID FROM channelAncestors WHERE ancestorID = $)",
 			[channel.info.channelID, channel.info.channelID]
 		);
+	});
+});
+root.api.session.user.admin.channel.censor = bt.dispatch(function(query, session, user, channel) {
+	if(!query.censorText) return {error: "No censored text specified"};
+	if(!query.replacementText) return {error: "No replacement text specified"};
+	var censorText = String(query.censorText), replacementText = String(query.replacementText);
+	return session.promise(function(ticket) {
+		bt.map(channel.history, function(body) {
+			if(censorText !== body.text) return;
+			body.text = replacementText;
+			body.censored = true;
+			channel.autosave();
+		});
+		channel.privateGroup.sendEvent("/user/channel/censor/", {channelID: channel.info.channelID, censorText: censorText, replacementText: replacementText}, ticket);
+		Group.admins.sendEvent("/user/admin/censored/", [{modUserName: user.info.userName, topic: channel.info.topic, time: new Date().getTime(), censorText: censorText, replacementText: replacementText}]);
+		db.query("INSERT INTO censoredMessages (modUserID, channelID, censorText, replacementText) VALUES ($, $, $, $)", [user.info.userID, channel.info.channelID, censorText, replacementText]);
 	});
 });
 

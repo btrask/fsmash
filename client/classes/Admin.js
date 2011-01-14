@@ -17,16 +17,25 @@ var Admin = function(session, user, signupAllowed) {
 
 	var adminItem;
 	var adminElems = {};
-	var unreadReports = 0;
+
+	var bump = function() {
+		if(!adminItem.selected) DOM.fill(adminItem.counter, "!");
+	};
 
 	admin.event = bt.dispatch();
 	admin.event.reports = bt.dispatch(function(reports) {
 		adminElems.reports.insertBefore(DOM.toElement(bt.map(reports, function(report) {
-			return "User: "+report.userName+"; Channel: "+(report.topic || "")+"; Time: "+new Date(report.time).toUTCString();
+			return (report.topic || "(untitled)") + " / " + report.userName + " / " + new Date(report.time).toUTCString();
 		}).join("\n")+"\n"), adminElems.reports.firstChild);
-		if(adminItem.selected) return;
-		unreadReports += reports.length;
-		DOM.fill(adminItem.counter, unreadReports);
+		bump();
+	});
+	admin.event.censored = bt.dispatch(function(censoredMessages) {
+		adminElems.censored.insertBefore(DOM.toElement(bt.map(censoredMessages, function(censored) {
+			return (censored.topic || "(untitled)") + " / " + censored.modUserName + " / " + new Date(censored.time).toUTCString() +
+				"\n\t" + censored.censorText +
+				"\n\t"+censored.replacementText;
+		}).join("\n")+"\n"), adminElems.censored.firstChild);
+		bump();
 	});
 
 	admin.request = function(path, properties, callback) {
@@ -35,11 +44,11 @@ var Admin = function(session, user, signupAllowed) {
 
 	adminItem = new SidebarItem("Admin");
 	adminItem.onshow = function() {
-		unreadReports = 0;
 		DOM.fill(adminItem.counter);
 	};
 	session.siteItem.children.appendChild(adminItem.element);
 	adminItem.setContent(DOM.clone("admin", adminElems));
+	bump();
 
 	adminElems.signupAllowed.value = signupAllowed ? "Turn Signup Off" : "Turn Signup On";
 	adminElems.signupAllowed.onclick = function() {

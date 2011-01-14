@@ -15,7 +15,7 @@
 	</head>
 	<body>
 		<div id="audio"></div>
-		<div id="body" class="absolute full invisible">
+		<div id="body" class="absolute full invisible notAdmin">
 			<div id="sidebar" class="absolute scroll"></div>
 			<div id="main" class="absolute">
 			</div>
@@ -207,7 +207,7 @@
 
 			<div id="info" class="info absolute full scroll">
 				<div class="panels" data-id="panels">
-					<div class="admin panel wrap invisible" data-id="admin">
+					<div class="admin panel wrap adminOnly" data-id="admin">
 						<div class="line">
 							<input type="button" class="button padding" value="Empty…" data-id="empty">
 						</div>
@@ -260,7 +260,7 @@
 				</div>
 			</div>
 			<div id="message">
-				<span class="light">(<span data-id="date"></span>) <span data-id="name"></span>: </span><span data-id="text"></span>
+				<span class="censor adminOnly" data-id="censor">X</span> <span class="light">(<span data-id="date"></span>) <span data-id="name"></span>: </span><span data-id="text"></span>
 			</div>
 			<div id="notification" class="center">
 				<span data-id="message"></span><span class="light"> (<span data-id="date"></span>)</span>
@@ -290,6 +290,10 @@
 				<div class="header">Reports</div>
 				<div class="padding">
 					<pre data-id="reports"></pre>
+				</div>
+				<div class="header">Censored Messages</div>
+				<div class="padding">
+					<pre data-id="censored"></pre>
 				</div>
 			</div>
 

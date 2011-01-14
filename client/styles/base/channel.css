@@ -116,3 +116,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 	content: "✓";
 	color: #a00;
 }
+
+.censor, .censored {
+	color: #f00;
+}
