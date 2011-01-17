@@ -404,7 +404,7 @@ root.api.session.user = bt.dispatch(function(query, session) {
 				}
 			);
 			db.query(
-				"SELECT administratorID FROM administrators WHERE userID = $ LIMIT 1",
+				"SELECT administratorID FROM administrators WHERE administratorUserID = $ LIMIT 1",
 				[user.info.userID],
 				function(err, administratorResult) {
 					if(!administratorResult.length) return;

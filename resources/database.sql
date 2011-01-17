@@ -12,7 +12,7 @@ SET SQL_MODE="NO_AUTO_VALUE_ON_ZERO";
 
 CREATE TABLE `administrators` (
   `administratorID` int(11) NOT NULL auto_increment,
-  `userID` int(11) NOT NULL,
+  `administratorUserID` int(11) NOT NULL,
   PRIMARY KEY  (`administratorID`),
   UNIQUE KEY `userID` (`userID`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
