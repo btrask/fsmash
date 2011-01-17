@@ -42,7 +42,7 @@ MySQL database configuration
 2. Install up-to-date IP geolocation tables from <http://ipinfodb.com/ip_database.php> (use the multi-table "Complete (City)" version)
 3. Create some `channels` and add them to `publicChannels`
 4. Add `matchTypes`, `rules`, and `soundsets`
-5. Configure your account as an `admin`
+5. Configure your account as an `administrator`
 
 Installing node-crypt
 ---------------------

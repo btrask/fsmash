@@ -24,6 +24,6 @@ var Group = function() {
 };
 Group.sessions = new Group();
 Group.users = new Group();
-Group.admins = new Group();
+Group.administrators = new Group();
 
 module.exports = Group;

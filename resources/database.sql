@@ -7,13 +7,13 @@ SET SQL_MODE="NO_AUTO_VALUE_ON_ZERO";
 -- --------------------------------------------------------
 
 --
--- Table structure for table `admins`
+-- Table structure for table `administrators`
 --
 
-CREATE TABLE `admins` (
-  `adminID` int(11) NOT NULL auto_increment,
+CREATE TABLE `administrators` (
+  `administratorID` int(11) NOT NULL auto_increment,
   `userID` int(11) NOT NULL,
-  PRIMARY KEY  (`adminID`),
+  PRIMARY KEY  (`administratorID`),
   UNIQUE KEY `userID` (`userID`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 

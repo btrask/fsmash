@@ -64,10 +64,10 @@ var Channel = function(session, user, channelID, parentID) {
 		var banAction = function(validate, item) {
 			if(validate) {
 				this.value = "Ban…";
-				return user.admin && item.person !== user.person;
+				return user.administrator && item.person !== user.person;
 			}
 			DOM.button.confirm(this, function() {
-				user.admin.request("/ban/", {personUserID: item.person.info.userID});
+				user.administrator.request("/ban/", {personUserID: item.person.info.userID});
 			});
 		};
 		var rateAction = function(validate, item) {
@@ -259,8 +259,8 @@ var Channel = function(session, user, channelID, parentID) {
 				}
 				msgElems.censor.onclick = function() {
 					if(censored) return;
-					if(!user.admin) throw "Admin-only action";
-					user.admin.request("/channel/censor", {channelID: channel.info.channelID, censorText: info.text, replacementText: "Message removed by moderator"});
+					if(!user.administrator) throw "Administrator-only action";
+					user.administrator.request("/channel/censor", {channelID: channel.info.channelID, censorText: info.text, replacementText: "Message removed by moderator"});
 				};
 			})();
 			return elem;
@@ -426,7 +426,7 @@ var Channel = function(session, user, channelID, parentID) {
 
 	infoElems.empty.onclick = function() {
 		DOM.button.confirm(this, function() {
-			user.admin.request("/channel/empty/", {channelID: channel.info.channelID});
+			user.administrator.request("/channel/empty/", {channelID: channel.info.channelID});
 		});
 	};
 

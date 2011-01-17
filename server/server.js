@@ -404,13 +404,13 @@ root.api.session.user = bt.dispatch(function(query, session) {
 				}
 			);
 			db.query(
-				"SELECT adminID FROM admins WHERE userID = $ LIMIT 1",
+				"SELECT administratorID FROM administrators WHERE userID = $ LIMIT 1",
 				[user.info.userID],
-				function(err, adminResult) {
-					if(!adminResult.length) return;
-					user.admin = true;
-					Group.admins.objects.push(user);
-					user.sendEvent("/user/admin/", {signupAllowed: config.signup.allowed});
+				function(err, administratorResult) {
+					if(!administratorResult.length) return;
+					user.administrator = true;
+					Group.administrators.objects.push(user);
+					user.sendEvent("/user/administrator/", {signupAllowed: config.signup.allowed});
 					db.query(
 						"SELECT u.userName, c.topic, UNIX_TIMESTAMP(r.reportTime) * 1000 time"+
 						" FROM reports r"+
@@ -419,7 +419,7 @@ root.api.session.user = bt.dispatch(function(query, session) {
 						" WHERE r.reportTime > DATE_SUB(NOW(), INTERVAL 3 DAY) AND r.isResolved = 0"+
 						" ORDER BY r.reportTime DESC",
 						function(err, reportResults) {
-							user.sendEvent("/user/admin/reports/", mysql.rows(reportResults));
+							user.sendEvent("/user/administrator/reports/", mysql.rows(reportResults));
 						}
 					);
 					db.query(
@@ -430,7 +430,7 @@ root.api.session.user = bt.dispatch(function(query, session) {
 						" WHERE cm.censorTime > DATE_SUB(NOW(), INTERVAL 3 DAY)"+
 						" ORDER BY cm.censorTime DESC",
 						function(err, censorResults) {
-							user.sendEvent("/user/admin/censored/", mysql.rows(censorResults));
+							user.sendEvent("/user/administrator/censored/", mysql.rows(censorResults));
 						}
 					);
 				}
@@ -521,15 +521,15 @@ root.api.session.user.idle = bt.dispatch(function(query, session, user) {
 	});
 });
 
-root.api.session.user.admin = bt.dispatch(null, function(func, query, session, user) {
-	if(!user.admin) return {error: "Admin permissions required"};
+root.api.session.user.administrator = bt.dispatch(null, function(func, query, session, user) {
+	if(!user.administrator) return {error: "Administrator permissions required"};
 	return func(query, session, user);
 });
-root.api.session.user.admin.signups = bt.dispatch(function(query, session, user) {
+root.api.session.user.administrator.signups = bt.dispatch(function(query, session, user) {
 	config.signup.allowed = Boolean(query.signupAllowed);
 	return {signupAllowed: config.signup.allowed};
 });
-root.api.session.user.admin.statistics = bt.dispatch(function(query, session, user) {
+root.api.session.user.administrator.statistics = bt.dispatch(function(query, session, user) {
 	return {
 		memory: process.memoryUsage(),
 		platform: process.platform,
@@ -540,7 +540,7 @@ root.api.session.user.admin.statistics = bt.dispatch(function(query, session, us
 		uptime: (new Date().getTime() - startTime) / (1000 * 60 * 60 * 24),
 	};
 });
-root.api.session.user.admin.ban = bt.dispatch(function(query, session, user) {
+root.api.session.user.administrator.ban = bt.dispatch(function(query, session, user) {
 	var personUserID = parseInt(query.personUserID);
 	if(!personUserID) return {error: "Invalid person user ID"};
 	db.query("DELETE FROM whitelist WHERE userID = $", [personUserID]);
@@ -549,24 +549,24 @@ root.api.session.user.admin.ban = bt.dispatch(function(query, session, user) {
 	return true;
 });
 
-root.api.session.user.admin.update = bt.dispatch();
-root.api.session.user.admin.update.files = bt.dispatch(function(query, session, user) {
+root.api.session.user.administrator.update = bt.dispatch();
+root.api.session.user.administrator.update.files = bt.dispatch(function(query, session, user) {
 	fileHandler.rescan();
 	return true;
 });
-root.api.session.user.admin.update.config = bt.dispatch(function(query, session, user) {
+root.api.session.user.administrator.update.config = bt.dispatch(function(query, session, user) {
 	config.update();
 	return true;
 });
-root.api.session.user.admin.update.database = bt.dispatch(function(query, session, user) {
+root.api.session.user.administrator.update.database = bt.dispatch(function(query, session, user) {
 	configureSessions();
 	return true;
 });
-root.api.session.user.admin.update.rankings = bt.dispatch(function(query, session, user) {
+root.api.session.user.administrator.update.rankings = bt.dispatch(function(query, session, user) {
 	updateRankings();
 	return true;
 });
-root.api.session.user.admin.update.channelAncestors = bt.dispatch(function(query, session, user) {
+root.api.session.user.administrator.update.channelAncestors = bt.dispatch(function(query, session, user) {
 	db.query("LOCK TABLES channelAncestors WRITE, channelAncestors ca1 READ, channelAncestors ca2 READ, channels c READ");
 	db.query("DELETE FROM channelAncestors WHERE 1");
 	db.query("ALTER TABLE channelAncestors AUTO_INCREMENT = 0");
@@ -590,13 +590,13 @@ root.api.session.user.admin.update.channelAncestors = bt.dispatch(function(query
 	})();
 });
 
-root.api.session.user.admin.channel = bt.dispatch(null, function(func, query, session, user) {
+root.api.session.user.administrator.channel = bt.dispatch(null, function(func, query, session, user) {
 	var channelID = query.channelID;
 	if(undefined === channelID) return {error: "No channel ID specified"};
 	if(!user.channelByID.hasOwnProperty(channelID)) return false;
 	return func(query, session, user, user.channelByID[channelID]);
 });
-root.api.session.user.admin.channel.empty = bt.dispatch(function(query, session, user, channel) {
+root.api.session.user.administrator.channel.empty = bt.dispatch(function(query, session, user, channel) {
 	return session.promise(function(ticket) {
 		channel.removeAllUsers(ticket);
 		db.query(
@@ -607,7 +607,7 @@ root.api.session.user.admin.channel.empty = bt.dispatch(function(query, session,
 		);
 	});
 });
-root.api.session.user.admin.channel.censor = bt.dispatch(function(query, session, user, channel) {
+root.api.session.user.administrator.channel.censor = bt.dispatch(function(query, session, user, channel) {
 	if(!query.censorText) return {error: "No censored text specified"};
 	if(!query.replacementText) return {error: "No replacement text specified"};
 	var censorText = String(query.censorText), replacementText = String(query.replacementText);
@@ -619,7 +619,7 @@ root.api.session.user.admin.channel.censor = bt.dispatch(function(query, session
 			channel.autosave();
 		});
 		channel.privateGroup.sendEvent("/user/channel/censor/", {channelID: channel.info.channelID, censorText: censorText, replacementText: replacementText}, ticket);
-		Group.admins.sendEvent("/user/admin/censored/", [{modUserName: user.info.userName, topic: channel.info.topic, time: new Date().getTime(), censorText: censorText, replacementText: replacementText}]);
+		Group.administrators.sendEvent("/user/administrator/censored/", [{modUserName: user.info.userName, topic: channel.info.topic, time: new Date().getTime(), censorText: censorText, replacementText: replacementText}]);
 		db.query("INSERT INTO censoredMessages (modUserID, channelID, censorText, replacementText) VALUES ($, $, $, $)", [user.info.userID, channel.info.channelID, censorText, replacementText]);
 	});
 });
@@ -756,7 +756,7 @@ root.api.session.user.channel.report = bt.dispatch(function(query, session, user
 			);
 		}
 	);
-	Group.admins.sendEvent("/user/admin/reports/", [{userName: user.info.userName, topic: channel.info.topic, time: new Date().getTime()}]);
+	Group.administrators.sendEvent("/user/administrator/reports/", [{userName: user.info.userName, topic: channel.info.topic, time: new Date().getTime()}]);
 	return true;
 });
 

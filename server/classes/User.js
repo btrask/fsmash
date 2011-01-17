@@ -44,7 +44,7 @@ var User = function(session, userID) {
 		});
 		Group.users.sendEvent("/user/person/signout/", {userID: user.info.userID});
 		bt.array.removeObject(Group.users.objects, user);
-		bt.array.removeObject(Group.admins.objects, user);
+		bt.array.removeObject(Group.administrators.objects, user);
 		delete session.user;
 		delete session.constructor.byUserID[user.info.userID];
 	};

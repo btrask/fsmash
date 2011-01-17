@@ -101,13 +101,13 @@ var User = function(session, userID) {
 	}, null, function(body) {
 		return user.channelByID.hasOwnProperty(body.channelID) ? user.channelByID[body.channelID].event : null;
 	});
-	user.event.admin = bt.dispatch(function(body) {
-		if(user.admin) return;
-		user.admin = new Admin(session, user, body.signupAllowed);
-		DOM.changeClass(DOM.id("body"), "admin", true);
-		DOM.changeClass(DOM.id("body"), "notAdmin", false);
+	user.event.administrator = bt.dispatch(function(body) {
+		if(user.administrator) return;
+		user.administrator = new Administrator(session, user, body.signupAllowed);
+		DOM.changeClass(DOM.id("body"), "administrator", true);
+		DOM.changeClass(DOM.id("body"), "notAdministrator", false);
 	}, null, function(body) {
-		return user.admin.event;
+		return user.administrator.event;
 	});
 
 	user.request = function(path, properties, callback) {

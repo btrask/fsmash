@@ -9,14 +9,14 @@ CLIENT_SCRIPTS = client/external/json2.js \
                  client/classes/VideosPage.js \
                  client/classes/Session.js \
                  client/classes/User.js \
-                 client/classes/Admin.js \
+                 client/classes/Administrator.js \
                  client/classes/Person.js \
                  client/classes/Group.js \
                  client/classes/Channel.js \
                  client/classes/Game.js \
                  client/client.js
 
-STYLE_BASE_COMPONENTS = global.css sidebar.css modal.css authenticate.css account.css channel.css static.css videos.css admin.css
+STYLE_BASE_COMPONENTS = global.css sidebar.css modal.css authenticate.css account.css channel.css static.css videos.css administrator.css
 STYLES += public/styles/base/index.css public/styles/base/resources
 STYLES += public/styles/dark/index.css public/styles/dark/resources
 STYLES += public/styles/greenscreen/index.css
