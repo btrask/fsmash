@@ -98,7 +98,7 @@ var configureSessions = (function configureSessions() {
 		}
 	);
 	db.query(
-		"SELECT pc.channelID, c.topic, c.allowsGameChannels, pc.descriptionHTML"+
+		"SELECT pc.channelID, c.topic, c.allowsGameChannels, c.historyJSON, pc.descriptionHTML"+
 		" FROM publicChannels pc"+
 		" LEFT JOIN channels c ON (pc.channelID = c.channelID)"+
 		" WHERE 1 ORDER BY pc.sortOrder ASC",
@@ -115,8 +115,8 @@ var configureSessions = (function configureSessions() {
 				else channel = new Channel(null, channelRow.channelID);
 				channel.info.topic = channelRow.topic;
 				channel.info.allowsGameChannels = channelRow.allowsGameChannels;
+				channel.history = JSON.parse(channelRow.historyJSON || "[]");
 				Channel.public.byID[channelRow.channelID] = channel;
-				channel.autosave();
 			});
 		}
 	);
@@ -358,7 +358,7 @@ root.api.session.user = bt.dispatch(function(query, session) {
 		};
 		var loadChannels = function(user) {
 			db.query(
-				"SELECT cm.channelID, c.parentID, c.topic, c.allowsGameChannels, g.matchTypeID, g.ruleID"+
+				"SELECT cm.channelID, c.parentID, c.topic, c.allowsGameChannels, c.historyJSON, g.matchTypeID, g.ruleID"+
 				" FROM channelMembers cm"+
 				" LEFT JOIN channels c ON (cm.channelID = c.channelID)"+
 				" LEFT JOIN games g ON (cm.channelID = g.channelID)"+
@@ -372,6 +372,8 @@ root.api.session.user = bt.dispatch(function(query, session) {
 						else {
 							channel = new Channel(channelRow.parentID, channelRow.channelID);
 							channel.info.allowsGameChannels = Boolean(channelRow.allowsGameChannels);
+							console.log(channel.info.channelID, channelRow.historyJSON);
+							channel.hitory = JSON.parse(channelRow.historyJSON || "[]");
 							if(channelRow.topic) {
 								channel.info.topic = channelRow.topic;
 							} else {
@@ -379,7 +381,6 @@ root.api.session.user = bt.dispatch(function(query, session) {
 								game.info.matchTypeID = channelRow.matchTypeID || 0;
 								game.info.ruleID = channelRow.ruleID || 0;
 							}
-							channel.autosave();
 						}
 						channel.addUser(user);
 						channel.group.sendEvent("/user/channel/member/", {channelID: channel.info.channelID, memberUserID: user.info.userID}, undefined, [user]);
@@ -616,7 +617,6 @@ root.api.session.user.administrator.channel.censor = bt.dispatch(function(query,
 			if(censorText !== body.text) return;
 			body.text = replacementText;
 			body.censored = true;
-			channel.autosave();
 		});
 		channel.privateGroup.sendEvent("/user/channel/censor/", {channelID: channel.info.channelID, censorText: censorText, replacementText: replacementText}, ticket);
 		Group.administrators.sendEvent("/user/administrator/censored/", [{modUserName: user.info.userName, topic: channel.info.topic, time: new Date().getTime(), censorText: censorText, replacementText: replacementText}]);
@@ -684,7 +684,6 @@ root.api.session.user.channel.spawn = bt.dispatch(function(query, session, user,
 				} else {
 					game = new Game(channel);
 				}
-				channel.autosave();
 				channel.addUser(user, ticket);
 				if(ancestorValues.length) db.query(
 					"INSERT IGNORE INTO channelAncestors (channelID, ancestorID)"+
@@ -728,6 +727,12 @@ root.api.session.user.channel.message = bt.dispatch(function(query, session, use
 	if(!text.length) return {error: "Message text has zero length (whitespace trimmed)"};
 	return session.promise(function(ticket) {
 		channel.sendMessage(user, text, ticket);
+		channel.autosaveLimit(function() {
+			db.query(
+				"UPDATE channels SET historyText = $ WHERE channelID = $ LIMIT 1",
+				[JSON.stringify(channel.history), channel.info.channelID]
+			);
+		});
 	});
 });
 root.api.session.user.channel.leave = bt.dispatch(function(query, session, user, channel) {
@@ -985,5 +990,26 @@ root.paypal = bt.dispatch(function(req, data) {
 	});
 	req.end(outgoing);
 });
+
+
+(function TEMP_importChannelsFromFiles() { // TODO: Remove this.
+	try {
+		var path = require("path");
+		var autosavePath = path.join(__dirname, "/../channels");
+		var filenames = fs.readdirSync(autosavePath);
+		filenames.sort(function(a, b) {
+			return parseInt(a) - parseInt(b);
+		});
+		for(var i = 0; i < filenames.length; ++i) {
+			var obj = JSON.parse(fs.readFileSync(path.join(autosavePath, filenames[i]), "utf8"));
+			db.query("UPDATE channels SET historyJSON = $ WHERE channelID = $ AND historyJSON IS NULL LIMIT 1", [JSON.stringify(obj.history), obj.info.channelID], function(err) {
+				if(err) console.log(err);
+			});
+		}
+	} catch(e) {
+		console.log(e.message);
+	}
+})();
+
 
 http.createServer(root, fileHandler).listen(config.server.port, config.server.host);

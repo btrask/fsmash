@@ -22,8 +22,10 @@
 			"timeout": 604800000
 		},
 		"autosave": {
-			"timeout": 60000,
-			"relativePath": "/../../channels"
+			"rate": {
+				"rise": 1,
+				"run": 10000
+			}
 		}
 	}
 }

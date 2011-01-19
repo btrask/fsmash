@@ -11,9 +11,10 @@ SET SQL_MODE="NO_AUTO_VALUE_ON_ZERO";
 --
 
 CREATE TABLE `administrators` (
-  `adminID` int(11) NOT NULL auto_increment,
+  `administratorID` int(11) NOT NULL auto_increment,
   `administratorUserID` int(11) NOT NULL,
-  PRIMARY KEY  (`adminID`),
+  `administratorTime` timestamp NOT NULL default CURRENT_TIMESTAMP,
+  PRIMARY KEY  (`administratorID`),
   UNIQUE KEY `userID` (`administratorUserID`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
@@ -117,6 +118,21 @@ CREATE TABLE `channelMembers` (
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `channelModerators`
+--
+
+CREATE TABLE `channelModerators` (
+  `channelModeratorID` int(11) NOT NULL auto_increment,
+  `channelID` int(11) NOT NULL,
+  `moderatorUserID` int(11) NOT NULL,
+  `moderatorTime` timestamp NOT NULL default CURRENT_TIMESTAMP,
+  PRIMARY KEY  (`channelModeratorID`),
+  UNIQUE KEY `channelID` (`channelID`,`moderatorUserID`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `channels`
 --
 
@@ -125,6 +141,7 @@ CREATE TABLE `channels` (
   `topic` varchar(255) collate utf8_unicode_ci default NULL,
   `parentID` int(11) default NULL,
   `allowsGameChannels` tinyint(4) NOT NULL default '1',
+  `historyJSON` text collate utf8_unicode_ci,
   `creationTime` timestamp NOT NULL default CURRENT_TIMESTAMP,
   PRIMARY KEY  (`channelID`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;

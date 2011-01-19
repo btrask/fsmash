@@ -21,14 +21,11 @@ var util = require("util");
 var bt = require("../../shared/bt");
 var config = require("../config/");
 
-var Autosave = require("./Autosave");
 var Group = require("./Group");
 var Game = require("./Game");
 
 var Channel = function(parentID, channelID) {
 	var channel = this;
-	var cacheTimeout = null;
-	var autosavePath = path.join(__dirname, config.Channel.autosave.relativePath, channelID+".json");
 
 	Channel.byID[channelID] = channel;
 	Channel.count.active++;
@@ -61,15 +58,8 @@ var Channel = function(parentID, channelID) {
 		channel.privateGroup.sendEvent("/user/channel/message/", bt.union(body, {channelID: channel.info.channelID}), ticket);
 		channel.history.push(body);
 		while(channel.history.length > config.Channel.history.length.max) channel.history.shift();
-		channel.autosave();
 	};
 	channel.addUser = function(user, ticket) {
-		if(cacheTimeout) {
-			Channel.count.inactive--;
-			Channel.count.active++;
-			clearTimeout(cacheTimeout);
-			cacheTimeout = null;
-		}
 		user.channelByID[channel.info.channelID] = channel;
 		channel.memberByUserID[user.info.userID] = user;
 		if(!channel.teamIDByUserID.hasOwnProperty(user.info.userID)) channel.teamIDByUserID[user.info.userID] = 0;
@@ -129,56 +119,19 @@ var Channel = function(parentID, channelID) {
 			broadcastingSubchannel.sendInfoToTarget(target, false);
 		});
 	};
-	channel.uncache = function(time) {
-		var timeout = config.Channel.cache.timeout;
-		if(!channel.parent) return;
-		if(cacheTimeout) return;
-		Channel.count.active--;
-		Channel.count.inactive++;
-		if(time) timeout = Math.max(1000 * 1, (time + config.Channel.cache.timeout) - new Date().getTime());
-		cacheTimeout = setTimeout(bt.curry(function forgetSubchannels(c) {
+	channel.uncache = function() {
+		if(channel.parent) (function forgetSubchannels(c) {
 			bt.map(c.subchannelByID, forgetSubchannels);
-			if(Channel.byID.hasOwnProperty(c.info.channelID)) Channel.count.inactive--;
 			delete Channel.byID[c.info.channelID];
-			fs.unlink(autosavePath);
-		}, channel), timeout);
+			Channel.count.active--;
+		})(channel);
 	};
-	channel.autosave = new Autosave(function() {
-		fs.writeFile(autosavePath, JSON.stringify({
-			time: new Date().getTime(),
-			info: channel.info,
-			history: channel.history,
-			isGameChannel: Boolean(channel.game),
-		}), "utf8");
-	}, config.Channel.autosave.timeout);
+	channel.autosaveLimit = bt.limit(config.Channel.autosave.rate);
 };
 Channel.byID = {};
 Channel.public = {byID: {}};
 Channel.count = {
 	active: 0,
-	inactive: 0,
 };
-
-(function loadFromAutosave() {
-	var autosavePath = path.join(__dirname, config.Channel.autosave.relativePath);
-	try {
-		fs.mkdirSync(autosavePath, 0777);
-	} catch(e) {
-		if(constants.EEXIST !== e.errno) util.log(e);
-	}
-	var filenames = fs.readdirSync(autosavePath);
-	filenames.sort(function(a, b) {
-		return parseInt(a) - parseInt(b);
-	});
-	for(var i = 0; i < filenames.length; ++i) {
-		var obj = JSON.parse(fs.readFileSync(path.join(autosavePath, filenames[i]), "utf8"));
-		if(obj.info.parentID && !Channel.byID.hasOwnProperty(obj.info.parentID)) continue;
-		var channel = new Channel(obj.info.parentID, obj.info.channelID);
-		bt.mixin(channel.info, obj.info);
-		channel.history = obj.history;
-		if(obj.isGameChannel) new Game(channel);
-		channel.uncache(obj.time);
-	}
-})();
 
 module.exports = Channel;
