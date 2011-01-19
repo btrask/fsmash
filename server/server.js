@@ -372,7 +372,6 @@ root.api.session.user = bt.dispatch(function(query, session) {
 						else {
 							channel = new Channel(channelRow.parentID, channelRow.channelID);
 							channel.info.allowsGameChannels = Boolean(channelRow.allowsGameChannels);
-							console.log(channel.info.channelID, channelRow.historyJSON);
 							channel.hitory = JSON.parse(channelRow.historyJSON || "[]");
 							if(channelRow.topic) {
 								channel.info.topic = channelRow.topic;
@@ -729,7 +728,7 @@ root.api.session.user.channel.message = bt.dispatch(function(query, session, use
 		channel.sendMessage(user, text, ticket);
 		channel.autosaveLimit(function() {
 			db.query(
-				"UPDATE channels SET historyText = $ WHERE channelID = $ LIMIT 1",
+				"UPDATE channels SET historyJSON = $ WHERE channelID = $ LIMIT 1",
 				[JSON.stringify(channel.history), channel.info.channelID]
 			);
 		});
