@@ -11,9 +11,22 @@ SET SQL_MODE="NO_AUTO_VALUE_ON_ZERO";
 --
 
 CREATE TABLE `administrators` (
-  `administratorID` int(11) NOT NULL auto_increment,
+  `adminID` int(11) NOT NULL auto_increment,
   `administratorUserID` int(11) NOT NULL,
-  PRIMARY KEY  (`administratorID`),
+  PRIMARY KEY  (`adminID`),
+  UNIQUE KEY `userID` (`administratorUserID`)
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `admins`
+--
+
+CREATE TABLE `admins` (
+  `adminID` int(11) NOT NULL auto_increment,
+  `userID` int(11) NOT NULL,
+  PRIMARY KEY  (`adminID`),
   UNIQUE KEY `userID` (`userID`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
@@ -51,7 +64,23 @@ CREATE TABLE `bannedSessions` (
   PRIMARY KEY  (`bannedSessionID`),
   UNIQUE KEY `sessionID` (`sessionID`),
   KEY `modUserID` (`modUserID`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `censoredMessages`
+--
+
+CREATE TABLE `censoredMessages` (
+  `censoredMessageID` int(11) NOT NULL auto_increment,
+  `modUserID` int(11) NOT NULL,
+  `channelID` int(11) NOT NULL,
+  `censorText` text collate utf8_unicode_ci NOT NULL,
+  `replacementText` text collate utf8_unicode_ci NOT NULL,
+  `censorTime` timestamp NOT NULL default CURRENT_TIMESTAMP,
+  PRIMARY KEY  (`censoredMessageID`)
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 -- --------------------------------------------------------
 
