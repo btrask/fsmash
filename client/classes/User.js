@@ -17,6 +17,9 @@ var User = function(session, userID) {
 
 	var subscribeItem = new SidebarItem("Subscribe");
 	session.siteItem.children.appendChild(subscribeItem.element);
+	subscribeItem.onshow = function() {
+		DOM.fill(subscribeItem.counter);
+	};
 	var subscribeElems = {};
 	subscribeItem.setContent(DOM.clone("subscribe", subscribeElems));
 	subscribeElems.custom.value = JSON.stringify({userID: userID});
@@ -108,6 +111,14 @@ var User = function(session, userID) {
 		DOM.changeClass(DOM.id("body"), "notAdministrator", false);
 	}, null, function(body) {
 		return user.administrator.event;
+	});
+	user.event.subscription = bt.dispatch(function(body) {
+		if(body.expireTime) {
+			DOM.fill(subscribeElems.expireTime, new Date(body.expireTime).toLocaleDateString());
+		} else {
+			if(!subscribeItem.selected) DOM.fill(subscribeItem.counter, "!");
+		}
+		DOM.changeClass(subscribeElems.subscriberInfo, "invisible", !body.expireTime);
 	});
 
 	user.request = function(path, properties, callback) {

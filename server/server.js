@@ -333,11 +333,14 @@ root.api.session.user = bt.dispatch(function(query, session) {
 				}
 			);
 			db.query(
-				"SELECT donationID FROM donations"+
-				" WHERE userID = $ AND startTime <= NOW() AND expireTime > NOW() LIMIT 1",
-				[user.info.userID],
+				"SELECT UNIX_TIMESTAMP(expireTime) * 1000 expireTime"+
+				" FROM donations WHERE userID = $ AND expireTime > NOW()"+
+				" ORDER BY expireTime DESC LIMIT 1",
+				[userID],
 				function(err, donationResult) {
-					if(donationResult.length) user.info.subscriber = true;
+					if(!donationResult.length) return;
+					user.info.subscriber = true;
+					user.subscriptionExpireTime = mysql.rows(donationResult)[0].expireTime;
 				}
 			);
 			db.query(
@@ -400,6 +403,7 @@ root.api.session.user = bt.dispatch(function(query, session) {
 				if(parseInt(otherUserID) === user.info.userID) return;
 				session.sendEvent("/user/person/", otherSession.user.info);
 			});
+			user.sendEvent("/user/subscription/", {expireTime: user.subscriptionExpireTime});
 			db.query(
 				"SELECT styleID, soundsetID FROM settings WHERE userID = $ LIMIT 1",
 				[user.info.userID],
@@ -1014,22 +1018,34 @@ root.paypal = bt.dispatch(function(req, data) {
 			var userID = parseInt(custom.userID);
 			if(!userID) return;
 			if(!verify(config.PayPal.verify, query)) return;
-			var grossPennies = parsePennies(query["mc_gross"] || query["mc_gross_1"]);
-			if(config.PayPal.payment.pennies.min > gross) return;
-			if(config.PayPal.payment.pennies.max < gross) return;
+			var pennies = parsePennies(query["mc_gross"] || query["mc_gross_1"]);
+			if(config.PayPal.payment.pennies.min > pennies) return;
+			if(config.PayPal.payment.pennies.max < pennies) return;
 			if("Completed" != query["payment_status"]) return;
 			// We shouldn't need to check the txn_type as long as the other conditions are met.
 			db.query(
-				"INSERT IGNORE INTO donations (userID, payerID, transactionID, amount, startTime, expireTime)"+
-				" VALUES ($, $, $, $, NOW(), DATE_SUB(NOW(), INTERVAL -1 MONTH))",
-				[userID, query["payer_id"], query["txn_id"], String(gross) + query["mc_currency"]],
-				function(err, donationResult) {
-					if(err && 1062 === err.number) return;
-					if(!Session.byUserID.hasOwnProperty(userID)) return;
-					var user = Session.byUserID[userID].user;
-					if(user.info.subscriber) return;
-					user.info.subscriber = true;
-					Group.users.sendEvent("/user/person/", user.info);
+				"SELECT UNIX_TIMESTAMP(expireTime) * 1000 expireTime"+
+				" FROM donations WHERE userID = $ AND expireTime > NOW()"+
+				" ORDER BY expireTime DESC LIMIT 1",
+				[userID],
+				function(err, donationsResult) {
+					var startTime = donationsResult.length ? mysql.rows(donationsResult)[0].expireTime : new Date().getTime();
+					var additional = Math.ceil((((pennies / 4) * 3) * (1000 * 60 * 60 * 24 * (365.242199 / 12))) / 100);
+					db.query(
+						"INSERT IGNORE INTO donations (userID, payerID, transactionID, pennies, startTime, expireTime)"+
+						" VALUES ($, $, $, $, FROM_UNIXTIME($ / 1000), DATE_SUB(FROM_UNIXTIME($ / 1000), INTERVAL ($ / 1000) SECOND))"
+						[userID, query["payer_id"], query["txn_id"], pennies, startTime, startTime, additional],
+						function(err, donationResult) {
+							if(err && 1062 === err.number) return;
+							if(err) throw err;
+							if(!Session.byUserID.hasOwnProperty(userID)) return;
+							var user = Session.byUserID[userID].user;
+							if(user.info.subscriber) return;
+							user.info.subscriber = true;
+							Group.users.sendEvent("/user/person/", user.info);
+							user.sendEvent("/user/subscription/", {expireTime: startTime + additional});
+						}
+					);
 				}
 			);
 		});

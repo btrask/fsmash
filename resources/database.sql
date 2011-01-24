@@ -171,10 +171,12 @@ CREATE TABLE `donations` (
   `payerID` varchar(13) collate utf8_unicode_ci NOT NULL,
   `transactionID` varchar(19) collate utf8_unicode_ci default NULL,
   `amount` varchar(40) collate utf8_unicode_ci NOT NULL default '0.00USD',
+  `pennies` int(11) NOT NULL default '0',
   `startTime` timestamp NOT NULL default CURRENT_TIMESTAMP,
   `expireTime` timestamp NOT NULL default '0000-00-00 00:00:00',
   PRIMARY KEY  (`donationID`),
-  UNIQUE KEY `transactionID` (`transactionID`)
+  UNIQUE KEY `transactionID` (`transactionID`),
+  KEY `expireTime` (`expireTime`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 -- --------------------------------------------------------
