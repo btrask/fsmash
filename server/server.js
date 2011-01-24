@@ -373,7 +373,7 @@ root.api.session.user = bt.dispatch(function(query, session) {
 						else {
 							channel = new Channel(channelRow.parentID, channelRow.channelID);
 							channel.info.allowsGameChannels = Boolean(channelRow.allowsGameChannels);
-							channel.hitory = JSON.parse(channelRow.historyJSON || "[]");
+							channel.history = JSON.parse(channelRow.historyJSON || "[]");
 							if(channelRow.topic) {
 								channel.info.topic = channelRow.topic;
 							} else {
