@@ -75,6 +75,7 @@ var Channel = function(parentID, channelID) {
 		channel.privateGroup.objects.splice(i, 1);
 		delete channel.memberByUserID[user.info.userID];
 		delete user.channelByID[channel.info.channelID];
+		delete user.moderatorChannelByID[channel.info.channelID];
 		bt.map(channel.broadcastingSubchannelByID, function(subchannel) {
 			delete subchannel.game.applicantByUserID[user.info.userID];
 		});
@@ -89,6 +90,7 @@ var Channel = function(parentID, channelID) {
 			if(channel.game && channel.game.broadcasting) user.broadcastCount--;
 			user.sendEvent("/user/channel/member/leave/", {channelID: channel.info.channelID, memberUserID: user.info.userID}, ticket);
 			delete user.channelByID[channel.info.channelID];
+			delete user.moderatorChannelByID[channel.info.channelID];
 		});
 		channel.memberByUserID = {};
 		channel.privateGroup.objects = [];

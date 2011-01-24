@@ -193,6 +193,15 @@ var Channel = function(session, user, channelID, parentID) {
 	channel.setAllowsGameChannels = function(flag) {
 		DOM.input.enable(chnlElems.newGame, flag && !channel.game);
 	};
+	channel.setModerator = function(flag) {
+		if(channel.isModerator === flag) return;
+		channel.isModerator = Boolean(flag);
+		DOM.changeClass(channel.element, "moderator", Boolean(flag));
+		DOM.changeClass(channel.element, "notModerator", !flag);
+		bt.map(channel.channelByID, function(subchannel) {
+			subchannel.setModerator(flag);
+		});
+	};
 
 	channel.event = bt.dispatch();
 	channel.event.member = bt.dispatch(function(body) {
@@ -259,8 +268,8 @@ var Channel = function(session, user, channelID, parentID) {
 				}
 				msgElems.censor.onclick = function() {
 					if(censored) return;
-					if(!user.administrator) throw "Administrator-only action";
-					user.administrator.request("/channel/censor", {channelID: channel.info.channelID, censorText: info.text, replacementText: "Message removed by moderator"});
+					if(!channel.isModerator) throw "Moderator-only action";
+					user.request("/channel/moderator/censor", {channelID: channel.info.channelID, censorText: info.text, replacementText: "Message removed by moderator"});
 				};
 			})();
 			return elem;
@@ -303,6 +312,9 @@ var Channel = function(session, user, channelID, parentID) {
 	}, null, function(body) {
 		if(!channel.game) throw "Specified channel is not a game channel";
 		return channel.game.event;
+	});
+	channel.event.moderator = bt.dispatch(function(body) {
+		channel.setModerator(true);
 	});
 
 	(function unreadCounts() {
@@ -348,10 +360,12 @@ var Channel = function(session, user, channelID, parentID) {
 			channel.groups.nonMembers.addItem(member.item());
 		});
 		channel.groups.nonMembers.update();
+		channel.setModerator(channel.parent.isModerator);
 	} else {
 		user.rootChannelByID[channelID] = channel;
 		DOM.changeClass(channel.groups.nonMembers.element, "invisible");
 		DOM.changeClass(channel.groups.formerMembers.element, "invisible");
+		channel.setModerator(false);
 	}
 
 	chnlElems.info.onclick = function() {

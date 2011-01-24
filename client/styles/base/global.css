@@ -273,3 +273,18 @@ td > .button, td > select {
 	margin-left: 2px;
 	margin-top: 2px;
 }
+
+.notAdministrator .administratorOnly {
+	display: none !important;
+}
+
+.notModerator .moderatorOnly {
+	display: none !important;
+}
+
+.hoverOnly {
+	display: none;
+}
+.hover:hover .hoverOnly.inline {
+	display: inline;
+}

@@ -358,11 +358,12 @@ root.api.session.user = bt.dispatch(function(query, session) {
 		};
 		var loadChannels = function(user) {
 			db.query(
-				"SELECT cm.channelID, c.parentID, c.topic, c.allowsGameChannels, c.historyJSON, g.matchTypeID, g.ruleID"+
-				" FROM channelMembers cm"+
-				" LEFT JOIN channels c ON (cm.channelID = c.channelID)"+
-				" LEFT JOIN games g ON (cm.channelID = g.channelID)"+
-				" WHERE cm.userID = $ ORDER BY cm.channelID ASC",
+				"SELECT cmem.channelID, c.parentID, c.topic, c.allowsGameChannels, c.historyJSON, g.matchTypeID, g.ruleID, cmod.channelModeratorID"+
+				" FROM channelMembers cmem"+
+				" LEFT JOIN channels c ON (cmem.channelID = c.channelID)"+
+				" LEFT JOIN games g ON (cmem.channelID = g.channelID)"+
+				" LEFT JOIN channelModerators cmod ON (cmem.channelID = cmod.channelID AND cmem.userID = cmod.moderatorUserID)"+
+				" WHERE cmem.userID = $ ORDER BY cmem.channelID ASC",
 				[user.info.userID],
 				function(err, channelResult) {
 					sendUser(user);
@@ -383,6 +384,10 @@ root.api.session.user = bt.dispatch(function(query, session) {
 						}
 						channel.addUser(user);
 						channel.group.sendEvent("/user/channel/member/", {channelID: channel.info.channelID, memberUserID: user.info.userID}, undefined, [user]);
+						if(channelRow.channelModeratorID) {
+							user.moderatorChannelByID[channel.info.channelID] = channel;
+							user.sendEvent("/user/channel/moderator/", {channelID: channel.info.channelID});
+						}
 					});
 				}
 			);
@@ -607,21 +612,6 @@ root.api.session.user.administrator.channel.empty = bt.dispatch(function(query, 
 		);
 	});
 });
-root.api.session.user.administrator.channel.censor = bt.dispatch(function(query, session, user, channel) {
-	if(!query.censorText) return {error: "No censored text specified"};
-	if(!query.replacementText) return {error: "No replacement text specified"};
-	var censorText = String(query.censorText), replacementText = String(query.replacementText);
-	return session.promise(function(ticket) {
-		bt.map(channel.history, function(body) {
-			if(censorText !== body.text) return;
-			body.text = replacementText;
-			body.censored = true;
-		});
-		channel.privateGroup.sendEvent("/user/channel/censor/", {channelID: channel.info.channelID, censorText: censorText, replacementText: replacementText}, ticket);
-		Group.administrators.sendEvent("/user/administrator/censored/", [{modUserName: user.info.userName, topic: channel.info.topic, time: new Date().getTime(), censorText: censorText, replacementText: replacementText}]);
-		db.query("INSERT INTO censoredMessages (modUserID, channelID, censorText, replacementText) VALUES ($, $, $, $)", [user.info.userID, channel.info.channelID, censorText, replacementText]);
-	});
-});
 
 root.api.session.user.person = bt.dispatch(null, function(func, query, session, user) {
 	var personUserID = parseInt(query.personUserID);
@@ -714,8 +704,27 @@ root.api.session.user.channel.invite = bt.dispatch(function(query, session, user
 		}
 		if(!channel.game.info.playersNeeded) channel.game.stopBroadcasting();
 	}
-	channel.group.sendEvent("/user/channel/member/", {channelID: channel.info.channelID, memberUserID: invitedUser.info.userID, invitingUserID: user.info.userID, time: new Date().getTime()});
-	db.query("INSERT IGNORE INTO channelMembers (channelID, userID, invitedByUserID) VALUES ($, $, $)", [channel.info.channelID, invitedUser.info.userID, user.info.userID]);
+	channel.group.sendEvent(
+		"/user/channel/member/",
+		{channelID: channel.info.channelID, memberUserID: invitedUser.info.userID, invitingUserID: user.info.userID, time: new Date().getTime()}
+	);
+	db.query(
+		"INSERT IGNORE INTO channelMembers"+
+		" (channelID, userID, invitedByUserID) VALUES ($, $, $)",
+		[channel.info.channelID, invitedUser.info.userID, user.info.userID]
+	);
+	db.query(
+		"SELECT channelModeratorID"+
+		" FROM channelModerators"+
+		" WHERE channelID = $ AND moderatorUserID = $"+
+		" LIMIT 1",
+		[channel.info.channelID, invitedUser.info.userID],
+		function(err, modResult) {
+			if(!modResult.length) return;
+			invitedUser.moderatorChannelByID[channel.info.channelID] = channel;
+			invitedUser.sendEvent("/user/channel/moderator/", {channelID: channel.info.channelID});
+		}
+	);
 	return true;
 });
 root.api.session.user.channel.message = bt.dispatch(function(query, session, user, channel) {
@@ -762,6 +771,31 @@ root.api.session.user.channel.report = bt.dispatch(function(query, session, user
 	);
 	Group.administrators.sendEvent("/user/administrator/reports/", [{userName: user.info.userName, topic: channel.info.topic, time: new Date().getTime()}]);
 	return true;
+});
+
+root.api.session.user.channel.moderator = bt.dispatch(null, function(func, query, session, user, channel) {
+	var c;
+	for(c = channel; c; c = c.parent) {
+		if(!user.moderatorChannelByID.hasOwnProperty(c.info.channelID)) continue;
+		if(c !== user.moderatorChannelByID[c.info.channelID]) continue;
+		return func(query, session, user, channel);
+	}
+	return false;
+});
+root.api.session.user.channel.moderator.censor = bt.dispatch(function(query, session, user, channel) {
+	if(!query.censorText) return {error: "No censored text specified"};
+	if(!query.replacementText) return {error: "No replacement text specified"};
+	var censorText = String(query.censorText), replacementText = String(query.replacementText);
+	return session.promise(function(ticket) {
+		bt.map(channel.history, function(body) {
+			if(censorText !== body.text) return;
+			body.text = replacementText;
+			body.censored = true;
+		});
+		channel.privateGroup.sendEvent("/user/channel/censor/", {channelID: channel.info.channelID, censorText: censorText, replacementText: replacementText}, ticket);
+		Group.administrators.sendEvent("/user/administrator/censored/", [{modUserName: user.info.userName, topic: channel.info.topic, time: new Date().getTime(), censorText: censorText, replacementText: replacementText}]);
+		db.query("INSERT INTO censoredMessages (modUserID, channelID, censorText, replacementText) VALUES ($, $, $, $)", [user.info.userID, channel.info.channelID, censorText, replacementText]);
+	});
 });
 
 root.api.session.user.channel.game = bt.dispatch(null, function(func, query, session, user, channel) {
@@ -861,9 +895,22 @@ root.api.session.user.publicChannel = bt.dispatch(null, function(func, query, se
 root.api.session.user.publicChannel.join = bt.dispatch(function(query, session, user, channel) {
 	if(user.channelByID.hasOwnProperty(channel.info.channelID)) return false;
 	return session.promise(function(ticket) {
+		// TODO: A lot of this is very similar to ...channel.invite. Can we reuse it?
 		channel.addUser(user, ticket);
 		channel.group.sendEvent("/user/channel/member/", {channelID: channel.info.channelID, memberUserID: user.info.userID, time: new Date().getTime()});
 		db.query("INSERT IGNORE INTO channelMembers (channelID, userID) VALUES ($, $)", [channel.info.channelID, user.info.userID]);
+		db.query(
+			"SELECT channelModeratorID"+
+			" FROM channelModerators"+
+			" WHERE channelID = $ AND moderatorUserID = $"+
+			" LIMIT 1",
+			[channel.info.channelID, user.info.userID],
+			function(err, modResult) {
+				if(!modResult.length) return;
+				user.moderatorChannelByID[channel.info.channelID] = channel;
+				user.sendEvent("/user/channel/moderator/", {channelID: channel.info.channelID});
+			}
+		);
 	});
 });
 

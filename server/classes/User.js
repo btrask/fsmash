@@ -26,6 +26,7 @@ var User = function(session, userID) {
 		subscriber: false,
 	};
 	user.channelByID = {};
+	user.moderatorChannelByID = {};
 	user.blockedByUserID = {};
 	user.broadcastCount = 0;
 
