@@ -8,6 +8,7 @@ var sys = require('./sys'),
 function Query(properties) {
   EventEmitter.call(this);
 
+  this.sql = null;
   this.typeCast = true;
 
   for (var key in properties) {
@@ -30,6 +31,7 @@ Query.prototype._handlePacket = function(packet) {
       this.emit('end', Client._packetToUserObject(packet));
       break;
     case Parser.ERROR_PACKET:
+      packet.sql = this.sql;
       this.emit('error', Client._packetToUserObject(packet));
       break;
     case Parser.FIELD_PACKET:
@@ -52,56 +54,60 @@ Query.prototype._handlePacket = function(packet) {
       }
       break;
     case Parser.ROW_DATA_PACKET:
-      var row = this._row = {},
-          field = this._fields[0];
+      var row = this._row = {}, field;
 
       this._rowIndex = 0;
-      row[field.name] = '';
 
       packet.on('data', function(buffer, remaining) {
+        if (!field) {
+          field = self._fields[self._rowIndex];
+          row[field.name] = '';
+        }
+
         if (buffer) {
           row[field.name] += buffer.toString('utf-8');
         } else {
           row[field.name] = null;
         }
 
-        if (remaining == 0) {
-          self._rowIndex++;
-          if (self.typeCast && buffer !== null) {
-            switch (field.fieldType) {
-              case Query.FIELD_TYPE_TIMESTAMP:
-              case Query.FIELD_TYPE_DATE:
-              case Query.FIELD_TYPE_DATETIME:
-              case Query.FIELD_TYPE_NEWDATE:
-                row[field.name] = new Date(row[field.name]+'Z');
-                break;
-              case Query.FIELD_TYPE_TINY:
-              case Query.FIELD_TYPE_SHORT:
-              case Query.FIELD_TYPE_LONG:
-              case Query.FIELD_TYPE_LONGLONG:
-              case Query.FIELD_TYPE_INT24:
-              case Query.FIELD_TYPE_YEAR:
-                row[field.name] = parseInt(row[field.name], 10);
-                break;
-              case Query.FIELD_TYPE_DECIMAL:
-              case Query.FIELD_TYPE_FLOAT:
-              case Query.FIELD_TYPE_DOUBLE:
-              case Query.FIELD_TYPE_NEWDECIMAL:
-                row[field.name] = parseFloat(row[field.name]);
-                break;
-            }
-          }
-
-          if (self._rowIndex == self._fields.length) {
-             delete self._row;
-             delete self._rowIndex;
-             self.emit('row', row);
-             return;
-          }
-
-          field = self._fields[self._rowIndex];
-          row[field.name] = '';
+        if (remaining !== 0) {
+          return;
         }
+
+        self._rowIndex++;
+        if (self.typeCast && buffer !== null) {
+          switch (field.fieldType) {
+            case Query.FIELD_TYPE_TIMESTAMP:
+            case Query.FIELD_TYPE_DATE:
+            case Query.FIELD_TYPE_DATETIME:
+            case Query.FIELD_TYPE_NEWDATE:
+              row[field.name] = new Date(row[field.name]+'Z');
+              break;
+            case Query.FIELD_TYPE_TINY:
+            case Query.FIELD_TYPE_SHORT:
+            case Query.FIELD_TYPE_LONG:
+            case Query.FIELD_TYPE_LONGLONG:
+            case Query.FIELD_TYPE_INT24:
+            case Query.FIELD_TYPE_YEAR:
+              row[field.name] = parseInt(row[field.name], 10);
+              break;
+            case Query.FIELD_TYPE_DECIMAL:
+            case Query.FIELD_TYPE_FLOAT:
+            case Query.FIELD_TYPE_DOUBLE:
+            case Query.FIELD_TYPE_NEWDECIMAL:
+              row[field.name] = parseFloat(row[field.name]);
+              break;
+          }
+        }
+
+        if (self._rowIndex == self._fields.length) {
+           delete self._row;
+           delete self._rowIndex;
+           self.emit('row', row);
+           return;
+        }
+
+        field = null;
       });
       break;
   }

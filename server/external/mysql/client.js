@@ -7,7 +7,7 @@ var sys = require('./sys'),
     OutgoingPacket = require('./outgoing_packet'),
     Query = require('./query'),
     EventEmitter = require('events').EventEmitter,
-    netBinding = process.binding('net');
+    netConstants = require('./net_constants');
 
 function Client(properties) {
   if (!(this instanceof Client)) {
@@ -50,7 +50,7 @@ Client.prototype.connect = function(cb) {
 
     connection
       .on('error', function(err) {
-        if (err.errno & (netBinding.ECONNREFUSED | netBinding.ENOTFOUND)) {
+        if (err.errno & (netConstants.ECONNREFUSED | netConstants.ENOTFOUND)) {
           if (cb) {
             cb(err);
             return;
@@ -94,7 +94,10 @@ Client.prototype.query = function(sql, params, cb) {
     cb = arguments[1];
   }
 
-  var query = new Query({typeCast: this.typeCast});
+  var query = new Query({
+    typeCast: this.typeCast,
+    sql: sql
+  });
 
   if (cb) {
     var rows = [], fields = {};
@@ -351,11 +354,6 @@ Client._packetToUserObject = function(packet) {
   }
 
   return userObject;
-
-  packet.message = packet.errorMessage;
-  delete packet.errorMessage;
-  packet.number = packet.errorNumber;
-  delete packet.errorNumber;
 };
 
 Client.prototype._debugPacket = function(packet) {
