@@ -112,11 +112,13 @@ wrapper.createFileHandler = function(rootdir) {
 	};
 	var fileHandler = function(req, filename, write/* (status, header, data, encoding) */) {
 		if("/" === filename[filename.length - 1]) filename += "index.html";
-		var lookup = cacheByDisplayName.hasOwnProperty(filename) ? function() {
-			var cache = cacheByDisplayName[filename];
-			write(cache.status, cache.header, cache.body, cache.encoding);
-		} : function() {
-			writeError(404, "File Not Found", write);
+		var lookup = function() {
+			if(cacheByDisplayName.hasOwnProperty(filename)) {
+				var cache = cacheByDisplayName[filename];
+				write(cache.status, cache.header, cache.body, cache.encoding);
+			} else {
+				writeError(404, "File Not Found", write);
+			}
 		};
 		if(null === pendingLookups) lookup();
 		else pendingLookups.push(lookup);
