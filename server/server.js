@@ -1033,7 +1033,7 @@ root.paypal = bt.dispatch(function(req, data) {
 					var additional = Math.ceil((((pennies / 4) * 3) * (1000 * 60 * 60 * 24 * (365.242199 / 12))) / 100);
 					db.query(
 						"INSERT IGNORE INTO donations (userID, payerID, transactionID, pennies, startTime, expireTime)"+
-						" VALUES ($, $, $, $, FROM_UNIXTIME($ / 1000), DATE_SUB(FROM_UNIXTIME($ / 1000), INTERVAL ($ / 1000) SECOND))"
+						" VALUES ($, $, $, $, FROM_UNIXTIME($ / 1000), DATE_SUB(FROM_UNIXTIME($ / 1000), INTERVAL ($ / -1000) SECOND))"
 						[userID, query["payer_id"], query["txn_id"], pennies, startTime, startTime, additional],
 						function(err, donationResult) {
 							if(err && 1062 === err.number) return;
