@@ -1,5 +1,4 @@
 public/
-channels/
 config/zz01-secret.json
 deps/node-crypt/build/
 .DS_Store

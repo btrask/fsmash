@@ -1053,25 +1053,4 @@ root.paypal = bt.dispatch(function(req, data) {
 	req.end(outgoing);
 });
 
-
-(function TEMP_importChannelsFromFiles() { // TODO: Remove this.
-	try {
-		var path = require("path");
-		var autosavePath = path.join(__dirname, "/../channels");
-		var filenames = fs.readdirSync(autosavePath);
-		filenames.sort(function(a, b) {
-			return parseInt(a) - parseInt(b);
-		});
-		for(var i = 0; i < filenames.length; ++i) {
-			var obj = JSON.parse(fs.readFileSync(path.join(autosavePath, filenames[i]), "utf8"));
-			db.query("UPDATE channels SET historyJSON = $ WHERE channelID = $ AND historyJSON IS NULL LIMIT 1", [JSON.stringify(obj.history), obj.info.channelID], function(err) {
-				if(err) console.log(err);
-			});
-		}
-	} catch(e) {
-		console.log(e.message);
-	}
-})();
-
-
 http.createServer(root, fileHandler).listen(config.server.port, config.server.host);
