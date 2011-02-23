@@ -175,11 +175,14 @@ select {
 	border-color: #090;
 }
 
-.name.online {
+.message.online > .name {
 	color: #0f0;
 }
-.name.subscriber:after {
+.message.subscriber > .name:after {
 	color: #f00;
+}
+.message.ignored > .messageText {
+	color: #000; /* Background color */
 }
 
 /* Modal */

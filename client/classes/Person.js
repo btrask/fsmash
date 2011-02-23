@@ -49,17 +49,15 @@ var Person = function(session, user, userID) {
 		for(var component in Person.keysByComponent) if(Person.keysByComponent.hasOwnProperty(component)) DOM.fill(item[component], DOM.inputify(stringForComponent(component)));
 	};
 
-	var nameElements = [];
-
 	person.info = {
 		userID: userID,
 		friendCode: "(no friend code specified in profile)"
 	};
 	user.personByUserID[person.info.userID] = person;
-	person.ignored = false;
 	person.rated = false;
 	person.online = false;
 	person.subscriber = false;
+	person.ignored = false;
 
 	person.event = bt.dispatch();
 	person.event.signout = bt.dispatch(function(body) {
@@ -101,29 +99,32 @@ var Person = function(session, user, userID) {
 			}
 		}
 	};
-	person.setOnline = function(flag) {
-		if(flag == person.online) return;
-		person.online = Boolean(flag);
-		bt.map(nameElements, function(elem) {
+	(function() {
+		var messageElementsByChannelID = {};
+		var setProperty = function(prop, flag) {
+			if(flag == person[prop]) return;
+			person[prop] = Boolean(flag);
+			bt.map(messageElementsByChannelID, function(messages) {
+				bt.map(messages, function(elem) {
+					DOM.changeClass(elem, prop, flag);
+				});
+			});
+		};
+		person.trackMessageElement = function(elem, channelID) {
+			if(!messageElementsByChannelID.hasOwnProperty(channelID)) messageElementsByChannelID[channelID] = [];
+			messageElementsByChannelID[channelID].push(elem);
 			DOM.changeClass(elem, "online", person.online);
-		});
-	};
-	person.setSubscriber = function(flag) {
-		if(flag == person.subscriber) return;
-		person.subscriber = Boolean(flag);
-		bt.map(nameElements, function(elem) {
 			DOM.changeClass(elem, "subscriber", person.subscriber);
-		});
-	};
-	person.nameElement = function() {
-		var elem = document.createElement("span");
-		DOM.fill(elem, person.info.userName);
-		DOM.changeClass(elem, "name");
-		if(person.online) DOM.changeClass(elem, "online");
-		if(person.subscriber) DOM.changeClass(elem, "subscriber");
-		nameElements.push(elem);
-		return elem;
-	};
+			DOM.changeClass(elem, "ignored", person.ignored);
+		};
+		person.stopTrackingMessages = function(channelID) {
+			delete messageElementsByChannelID[channelID];
+		};
+
+		person.setOnline = bt.curry(setProperty, "online");
+		person.setSubscriber = bt.curry(setProperty, "subscriber");
+		person.setIgnored = bt.curry(setProperty, "ignored");
+	})();
 };
 Person.keysByComponent = {
 	title: ["userName", "location", "rank", "memberType"],

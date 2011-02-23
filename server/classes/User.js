@@ -27,7 +27,7 @@ var User = function(session, userID) {
 	};
 	user.channelByID = {};
 	user.moderatorChannelByID = {};
-	user.blockedByUserID = {};
+	user.ignoringByUserID = {};
 	user.broadcastCount = 0;
 
 	user.messageLimit = bt.limit(config.User.message.rate);

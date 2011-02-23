@@ -109,14 +109,17 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 	width: 70px;
 }
 
-.name.online {
+.message.online > .name {
 	color: #000;
 }
-.name.subscriber:after {
+.message.subscriber > .name:after {
 	content: "✓";
 	color: #a00;
 }
+.message.ignored > .messageText {
+	color: #eee; /* Background color */
+}
 
-.censor, .censored {
+.message > .censor, .message > .messageText.censored {
 	color: #f00;
 }

@@ -128,7 +128,7 @@ CREATE TABLE `channelModerators` (
   `moderatorTime` timestamp NOT NULL default CURRENT_TIMESTAMP,
   PRIMARY KEY  (`channelModeratorID`),
   UNIQUE KEY `channelID` (`channelID`,`moderatorUserID`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 -- --------------------------------------------------------
 
@@ -157,7 +157,7 @@ CREATE TABLE `donationAttempts` (
   `query` text collate utf8_unicode_ci NOT NULL,
   `attemptTime` timestamp NOT NULL default CURRENT_TIMESTAMP,
   PRIMARY KEY  (`donationAttemptID`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 -- --------------------------------------------------------
 
@@ -226,6 +226,21 @@ CREATE TABLE `httpRequests` (
   KEY `ipAddress` (`ipAddress`),
   KEY `filename` (`filename`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `ignores`
+--
+
+CREATE TABLE `ignores` (
+  `ignoreID` int(11) NOT NULL auto_increment,
+  `userID` int(11) NOT NULL,
+  `ignoredUserID` int(11) NOT NULL,
+  `ignoreTime` timestamp NOT NULL default CURRENT_TIMESTAMP,
+  PRIMARY KEY  (`ignoreID`),
+  UNIQUE KEY `userID` (`userID`,`ignoredUserID`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 -- --------------------------------------------------------
 

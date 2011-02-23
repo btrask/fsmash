@@ -333,6 +333,15 @@ root.api.session.user = bt.dispatch(function(query, session) {
 				}
 			);
 			db.query(
+				"SELECT ignoredUserID FROM ignores WHERE userID = $",
+				[userID],
+				function(err, ignoresResult) {
+					bt.map(mysql.rows(ignoresResult), function(row) {
+						user.ignoringByUserID[row.ignoredUserID] = true;
+					});
+				}
+			);
+			db.query(
 				"SELECT UNIX_TIMESTAMP(expireTime) * 1000 expireTime"+
 				" FROM donations WHERE userID = $ AND expireTime > NOW()"+
 				" ORDER BY expireTime DESC LIMIT 1",
@@ -403,6 +412,7 @@ root.api.session.user = bt.dispatch(function(query, session) {
 				if(parseInt(otherUserID) === user.info.userID) return;
 				session.sendEvent("/user/person/", otherSession.user.info);
 			});
+			user.sendEvent("/user/ignore/", {ignoringByUserID: user.ignoringByUserID});
 			user.sendEvent("/user/subscription/", {expireTime: user.subscriptionExpireTime});
 			db.query(
 				"SELECT styleID, soundsetID FROM settings WHERE userID = $ LIMIT 1",
@@ -622,9 +632,19 @@ root.api.session.user.person = bt.dispatch(null, function(func, query, session, 
 	if(!personUserID) return {error: "Invalid person user ID"};
 	return func(query, session, user, personUserID);
 });
-root.api.session.user.person.block = bt.dispatch(function(query, session, user, personUserID) {
-	user.blockedByUserID[personUserID] = Boolean(query.block);
-	return true;
+root.api.session.user.person.ignore = bt.dispatch(function(query, session, user, personUserID) {
+	return session.promise(function(ticket) {
+		if(query.ignore) {
+			user.ignoringByUserID[personUserID] = true;
+			db.query("INSERT IGNORE INTO ignores (userID, ignoredUserID) VALUES ($, $)", [user.info.userID, personUserID]);
+		} else {
+			delete user.ignoringByUserID[personUserID];
+			db.query("DELETE FROM ignores WHERE userID = $ AND ignoredUserID = $", [user.info.userID, personUserID]);
+		}
+		var ignoringByUserID = {};
+		ignoringByUserID[personUserID] = Boolean(query.ignore);
+		user.sendEvent("/user/ignore/", {ignoringByUserID: ignoringByUserID}, ticket);
+	});
 });
 root.api.session.user.person.rate = bt.dispatch(function(query, session, user, personUserID) {
 	var rating = parseInt(query.rating);
@@ -698,7 +718,7 @@ root.api.session.user.channel.invite = bt.dispatch(function(query, session, user
 	if(channel.memberByUserID.hasOwnProperty(query.invitedUserID)) return false;
 	if(!channel.parent.memberByUserID.hasOwnProperty(query.invitedUserID)) return false;
 	invitedUser = channel.parent.memberByUserID[query.invitedUserID];
-	if(invitedUser.blockedByUserID[user.info.userID]) return false;
+	if(invitedUser.ignoringByUserID[user.info.userID]) return false;
 	channel.addUser(invitedUser);
 	if(channel.game) {
 		delete channel.game.applicantByUserID[invitedUser.info.userID];

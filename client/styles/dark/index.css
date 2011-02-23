@@ -148,11 +148,14 @@ a:active {
 	background: #222;
 }
 
-.name.online {
+.message.online > .name {
 	color: #bbb;
 }
-.name.subscriber:after {
+.message.subscriber > .name:after {
 	color: #b33;
+}
+.message.ignored > .messageText {
+	color: #333; /* Background color */
 }
 
 /* Modal */

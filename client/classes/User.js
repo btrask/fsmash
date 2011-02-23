@@ -112,6 +112,11 @@ var User = function(session, userID) {
 	}, null, function(body) {
 		return user.administrator.event;
 	});
+	user.event.ignore = bt.dispatch(function(body) {
+		bt.map(body.ignoringByUserID, function(ignored, ignoredUserID) {
+			user.getPerson(ignoredUserID).setIgnored(ignored);
+		});
+	});
 	user.event.subscription = bt.dispatch(function(body) {
 		if(body.expireTime) {
 			DOM.fill(subscribeElems.expireTime, new Date(body.expireTime).toLocaleDateString());

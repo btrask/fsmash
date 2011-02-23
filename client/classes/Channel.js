@@ -103,14 +103,17 @@ var Channel = function(session, user, channelID, parentID) {
 			session.showModal(ratePanel);
 		};
 		var ignoreAction = function(validate, item) {
+			var ignoreButton = this;
 			if(validate) {
-				this.value = (item.person.ignored ? "Unignore" : "Ignore");
+				ignoreButton.value = (item.person.ignored ? "Unignore" : "Ignore");
 				return channel.userIsMember && item.person !== user.person;
 			}
 			var setIgnored = function(flag) {
-				item.person.ignored = flag;
-				user.request("/person/block/", {personUserID: item.person.info.userID, block: flag});
-				item.group.update();
+				DOM.input.enable(ignoreButton, false);
+				user.request("/person/ignore/", {personUserID: item.person.info.userID, ignore: flag}, function() {
+					DOM.input.enable(ignoreButton, true);
+					item.group.update();
+				});
 			};
 			setIgnored(!item.person.ignored);
 		};
@@ -249,8 +252,9 @@ var Channel = function(session, user, channelID, parentID) {
 			var msgElems = {};
 			var elem = DOM.clone("message", msgElems);
 			DOM.fill(msgElems.date, new Date(info.time).toLocaleTimeString());
-			DOM.fill(msgElems.name, user.getPerson(info.userID, info.userName).nameElement());
+			DOM.fill(msgElems.name, info.userName);
 			DOM.fill(msgElems.text, DOM.inputify(info.text));
+			user.getPerson(info.userID, info.userName).trackMessageElement(elem);
 			(function censoring() {
 				var censored = false;
 				var censor = function(censorText, replacementText) {
@@ -402,6 +406,7 @@ var Channel = function(session, user, channelID, parentID) {
 		chatElems.clear.onclick = function() {
 			DOM.button.confirm(this, function() {
 				DOM.fill(chatElems.messages);
+				// TODO: person.stopTrackingMessages() for every person. We have to do this even if the person left the channel because they might still have messages in it.
 			});
 		};
 	})();
