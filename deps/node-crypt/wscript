@@ -2,8 +2,6 @@ srcdir = "."
 blddir = "build"
 VERSION = "0.0.1"
 
-sub = "crypt_blowfish-1.0.4/";
-
 def set_options(opt):
 	opt.tool_options("compiler_cxx")
 	opt.tool_options("compiler_cc")
@@ -14,9 +12,11 @@ def configure(conf):
 	conf.check_tool("node_addon")
 
 def build(bld):
-	sub1 = bld(features = "cc", source = [sub+"crypt_blowfish.c", sub+"crypt_gensalt.c", sub+"wrapper.c"], target = "asdf")
-
 	main = bld.new_task_gen("cxx", "shlib", "node_addon")
 	main.target = "crypt"
-	main.source = "node-crypt.cc"
-	main.add_objects = "asdf"
+	main.source = """
+		node-crypt.cc
+		crypt_blowfish-1.0.4/crypt_blowfish.c
+		crypt_blowfish-1.0.4/crypt_gensalt.c
+		crypt_blowfish-1.0.4/wrapper.c
+	"""
