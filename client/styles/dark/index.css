@@ -148,10 +148,10 @@ a:active {
 	background: #222;
 }
 
-.message.online > .name {
+.message.online > span > .name {
 	color: #bbb;
 }
-.message.subscriber > .name:after {
+.message.subscriber > span > .name:after {
 	color: #b33;
 }
 .message.ignored > .messageText {

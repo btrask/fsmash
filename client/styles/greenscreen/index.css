@@ -175,10 +175,10 @@ select {
 	border-color: #090;
 }
 
-.message.online > .name {
+.message.online > span > .name {
 	color: #0f0;
 }
-.message.subscriber > .name:after {
+.message.subscriber > span > .name:after {
 	color: #f00;
 }
 .message.ignored > .messageText {

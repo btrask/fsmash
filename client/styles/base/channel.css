@@ -109,10 +109,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 	width: 70px;
 }
 
-.message.online > .name {
+.message.online > span > .name {
 	color: #000;
 }
-.message.subscriber > .name:after {
+.message.subscriber > span > .name:after {
 	content: "✓";
 	color: #a00;
 }
