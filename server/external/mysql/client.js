@@ -1,13 +1,12 @@
 if (global.GENTLY) require = GENTLY.hijack(require);
 
-var sys = require('./sys'),
+var util = require('util'),
     Stream = require('net').Stream,
     auth = require('./auth'),
     Parser = require('./parser'),
     OutgoingPacket = require('./outgoing_packet'),
     Query = require('./query'),
-    EventEmitter = require('events').EventEmitter,
-    netConstants = require('./net_constants');
+    EventEmitter = require('events').EventEmitter;
 
 function Client(properties) {
   if (!(this instanceof Client)) {
@@ -39,7 +38,7 @@ function Client(properties) {
     this[key] = properties[key];
   }
 };
-sys.inherits(Client, EventEmitter);
+util.inherits(Client, EventEmitter);
 module.exports = Client;
 
 Client.prototype.connect = function(cb) {
@@ -50,7 +49,8 @@ Client.prototype.connect = function(cb) {
 
     connection
       .on('error', function(err) {
-        if (err.errno & (netConstants.ECONNREFUSED | netConstants.ENOTFOUND)) {
+        var connectionError = err.code && err.code.match(/ECONNREFUSED|ENOTFOUND/);
+        if (connectionError) {
           if (cb) {
             cb(err);
             return;
@@ -178,6 +178,10 @@ Client.prototype.escape = function(val) {
   switch (typeof val) {
     case 'boolean': return (val) ? 'true' : 'false';
     case 'number': return val+'';
+  }
+
+  if (typeof val === 'object') {
+    val = val.toString();
   }
 
   val = val.replace(/[\0\n\r\b\t\\\'\"\x1a]/g, function(s) {
