@@ -12,11 +12,12 @@ def configure(conf):
 	conf.check_tool("node_addon")
 
 def build(bld):
+	cryptc = bld.new_task_gen("cc", "shlib", "node_addon")
+	cryptc.target = "cryptc"
+	cryptc.source = bld.path.ant_glob("crypt_blowfish-1.0.4/*.c")
+	cryptc.name = "cryptc"
+
 	main = bld.new_task_gen("cxx", "shlib", "node_addon")
 	main.target = "crypt"
-	main.source = """
-		node-crypt.cc
-		crypt_blowfish-1.0.4/crypt_blowfish.c
-		crypt_blowfish-1.0.4/crypt_gensalt.c
-		crypt_blowfish-1.0.4/wrapper.c
-	"""
+	main.source = "node-crypt.cc"
+	main.add_objects = "cryptc"
