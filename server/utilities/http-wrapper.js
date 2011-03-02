@@ -59,7 +59,7 @@ wrapper.createServer = function(dispatcher, unknownHandler/* (req, filename, wri
 				else wrapper.writeJSON(req, res, result);
 			} catch(err) {
 				writeError(500, "Internal Server Error", write);
-				util.log(err);
+				util.log(err.stack);
 			}
 		});
 	});
