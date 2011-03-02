@@ -280,7 +280,6 @@ var Channel = function(session, user, channelID, parentID) {
 		};
 		channel.event.message = bt.dispatch(function(body) {
 			if(!user.personByUserID.hasOwnProperty(body.userID)) return;
-			if(user.personByUserID[body.userID].ignored) return;
 			var incoming = body.userID != user.person.info.userID;
 			if(incoming) channel.alert("message");
 			DOM.scroll.preserve(channel.scrollBox, function() {
