@@ -138,7 +138,7 @@ wrapper.createFileHandler = function(rootdir) {
 	return fileHandler;
 };
 wrapper.writeJSON = function(req, res, value) {
-	var body = new Buffer(JSON.stringify(value/*, undefined, "\t"*/), "utf8");
+	var body = new Buffer(JSON.stringify(value/*, undefined, "\t"*/) || "", "utf8");
 	if(!body) body = "";
 	res.writeHead(200, {
 		"Content-Type": "text/json; charset=UTF-8",
