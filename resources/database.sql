@@ -21,19 +21,6 @@ CREATE TABLE `administrators` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `admins`
---
-
-CREATE TABLE `admins` (
-  `adminID` int(11) NOT NULL auto_increment,
-  `userID` int(11) NOT NULL,
-  PRIMARY KEY  (`adminID`),
-  UNIQUE KEY `userID` (`userID`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
-
--- --------------------------------------------------------
-
---
 -- Table structure for table `bannedIPs`
 --
 
@@ -170,7 +157,6 @@ CREATE TABLE `donations` (
   `userID` int(11) NOT NULL,
   `payerID` varchar(13) collate utf8_unicode_ci NOT NULL,
   `transactionID` varchar(19) collate utf8_unicode_ci default NULL,
-  `amount` varchar(40) collate utf8_unicode_ci NOT NULL default '0.00USD',
   `pennies` int(11) NOT NULL default '0',
   `startTime` timestamp NOT NULL default CURRENT_TIMESTAMP,
   `expireTime` timestamp NOT NULL default '0000-00-00 00:00:00',
@@ -240,7 +226,7 @@ CREATE TABLE `ignores` (
   `ignoreTime` timestamp NOT NULL default CURRENT_TIMESTAMP,
   PRIMARY KEY  (`ignoreID`),
   UNIQUE KEY `userID` (`userID`,`ignoredUserID`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 -- --------------------------------------------------------
 
