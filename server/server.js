@@ -15,6 +15,7 @@ You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 var assert = require("assert");
 var fs = require("fs");
+var https = require("https");
 var querystring = require("querystring");
 var url = require("url");
 var util = require("util");
@@ -1008,12 +1009,16 @@ root.paypal = bt.dispatch(function(req, data) {
 		[data]
 	);
 	var outgoing = new Buffer("cmd=_notify-validate&" + data, "utf8");
-	var paypal = http.createClient(443, config.PayPal.host, true);
-	var req = paypal.request("POST", "/cgi-bin/webscr", {
-		"host": config.PayPal.host,
-		"content-length": outgoing.length,
-	});
-	req.addListener("response", function(res) {
+	var options = {
+		port: 443,
+		host: config.PayPal.host,
+		path: "/cgi-bin/webscr",
+		method: "POST",
+		headers: {
+			"content-length": outgoing.length,
+		},
+	};
+	var req = https.request(options, function(res) {
 		var confirm = "";
 		if(200 != res.statusCode) return;
 		res.setEncoding("utf8");
@@ -1053,7 +1058,7 @@ root.paypal = bt.dispatch(function(req, data) {
 					var additional = Math.ceil((((pennies / 4) * 3) * (1000 * 60 * 60 * 24 * (365.242199 / 12))) / 100);
 					db.query(
 						"INSERT IGNORE INTO donations (userID, payerID, transactionID, pennies, startTime, expireTime)"+
-						" VALUES ($, $, $, $, FROM_UNIXTIME($ / 1000), DATE_SUB(FROM_UNIXTIME($ / 1000), INTERVAL ($ / -1000) SECOND))"
+						" VALUES ($, $, $, $, FROM_UNIXTIME($ / 1000), DATE_SUB(FROM_UNIXTIME($ / 1000), INTERVAL ($ / -1000) SECOND))",
 						[userID, query["payer_id"], query["txn_id"], pennies, startTime, startTime, additional],
 						function(err, donationResult) {
 							if(err && 1062 === err.number) return;
