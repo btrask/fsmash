@@ -65,9 +65,9 @@ util.log("Starting " + process.title);
 		"SIGTTOU",
 		"SIGBUS",
 		"SIGPOLL",
-		"SIGPROF",
 		"SIGSYS",
 		"SIGTRAP",
+		// Ignore SIGPROF, it is used by Crankshaft in V8.
 	];
 	for(var i = 0; i < signals.length; ++i) process.addListener(signals[i], bt.curry(util.log, signals[i]));
 	process.addListener("uncaughtException", function(err) {
