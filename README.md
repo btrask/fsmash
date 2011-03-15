@@ -7,7 +7,7 @@ Installation
 ------------
 
 1. `cd` to the `fsmash` directory
-2. Run `make gzip-only`
+2. Run `make release`
 3. Upload `/public`, `/server`, and `/shared` to the server
 4. On the server:
 5. Configure the server

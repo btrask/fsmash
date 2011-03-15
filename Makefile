@@ -48,7 +48,7 @@ public/%: client/%
 gzip: public
 	for F in `find public -type f ! -name '*.gz' ! -name '*.wav' ! -name '.*'`; do gzip -nc9 $$F > $$F.gz; done
 
-gzip-only: gzip
+release: gzip
 	for F in `find public -type f ! -name '*.gz' ! -name '*.wav' ! -name '.*'`; do rm $$F; done
 
-.PHONY: all clean gzip gzip-only
+.PHONY: all clean gzip release
