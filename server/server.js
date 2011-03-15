@@ -82,7 +82,7 @@ var remoteAddressOfRequest = function(req) {
 var fileHandler = (function() {
 	var handler = http.createFileHandler(__dirname+"/../public");
 	var wrapper = function(req, filename, write/* (status, header, data, encoding) */) {
-		db.query("INSERT INTO httpRequests (ipAddress, filename, referer, userAgent) VALUES (INET_ATON($), $, $, $)", [remoteAddressOfRequest(req), filename, req.headers["referer"] || null, req.headers["user-agent"] || null]);
+		db.query("INSERT INTO httpRequests (ipAddress, filename, header, referer, userAgent) VALUES (INET_ATON($), $, $, $, $)", [remoteAddressOfRequest(req), filename, JSON.stringify(req.headers), req.headers["referer"] || null, req.headers["user-agent"] || null]);
 		return handler(req, filename, write);
 	};
 	wrapper.rescan = function() {

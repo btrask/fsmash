@@ -205,6 +205,7 @@ CREATE TABLE `httpRequests` (
   `requestID` int(11) NOT NULL auto_increment,
   `ipAddress` bigint(20) unsigned default NULL,
   `filename` varchar(255) collate utf8_unicode_ci NOT NULL,
+  `header` text collate utf8_unicode_ci,
   `referer` text collate utf8_unicode_ci,
   `userAgent` text collate utf8_unicode_ci,
   `requestTime` timestamp NOT NULL default CURRENT_TIMESTAMP,
