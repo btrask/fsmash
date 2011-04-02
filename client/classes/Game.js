@@ -183,7 +183,7 @@ var Game = function(session, user, channel) {
 
 		updateIsBroadcasting();
 	}, function(func, body) {
-		if(!game.broadcasting) throw "Broadcast channel event sent to non-broadcasting channel";
+		if(!game.broadcasting) throw new Error("Broadcast channel event sent to non-broadcasting channel");
 		return func(body);
 	});
 	game.event.broadcast.stop = bt.dispatch(function(body) {
@@ -204,7 +204,7 @@ var Game = function(session, user, channel) {
 	game.event.broadcast.application = bt.dispatch(function(body) {
 		var applicantUserID = body.applicantUserID, applicant;
 		if(game.applicantByUserID.hasOwnProperty(applicantUserID)) return;
-		if(!user.personByUserID.hasOwnProperty(applicantUserID)) throw "Invalid applicant ID";
+		if(!user.personByUserID.hasOwnProperty(applicantUserID)) throw new Error("Invalid applicant ID");
 		applicant = user.personByUserID[applicantUserID];
 		game.applicantByUserID[applicantUserID] = applicant;
 		game.groups.applicants.addItem(channel.groups.nonMembers.removeItem(applicantUserID) || channel.groups.formerMembers.removeItem(applicantUserID), true);
@@ -219,7 +219,7 @@ var Game = function(session, user, channel) {
 	});
 	game.event.broadcast.application.stop = bt.dispatch(function(body) {
 		var applicantUserID = body.applicantUserID, applicantName;
-		if(!game.applicantByUserID.hasOwnProperty(applicantUserID)) throw "Specified person is not an applicant";
+		if(!game.applicantByUserID.hasOwnProperty(applicantUserID)) throw new Error("Specified person is not an applicant");
 		channel.groups.nonMembers.addItem(game.groups.applicants.removeItem(applicantUserID), true);
 		if(body.time) {
 			applicantName = game.applicantByUserID[applicantUserID].info.userName;

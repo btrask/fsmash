@@ -210,8 +210,8 @@ var Channel = function(session, user, channelID, parentID) {
 	channel.event.member = bt.dispatch(function(body) {
 		var memberUserID = body.memberUserID;
 		var member, item, invitingPerson;
-		if(!user.personByUserID.hasOwnProperty(memberUserID)) throw "Invalid person joining the channel";
-		if(channel.parent && !channel.parent.memberByUserID.hasOwnProperty(memberUserID)) throw "Joining person not a member of parent channel";
+		if(!user.personByUserID.hasOwnProperty(memberUserID)) throw new Error("Invalid person joining the channel");
+		if(channel.parent && !channel.parent.memberByUserID.hasOwnProperty(memberUserID)) throw new Error("Joining person not a member of parent channel");
 		member = user.personByUserID[memberUserID];
 		if(!channel.memberByUserID.hasOwnProperty(memberUserID)) {
 			item = channel.groups.nonMembers.removeItem(memberUserID) || channel.groups.formerMembers.removeItem(memberUserID);
@@ -238,7 +238,7 @@ var Channel = function(session, user, channelID, parentID) {
 			else channel.postNotification(member.info.userName+" joined", new Date(body.time));
 		}
 	}, function(func, body) {
-		if(!channel.memberByUserID.hasOwnProperty(body.memberUserID)) throw "Invalid memberUserID";
+		if(!channel.memberByUserID.hasOwnProperty(body.memberUserID)) throw new Error("Invalid memberUserID");
 		return func(body, channel.memberByUserID[body.memberUserID]);
 	});
 	channel.event.member.leave = bt.dispatch(function(body, member) {
@@ -248,7 +248,7 @@ var Channel = function(session, user, channelID, parentID) {
 	(function messaging() {
 		var censorHistory = [];
 		var incomingMessage = function(info) {
-			if(!channel.userIsMember) throw "Non-members should not be able to receive messages";
+			if(!channel.userIsMember) throw new Error("Non-members should not be able to receive messages");
 			var msgElems = {};
 			var elem = DOM.clone("message", msgElems);
 			DOM.fill(msgElems.date, new Date(info.time).toLocaleTimeString());
@@ -272,7 +272,7 @@ var Channel = function(session, user, channelID, parentID) {
 				}
 				msgElems.censor.onclick = function() {
 					if(censored) return;
-					if(!channel.isModerator) throw "Moderator-only action";
+					if(!channel.isModerator) throw new Error("Moderator-only action");
 					user.request("/channel/moderator/censor", {channelID: channel.info.channelID, censorText: info.text, replacementText: "Message removed by moderator"});
 				};
 			})();
@@ -313,7 +313,7 @@ var Channel = function(session, user, channelID, parentID) {
 		}
 		channel.game.updateSettings(body);
 	}, null, function(body) {
-		if(!channel.game) throw "Specified channel is not a game channel";
+		if(!channel.game) throw new Error("Specified channel is not a game channel");
 		return channel.game.event;
 	});
 	channel.event.moderator = bt.dispatch(function(body) {
@@ -389,7 +389,7 @@ var Channel = function(session, user, channelID, parentID) {
 
 	(function() {
 		var sendMessage = function() {
-			if(!channel.userIsMember) throw "Non-members should not be able to send messages";
+			if(!channel.userIsMember) throw new Error("Non-members should not be able to send messages");
 			var text = chatElems.input.value.replace(/^\s*|\s*$/g, "");
 			if(text) {
 				chatElems.input.value = "";
@@ -412,7 +412,7 @@ var Channel = function(session, user, channelID, parentID) {
 
 	(function() {
 		var spawnSubchannel = function(topic) {
-			if(!channel.userIsMember) throw "Non-members should not be able to spawn subchannels";
+			if(!channel.userIsMember) throw new Error("Non-members should not be able to spawn subchannels");
 			channel.request("/spawn/", {topic: topic}, function(channel) {
 				if(channel) channel.sidebarItem.select(true);
 			});

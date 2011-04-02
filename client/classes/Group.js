@@ -48,7 +48,7 @@ var Group = function(title, actions) {
 		};
 		if(!item) return;
 		var userID = item.person.info.userID;
-		if(group.itemByUserID.hasOwnProperty(userID)) throw "This group already has an item for the specified person";
+		if(group.itemByUserID.hasOwnProperty(userID)) throw new Error("This group already has an item for the specified person");
 		group.itemByUserID[userID] = item;
 		item.group = group;
 		generateCommands();

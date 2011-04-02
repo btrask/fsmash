@@ -35,7 +35,7 @@ var VideosPage = function(session) {
 		session.request("/videos/", {start: count.total})
 	};
 	videosElems.submit.onclick = function() {
-		if(!session.user) throw "Only users can submit videos";
+		if(!session.user) throw new Error("Only users can submit videos");
 		var videoID = youtube.videoIDForURL(videosElems.videoURL.value);
 		if(videoID) session.user.request("/video/", {youtubeID: videoID});
 		videosElems.videoURL.value = "";

@@ -16,7 +16,7 @@ var Person = function(session, user, userID) {
 	var person = this;
 
 	var stringForComponent = function(component) {
-		if(!Person.keysByComponent.hasOwnProperty(component)) throw "Invalid component name";
+		if(!Person.keysByComponent.hasOwnProperty(component)) throw new Error("Invalid component name");
 		var keys = Person.keysByComponent[component];
 		var values = [];
 		for(var i = 0; i < keys.length; i++) if(person.info.hasOwnProperty(keys[i]) && person.info[keys[i]]) values.push(person.info[keys[i]]);
