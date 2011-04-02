@@ -362,7 +362,6 @@ root.api.session.user = bt.dispatch(function(query, session) {
 		};
 		var loadUserLocation = function(user) {
 			geoip.lookup(GeoIP.parseIP(query.remoteAddress), function(err, location) {
-				console.log(util.inspect(location));
 				user.info.location = bt.map([location.region, location.country], function(part) {
 					return part || undefined;
 				}).join(", ");
