@@ -217,7 +217,7 @@ root.api.session.user = bt.dispatch(function(query, session) {
 							if(err && 1062 === err.number) return accountError("Username already in use");
 							var userID = userResult.insertId;
 							db.query("INSERT IGNORE INTO settings (userID) VALUES ($)", [userID]);
-							logSession(userID, query.userName);
+							loadUser(userID, query.userName);
 						}
 					);
 				}
@@ -242,7 +242,7 @@ root.api.session.user = bt.dispatch(function(query, session) {
 					function(err, userResult) {
 						if(!userResult.length) return accountError("Invalid token");
 						var userRow = mysql.rows(userResult)[0];
-						logSession(userRow.userID, userRow.userName);
+						loadUser(userRow.userID, userRow.userName);
 					}
 				);
 			} else {
@@ -263,33 +263,48 @@ root.api.session.user = bt.dispatch(function(query, session) {
 								[crypt.hash(query.password), userRow.userID, legacyPassHash]
 							);
 						}
-						logSession(userRow.userID, userRow.userName);
+						loadUser(userRow.userID, userRow.userName);
 					}
 				);
 			}
 		};
-		var logSession = function(userID, userName) {
+		var loadUser = function(userID, userName) {
+			var createUser = function() {
+				session.signin(userID);
+				session.user.info.userName = userName;
+				loadUserInfo(session.user);
+			};
+			var recordBan = function(dependentSession) {
+				db.query(
+					"INSERT IGNORE INTO bannedSessions"+
+					" (dependentSessionID, sessionID) SELECT $, sessionID"+
+					" FROM sessions"+
+					" WHERE userID = $ OR ipAddress = INET_ATON($)",
+					[dependentSession || null, userID, query.remoteAddress]
+				);
+				accountError("You are banned");
+			};
 			db.query("INSERT INTO sessions (userID, ipAddress) VALUES ($, INET_ATON($))", [userID, query.remoteAddress]);
 			db.query(
 				"SELECT * FROM whitelist WHERE userID = $ LIMIT 1",
 				[userID],
 				function(err, whitelistResult) {
-					if(whitelistResult.length) return loadUser(userID, userName);
+					if(whitelistResult.length) return createUser(userID, userName);
 					db.query(
 						"SELECT bs.sessionID FROM bannedSessions bs"+
 						" LEFT JOIN sessions s ON (bs.sessionID = s.sessionID)"+
 						" WHERE s.userID = $ OR s.ipAddress = INET_ATON($) LIMIT 1",
 						[userID, query.remoteAddress],
 						function(err, bannedSessionResult) {
-							if(bannedSessionResult.length) return recordBan(userID, mysql.rows(bannedSessionResult)[0].sessionID);
+							if(bannedSessionResult.length) return recordBan(mysql.rows(bannedSessionResult)[0].sessionID);
 							db.query(
 								"SELECT bannedIPID"+
 								" FROM bannedIPs"+
 								" WHERE minIPAddress <= INET_ATON($) AND maxIPAddress >= INET_ATON($)",
 								[query.remoteAddress, query.remoteAddress],
 								function(err, bannedIPResult) {
-									if(bannedIPResult.length) return recordBan(userID);
-									loadUser(userID, userName);
+									if(bannedIPResult.length) return recordBan();
+									createUser(userID, userName);
 								}
 							);
 						}
@@ -297,20 +312,7 @@ root.api.session.user = bt.dispatch(function(query, session) {
 				}
 			);
 		};
-		var recordBan = function(userID, dependentSession) {
-			db.query(
-				"INSERT IGNORE INTO bannedSessions"+
-				" (dependentSessionID, sessionID) SELECT $, sessionID"+
-				" FROM sessions"+
-				" WHERE userID = $ OR ipAddress = INET_ATON($)",
-				[dependentSession || null, userID, query.remoteAddress]
-			);
-			accountError("You are banned");
-		};
-		var loadUser = function(userID, userName) {
-			session.signin(userID);
-			var user = session.user;
-			user.info.userName = userName;
+		var loadUserInfo = function(user) {
 			db.query(
 				"SELECT brawlName, friendCode, bio FROM profiles"+
 				" WHERE userID = $ LIMIT 1",
@@ -335,7 +337,7 @@ root.api.session.user = bt.dispatch(function(query, session) {
 			);
 			db.query(
 				"SELECT ignoredUserID FROM ignores WHERE userID = $",
-				[userID],
+				[user.info.userID],
 				function(err, ignoresResult) {
 					bt.map(mysql.rows(ignoresResult), function(row) {
 						user.ignoringByUserID[row.ignoredUserID] = true;
@@ -346,7 +348,7 @@ root.api.session.user = bt.dispatch(function(query, session) {
 				"SELECT UNIX_TIMESTAMP(expireTime) * 1000 expireTime"+
 				" FROM donations WHERE userID = $ AND expireTime > NOW()"+
 				" ORDER BY expireTime DESC LIMIT 1",
-				[userID],
+				[user.info.userID],
 				function(err, donationResult) {
 					if(!donationResult.length) return;
 					user.info.subscriber = true;
@@ -357,19 +359,19 @@ root.api.session.user = bt.dispatch(function(query, session) {
 				"SELECT totalPoints FROM rankings WHERE userID = $ LIMIT 1",
 				[user.info.userID],
 				function(err, pointsResult) {
-					if(!pointsResult.length) return loadChannels(user);
+					if(!pointsResult.length) return loadUserChannels(user);
 					db.query(
 						"SELECT COUNT(*) + 1 rank FROM rankings WHERE totalPoints > $",
 						[mysql.rows(pointsResult)[0].totalPoints],
 						function(err, rankResult) {
 							user.info.rank = mysql.rows(rankResult)[0].rank;
-							loadChannels(user);
+							loadUserChannels(user);
 						}
 					);
 				}
 			);
 		};
-		var loadChannels = function(user) {
+		var loadUserChannels = function(user) {
 			db.query(
 				"SELECT cmem.channelID, c.parentID, c.topic, c.allowsGameChannels, c.historyJSON, g.matchTypeID, g.ruleID, cmod.channelModeratorID"+
 				" FROM channelMembers cmem"+
