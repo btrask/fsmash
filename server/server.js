@@ -20,6 +20,8 @@ var querystring = require("querystring");
 var url = require("url");
 var util = require("util");
 
+var GeoIP = require("./external/GeoIP/");
+
 var crypt = require("./utilities/crypt-wrapper");
 var crypto = require("./utilities/crypto-wrapper");
 var http = require("./utilities/http-wrapper");
@@ -35,6 +37,7 @@ var Channel = require("./classes/Channel");
 var Game = require("./classes/Game");
 
 var db = mysql.connect(config.database);
+var geoip = new GeoIP(config.GeoIP.path);
 var startTime = new Date().getTime();
 var signinLimitForIP = {};
 
@@ -322,20 +325,6 @@ root.api.session.user = bt.dispatch(function(query, session) {
 				}
 			);
 			db.query(
-				"SELECT regions.name region, countries.name country FROM ip_group_city cities"+
-				" LEFT JOIN locations l ON (cities.location = l.id)"+
-				" LEFT JOIN iso3166_countries countries ON (l.country_code = countries.code)"+
-				" LEFT JOIN fips_regions regions ON (l.country_code = regions.country_code AND l.region_code = regions.code)"+
-				" WHERE ip_start <= INET_ATON($) ORDER BY ip_start DESC LIMIT 1",
-				[query.remoteAddress],
-				function(err, locationResult) {
-					if(!locationResult.length) return;
-					user.info.location = bt.map([locationResult[0].region, locationResult[0].country], function(part) {
-						return part || undefined;
-					}).join(", ");
-				}
-			);
-			db.query(
 				"SELECT ignoredUserID FROM ignores WHERE userID = $",
 				[user.info.userID],
 				function(err, ignoresResult) {
@@ -359,17 +348,26 @@ root.api.session.user = bt.dispatch(function(query, session) {
 				"SELECT totalPoints FROM rankings WHERE userID = $ LIMIT 1",
 				[user.info.userID],
 				function(err, pointsResult) {
-					if(!pointsResult.length) return loadUserChannels(user);
+					if(!pointsResult.length) return loadUserLocation(user);
 					db.query(
 						"SELECT COUNT(*) + 1 rank FROM rankings WHERE totalPoints > $",
 						[mysql.rows(pointsResult)[0].totalPoints],
 						function(err, rankResult) {
 							user.info.rank = mysql.rows(rankResult)[0].rank;
-							loadUserChannels(user);
+							loadUserLocation(user);
 						}
 					);
 				}
 			);
+		};
+		var loadUserLocation = function(user) {
+			geoip.lookup(GeoIP.parseIP(query.remoteAddress), function(err, location) {
+				console.log(util.inspect(location));
+				user.info.location = bt.map([location.region, location.country], function(part) {
+					return part || undefined;
+				}).join(", ");
+				loadUserChannels(user);
+			});
 		};
 		var loadUserChannels = function(user) {
 			db.query(

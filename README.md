@@ -10,10 +10,11 @@ Installation
 2. Run `make release`
 3. Upload `/public`, `/server`, and `/shared` to the server
 4. On the server:
-5. Configure the server (see below)
-6. Configure the MySQL database (see below)
-7. Install `node-crypt` (see below)
-8. Run `./server/server.js`
+5. Install the IP geolocation database from <http://www.maxmind.com/app/geolitecity>
+6. Configure the server (see below)
+7. Configure the MySQL database (see below)
+8. Install `node-crypt` (see below)
+9. Run `./server/server.js`
 
 Configuring the server
 ----------------------
@@ -32,17 +33,21 @@ Example `zz01-secret.json`
 		},
 		"database": {
 			"password": ""
+		},
+		"GeoIP": {
+			"path": null
 		}
 	}
+
+If you installed the IP geolocation database in the default location, you don't need to specify a path for it.
 
 MySQL database configuration
 ----------------------------
 
 1. Create the database schema using `/resources/database.sql`
-2. Install up-to-date IP geolocation tables from <http://ipinfodb.com/ip_database.php> (use the multi-table "Complete (City)" version)
-3. Create some `channels` and add them to `publicChannels`
-4. Add `matchTypes`, `rules`, and `soundsets`
-5. Configure your account as an `administrator`
+2. Create some `channels` and add them to `publicChannels`
+3. Add `matchTypes`, `rules`, and `soundsets`
+4. Configure your account as an `administrator`
 
 Installing node-crypt
 ---------------------
