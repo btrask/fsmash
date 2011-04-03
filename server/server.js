@@ -409,7 +409,7 @@ root.api.session.user = bt.dispatch(function(query, session) {
 			user.sendEvent("/user/config/", Session.config);
 			Group.users.sendEvent("/user/person/", user.info);
 			bt.map(Session.byUserID, function(otherSession, otherUserID) {
-				if(parseInt(otherUserID) === user.info.userID) return;
+				if(parseInt(otherUserID, 10) === user.info.userID) return;
 				session.sendEvent("/user/person/", otherSession.user.info);
 			});
 			user.sendEvent("/user/ignore/", {ignoringByUserID: user.ignoringByUserID});
@@ -500,10 +500,10 @@ root.api.session.user.remember = bt.dispatch(function(query, session, user) {
 root.api.session.user.settings = bt.dispatch(function(query, session, user) {
 	var settings = [];
 	if(undefined !== query.styleID) {
-		settings.push(db.format("styleID = $", parseInt(query.styleID)));
+		settings.push(db.format("styleID = $", parseInt(query.styleID, 10)));
 	}
 	if(undefined !== query.soundsetID) {
-		settings.push(db.format("soundsetID = $", parseInt(query.soundsetID)));
+		settings.push(db.format("soundsetID = $", parseInt(query.soundsetID, 10)));
 	}
 	if(settings.length) {
 		db.query("INSERT IGNORE INTO settings (userID) VALUES ($)", [user.info.userID]);
@@ -560,7 +560,7 @@ root.api.session.user.administrator.statistics = bt.dispatch(function(query, ses
 	};
 });
 root.api.session.user.administrator.ban = bt.dispatch(function(query, session, user) {
-	var personUserID = parseInt(query.personUserID);
+	var personUserID = parseInt(query.personUserID, 10);
 	if(!personUserID) return {error: "Invalid person user ID"};
 	db.query("DELETE FROM whitelist WHERE userID = $", [personUserID]);
 	db.query("INSERT IGNORE INTO bannedSessions (modUserID, sessionID) SELECT $, sessionID FROM sessions WHERE userID = $", [user.info.userID, personUserID]);
@@ -628,7 +628,7 @@ root.api.session.user.administrator.channel.empty = bt.dispatch(function(query, 
 });
 
 root.api.session.user.person = bt.dispatch(null, function(func, query, session, user) {
-	var personUserID = parseInt(query.personUserID);
+	var personUserID = parseInt(query.personUserID, 10);
 	if(!personUserID) return {error: "Invalid person user ID"};
 	return func(query, session, user, personUserID);
 });
@@ -647,7 +647,7 @@ root.api.session.user.person.ignore = bt.dispatch(function(query, session, user,
 	});
 });
 root.api.session.user.person.rate = bt.dispatch(function(query, session, user, personUserID) {
-	var rating = parseInt(query.rating);
+	var rating = parseInt(query.rating, 10);
 	if(isNaN(rating)) return {error: "Invalid rating"};
 	if(query.rating < -1 || query.rating > 1) return {error: "Invalid rating"};
 	db.query("UPDATE ratings SET isContradicted = 0 WHERE fromUserID = $ AND toUserID = $", [personUserID, user.info.userID]);
@@ -985,8 +985,8 @@ root.api.session.user.video = bt.dispatch(function(query, session, user) {
 });
 
 root.api.session.videos = bt.dispatch(function(query, session) {
-	var start = Math.round(parseInt(query.start)) || 0;
-	var count = Math.round(parseInt(query.count)) || 10;
+	var start = Math.round(parseInt(query.start, 10)) || 0;
+	var count = Math.round(parseInt(query.count, 10)) || 10;
 	return session.promise(function(ticket) {
 		db.query(
 			"SELECT v.youtubeID, u.userName, UNIX_TIMESTAMP(v.submitTime) * 1000 time"+
@@ -1034,12 +1034,12 @@ root.paypal = bt.dispatch(function(req, data) {
 			function parsePennies(string) {
 				var match = /(\d+)\.(\d{2})/.exec(string);
 				if(!match) return 0;
-				return parseInt(match[1]) * 100 + parseInt(match[2]);
+				return parseInt(match[1], 10) * 100 + parseInt(match[2], 10);
 			}
 			if("VERIFIED" != confirm) return;
 			var query = querystring.parse(data);
 			var custom = JSON.parse(query["custom"]);
-			var userID = parseInt(custom.userID);
+			var userID = parseInt(custom.userID, 10);
 			if(!userID) return;
 			if(!verify(config.PayPal.verify, query)) return;
 			var pennies = parsePennies(query["mc_gross"] || query["mc_gross_1"]);
