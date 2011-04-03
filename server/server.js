@@ -770,7 +770,6 @@ root.api.session.user.channel.message = bt.dispatch(function(query, session, use
 	});
 });
 root.api.session.user.channel.leave = bt.dispatch(function(query, session, user, channel) {
-	if(user.channelLimit()) return false;
 	channel.leaveRecursively(user, function(channelID) {
 		db.query("DELETE FROM channelMembers WHERE userID = $ AND channelID = $ LIMIT 1", [user.info.userID, channelID]);
 	});
@@ -919,6 +918,7 @@ root.api.session.user.publicChannel = bt.dispatch(null, function(func, query, se
 	return func(query, session, user, Channel.public.byID[query.channelID]);
 });
 root.api.session.user.publicChannel.join = bt.dispatch(function(query, session, user, channel) {
+	if(user.channelLimit()) return false;
 	if(user.channelByID.hasOwnProperty(channel.info.channelID)) return false;
 	return session.promise(function(ticket) {
 		// TODO: A lot of this is very similar to ...channel.invite. Can we reuse it?
