@@ -512,8 +512,11 @@ CREATE TABLE `videos` (
   `userID` int(11) NOT NULL,
   `youtubeID` varchar(11) collate utf8_unicode_ci NOT NULL,
   `submitTime` timestamp NOT NULL default CURRENT_TIMESTAMP,
+  `deleteTime` timestamp NULL default NULL,
   PRIMARY KEY  (`videoID`),
-  UNIQUE KEY `youtubeID` (`youtubeID`)
+  UNIQUE KEY `youtubeID` (`youtubeID`),
+  KEY `submitTime` (`submitTime`),
+  KEY `deleteTime` (`deleteTime`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 -- --------------------------------------------------------

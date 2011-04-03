@@ -992,7 +992,7 @@ root.api.session.videos = bt.dispatch(function(query, session) {
 			"SELECT v.youtubeID, u.userName, UNIX_TIMESTAMP(v.submitTime) * 1000 time"+
 			" FROM videos v"+
 			" LEFT JOIN users u ON (v.userID = u.userID)"+
-			" WHERE 1 ORDER BY v.submitTime DESC LIMIT $, $",
+			" WHERE deleteTime IS NULL ORDER BY v.submitTime DESC LIMIT $, $",
 			[start, count],
 			function(err, result) {
 				session.sendEvent("/videos/", {old: true, videos: mysql.rows(result)}, ticket);
