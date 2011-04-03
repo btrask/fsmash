@@ -361,12 +361,14 @@ root.api.session.user = bt.dispatch(function(query, session) {
 			);
 		};
 		var loadUserLocation = function(user) {
-			geoip.lookup(GeoIP.parseIP(query.remoteAddress), function(err, location) {
+			var callback = function(err, location) {
 				user.info.location = bt.map([location.region, location.country], function(part) {
 					return part || undefined;
 				}).join(", ");
 				loadUserChannels(user);
-			});
+			};
+			if(config.GeoIP.customDefinitions.hasOwnProperty(query.remoteAddress)) callback(null, config.GeoIP.customDefinitions[query.remoteAddress]);
+			else geoip.lookup(GeoIP.parseIP(query.remoteAddress), callback);
 		};
 		var loadUserChannels = function(user) {
 			db.query(

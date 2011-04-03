@@ -1,5 +1,6 @@
 {
 	"GeoIP": {
-		"path": null
+		"path": null,
+		"customDefinitions": {}
 	}
 }
