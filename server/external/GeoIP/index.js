@@ -42,6 +42,7 @@ var ORG_RECORD_LENGTH = 4;
 
 var COUNTRY_CODES = JSON.parse(fs.readFileSync(path.join(__dirname, "country-codes.json"), "utf8"));
 var COUNTRY_NAMES = JSON.parse(fs.readFileSync(path.join(__dirname, "country-names.json"), "utf8"));
+var REGION_NAMES = JSON.parse(fs.readFileSync(path.join(__dirname, "region-names.json"), "utf8"));
 
 var COUNTRY_BEGIN = 16776960;
 var STATE_BEGIN_REV0 = 16700000;
@@ -152,6 +153,14 @@ var GeoIP = function(path) {
 			}
 			return string || null;
 		};
+		var readRegion = function() {
+			var region = readString(), country;
+			if(REGION_NAMES.hasOwnProperty(location.countryCode)) {
+				country = REGION_NAMES[location.countryCode];
+				if(country.hasOwnProperty(region)) region = country[region];
+			}
+			return region;
+		};
 		var readCoord = function() {
 			var coord = 0;
 			for(var i = 0; i < 3; ++i) {
@@ -173,7 +182,7 @@ var GeoIP = function(path) {
 		};
 
 		readCountry();
-		location.region = readString();
+		location.region = readRegion();
 		location.city = readString();
 		location.postalCode = readString();
 		location.latitude = readCoord();
