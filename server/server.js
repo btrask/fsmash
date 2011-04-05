@@ -54,7 +54,6 @@ util.log("Starting " + process.title);
 		"SIGILL",
 		"SIGINT",
 		"SIGKILL",
-		"SIGPIPE",
 		"SIGQUIT",
 		"SIGSEGV",
 		"SIGTERM",
@@ -73,6 +72,9 @@ util.log("Starting " + process.title);
 		// Ignore SIGPROF, it is used by Crankshaft in V8.
 	];
 	for(var i = 0; i < signals.length; ++i) process.addListener(signals[i], bt.curry(util.log, signals[i]));
+	process.addListener("SIGPIPE", function() {
+		// Ignore silently.
+	});
 	process.addListener("uncaughtException", function(err) {
 		util.log(err.stack);
 	});
