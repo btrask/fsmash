@@ -148,9 +148,6 @@ a:active {
 	background: #222;
 }
 
-.message.online > span > .name {
-	color: #bbb;
-}
 .message.subscriber > span > .name:after {
 	color: #b33;
 }

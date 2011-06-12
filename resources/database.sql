@@ -168,21 +168,6 @@ CREATE TABLE `donations` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `fips_regions`
---
-
-CREATE TABLE `fips_regions` (
-  `id` int(11) NOT NULL auto_increment,
-  `country_code` varchar(2) NOT NULL,
-  `code` varchar(2) NOT NULL,
-  `name` varchar(64) NOT NULL,
-  PRIMARY KEY  (`id`),
-  KEY `code2country` (`country_code`,`code`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
-
--- --------------------------------------------------------
-
---
 -- Table structure for table `games`
 --
 
@@ -232,62 +217,6 @@ CREATE TABLE `ignores` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `ip_group_city`
---
-
-CREATE TABLE `ip_group_city` (
-  `ip_start` bigint(20) NOT NULL,
-  `location` int(11) NOT NULL,
-  UNIQUE KEY `ip_start` (`ip_start`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-
--- --------------------------------------------------------
-
---
--- Table structure for table `ip_group_country`
---
-
-CREATE TABLE `ip_group_country` (
-  `ip_start` bigint(20) NOT NULL,
-  `ip_cidr` varchar(20) NOT NULL,
-  `country_code` varchar(2) NOT NULL,
-  UNIQUE KEY `ip_start` (`ip_start`),
-  KEY `country` (`country_code`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-
--- --------------------------------------------------------
-
---
--- Table structure for table `iso3166_countries`
---
-
-CREATE TABLE `iso3166_countries` (
-  `code` varchar(2) NOT NULL,
-  `name` char(64) NOT NULL,
-  UNIQUE KEY `code` (`code`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-
--- --------------------------------------------------------
-
---
--- Table structure for table `locations`
---
-
-CREATE TABLE `locations` (
-  `id` int(11) NOT NULL,
-  `country_code` varchar(2) NOT NULL,
-  `region_code` varchar(2) NOT NULL,
-  `city` varchar(64) NOT NULL,
-  `zipcode` varchar(8) NOT NULL,
-  `latitude` float NOT NULL,
-  `longitude` float NOT NULL,
-  `metrocode` varchar(3) NOT NULL,
-  PRIMARY KEY  (`id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-
--- --------------------------------------------------------
-
---
 -- Table structure for table `matchTypes`
 --
 
@@ -313,6 +242,7 @@ CREATE TABLE `profiles` (
   `brawlName` varchar(20) collate utf8_unicode_ci NOT NULL default '',
   `friendCode` varchar(12) collate utf8_unicode_ci NOT NULL default '',
   `bio` text collate utf8_unicode_ci NOT NULL,
+  `color` varchar(6) collate utf8_unicode_ci default NULL,
   PRIMARY KEY  (`userProfileID`),
   UNIQUE KEY `userID` (`userID`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;

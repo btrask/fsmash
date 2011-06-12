@@ -23,6 +23,11 @@ var User = function(session, userID) {
 	var subscribeElems = {};
 	subscribeItem.setContent(DOM.clone("subscribe", subscribeElems));
 	subscribeElems.custom.value = JSON.stringify({userID: userID});
+	DOM.field.onChange(subscribeElems.color, function() {
+		var match = /[0-9a-fA-F]{6}/.exec(subscribeElems.color.value);
+		var color = match ? match[0] : null;
+		user.request("/subscription/color/", {color: color});
+	});
 
 	var channelsItem = new SidebarItem("Channels");
 	var acctElems = {};
@@ -123,7 +128,7 @@ var User = function(session, userID) {
 		} else {
 			if(!subscribeItem.selected) DOM.fill(subscribeItem.counter, "!");
 		}
-		DOM.changeClass(subscribeElems.subscriberInfo, "invisible", !body.expireTime);
+		DOM.changeClass(subscribeElems.subscriberPane, "invisible", !body.expireTime);
 	});
 
 	user.request = function(path, properties, callback) {
@@ -147,6 +152,9 @@ var User = function(session, userID) {
 			if(userName) user.personByUserID[userID].updateWithInfo({userName: userName});
 		}
 		return user.personByUserID[userID];
+	};
+	user.setColor = function(color) {
+		subscribeElems.color.value = color ? "#"+color : "";
 	};
 
 	acctElems.password.onclick = function() {

@@ -175,9 +175,6 @@ select {
 	border-color: #090;
 }
 
-.message.online > span > .name {
-	color: #0f0;
-}
 .message.subscriber > span > .name:after {
 	color: #f00;
 }

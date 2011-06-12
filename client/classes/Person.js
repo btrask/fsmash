@@ -58,6 +58,7 @@ var Person = function(session, user, userID) {
 	person.online = false;
 	person.subscriber = false;
 	person.ignored = false;
+	person.color = null;
 
 	person.event = bt.dispatch();
 	person.event.signout = bt.dispatch(function(body) {
@@ -84,6 +85,10 @@ var Person = function(session, user, userID) {
 			else delete info.memberType;
 			person.setSubscriber(info.subscriber);
 		}
+		if(undefined !== info.color) {
+			person.setColor(info.color ? "#"+info.color : "");
+			if(person === user.person) user.setColor(info.color);
+		}
 
 		var keys, componentNeedsUpdate, string;
 		for(var component in Person.keysByComponent) if(Person.keysByComponent.hasOwnProperty(component)) {
@@ -100,30 +105,44 @@ var Person = function(session, user, userID) {
 		}
 	};
 	(function() {
-		var messageElementsByChannelID = {};
+		var elementsByChannelID = {};
+		var applyToElements = function(func/* (elems) */) {
+			bt.map(elementsByChannelID, function(array) {
+				bt.map(array, func);
+			});
+		};
 		var setProperty = function(prop, flag) {
 			if(flag == person[prop]) return;
 			person[prop] = Boolean(flag);
-			bt.map(messageElementsByChannelID, function(messages) {
-				bt.map(messages, function(elem) {
-					DOM.changeClass(elem, prop, flag);
-				});
+			applyToElements(function(elems) {
+				DOM.changeClass(elems.element, prop, flag);
 			});
 		};
-		person.trackMessageElement = function(elem, channelID) {
-			if(!messageElementsByChannelID.hasOwnProperty(channelID)) messageElementsByChannelID[channelID] = [];
-			messageElementsByChannelID[channelID].push(elem);
-			DOM.changeClass(elem, "online", person.online);
+		person.trackMessageElement = function(elem, name, channelID) {
+			if(!elementsByChannelID.hasOwnProperty(channelID)) elementsByChannelID[channelID] = [];
+			elementsByChannelID[channelID].push({
+				element: elem,
+				name: name
+			});
+			DOM.changeClass(elem, "offline", !person.online);
 			DOM.changeClass(elem, "subscriber", person.subscriber);
 			DOM.changeClass(elem, "ignored", person.ignored);
+			console.log("color", person.info.userName, person.color);
+			name.style.color = person.color;
 		};
 		person.stopTrackingMessages = function(channelID) {
-			delete messageElementsByChannelID[channelID];
+			delete elementsByChannelID[channelID];
 		};
 
-		person.setOnline = bt.curry(setProperty, "online");
+		person.setOnline = bt.curry(setProperty, "online"); // It would be a little bit safer if we disable names using opacity instead of color. Or perhaps we could insert a new intermediate element between the text node and its parent.
 		person.setSubscriber = bt.curry(setProperty, "subscriber");
 		person.setIgnored = bt.curry(setProperty, "ignored");
+		person.setColor = function(color) {
+			person.color = color;
+			applyToElements(function(elems) {
+				elems.name.style.color = color;
+			});
+		};
 	})();
 };
 Person.keysByComponent = {

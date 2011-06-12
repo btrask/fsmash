@@ -319,7 +319,7 @@ root.api.session.user = bt.dispatch(function(query, session) {
 		};
 		var loadUserInfo = function(user) {
 			db.query(
-				"SELECT brawlName, friendCode, bio FROM profiles"+
+				"SELECT brawlName, friendCode, bio, color FROM profiles"+
 				" WHERE userID = $ LIMIT 1",
 				[user.info.userID],
 				function(err, profileResult) {
@@ -341,9 +341,12 @@ root.api.session.user = bt.dispatch(function(query, session) {
 				" ORDER BY expireTime DESC LIMIT 1",
 				[user.info.userID],
 				function(err, donationResult) {
-					if(!donationResult.length) return;
-					user.info.subscriber = true;
-					user.subscriptionExpireTime = mysql.rows(donationResult)[0].expireTime;
+					if(donationResult.length) {
+						user.info.subscriber = true;
+						user.subscriptionExpireTime = mysql.rows(donationResult)[0].expireTime;
+					} else {
+						delete user.info.color;
+					}
 				}
 			);
 			db.query(
@@ -541,6 +544,23 @@ root.api.session.user.idle = bt.dispatch(function(query, session, user) {
 	return session.promise(function(ticket) {
 		user.info.idle = Boolean(query.idle);
 		Group.users.sendEvent("/user/person/", user.info, ticket);
+	});
+});
+
+root.api.session.user.subscription = bt.dispatch(null, function(func, query, session, user) {
+	if(!user.info.subscriber) return {error: "Subscriber membership required"};
+	return func(query, session, user);
+});
+root.api.session.user.subscription.color = bt.dispatch(function(query, session, user) {
+	var match = /[0-9a-fA-f]{6}/.exec(String(query.color));
+	var color = match ? match[0] : null;
+	return session.promise(function(ticket) {
+		user.info.color = color;
+		Group.users.sendEvent("/user/person/", user.info, ticket);
+		db.query(
+			"UPDATE profiles SET color = $ WHERE userID = $ LIMIT 1",
+			[color, user.info.userID]
+		);
 	});
 });
 

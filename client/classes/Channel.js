@@ -254,7 +254,7 @@ var Channel = function(session, user, channelID, parentID) {
 			DOM.fill(msgElems.date, new Date(info.time).toLocaleTimeString());
 			DOM.fill(msgElems.name, info.userName);
 			DOM.fill(msgElems.text, DOM.inputify(info.text));
-			user.getPerson(info.userID, info.userName).trackMessageElement(elem);
+			user.getPerson(info.userID, info.userName).trackMessageElement(elem, msgElems.name);
 			(function censoring() {
 				var censored = false;
 				var censor = function(censorText, replacementText) {
