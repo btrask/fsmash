@@ -109,11 +109,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 	width: 70px;
 }
 
+.message > span > .name {
+	color: #000;
+}
 .message.offline > span > .name {
 	/* <http://www.quirksmode.org/css/opacity.html> */
-	-ms-filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=67)";
-	filter: alpha(opacity=67);
-	opacity: 0.67;
+	-ms-filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=33)";
+	filter: alpha(opacity=33);
+	opacity: 0.33;
 }
 .message.subscriber > span > .name:after, .subscriber.demo:after {
 	content: "✓";

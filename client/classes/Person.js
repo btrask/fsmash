@@ -55,7 +55,7 @@ var Person = function(session, user, userID) {
 	};
 	user.personByUserID[person.info.userID] = person;
 	person.rated = false;
-	person.online = false;
+	person.offline = true;
 	person.subscriber = false;
 	person.ignored = false;
 	person.color = null;
@@ -65,7 +65,7 @@ var Person = function(session, user, userID) {
 		bt.map(user.channelByID, function(channel) {
 			channel.removeMember(person);
 		});
-		person.setOnline(false);
+		person.setOffline(true);
 		if(person === user.person) session.terminate();
 	});
 
@@ -124,17 +124,16 @@ var Person = function(session, user, userID) {
 				element: elem,
 				name: name
 			});
-			DOM.changeClass(elem, "offline", !person.online);
+			DOM.changeClass(elem, "offline", person.offline);
 			DOM.changeClass(elem, "subscriber", person.subscriber);
 			DOM.changeClass(elem, "ignored", person.ignored);
-			console.log("color", person.info.userName, person.color);
 			name.style.color = person.color;
 		};
 		person.stopTrackingMessages = function(channelID) {
 			delete elementsByChannelID[channelID];
 		};
 
-		person.setOnline = bt.curry(setProperty, "online"); // It would be a little bit safer if we disable names using opacity instead of color. Or perhaps we could insert a new intermediate element between the text node and its parent.
+		person.setOffline = bt.curry(setProperty, "offline");
 		person.setSubscriber = bt.curry(setProperty, "subscriber");
 		person.setIgnored = bt.curry(setProperty, "ignored");
 		person.setColor = function(color) {

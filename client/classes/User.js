@@ -87,7 +87,7 @@ var User = function(session, userID) {
 		if(user.personByUserID.hasOwnProperty(body.userID)) person = user.personByUserID[body.userID];
 		else person = new Person(session, user, body.userID);
 		person.updateWithInfo(body);
-		person.setOnline(true);
+		person.setOffline(false);
 	}, null, function(body) {
 		return user.personByUserID.hasOwnProperty(body.userID) ? user.personByUserID[body.userID].event : null;
 	});
