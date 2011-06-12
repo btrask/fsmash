@@ -115,7 +115,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 	filter: alpha(opacity=67);
 	opacity: 0.67;
 }
-.message.subscriber > span > .name:after {
+.message.subscriber > span > .name:after, .subscriber.demo:after {
 	content: "✓";
 	color: #a00;
 }
