@@ -42,7 +42,7 @@ DOM.remove = function(elem) {
 DOM.fill = function(elem, child1, child2, etc) {
 	var i;
 	if(!elem) return;
-	elem.innerHTML = "";
+	while(elem.hasChildNodes()) elem.removeChild(elem.firstChild);
 	for(i = 1; i < arguments.length; ++i) if(arguments[i]) elem.appendChild(DOM.toElement(arguments[i]));
 };
 DOM.changeClass = function(elem, classString, add) {
