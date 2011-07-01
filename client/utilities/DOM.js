@@ -17,13 +17,13 @@ DOM.id = function(id) {
 	return document.getElementById(id);
 };
 DOM.clone = function(id, childByID) {
-	var element = DOM.id(id).cloneNode(true);
+	var element = document.getElementById(id).cloneNode(true);
 	delete element.id;
 	if(childByID) (function findIDsInElement(elem) {
-		var dataID;
+		var children = elem.childNodes, length = children.length, dataID, i;
 		if(elem.getAttribute) dataID = elem.getAttribute("data-id");
 		if(dataID) childByID[dataID] = elem;
-		bt.map(elem.childNodes, findIDsInElement);
+		for(i = 0; i < length; ++i) findIDsInElement(children[i]);
 	})(element);
 	return element;
 };
