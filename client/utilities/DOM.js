@@ -23,7 +23,7 @@ DOM.clone = function(id, childByID) {
 		var dataID;
 		if(elem.getAttribute) dataID = elem.getAttribute("data-id");
 		if(dataID) childByID[dataID] = elem;
-		bt.map(elem.childNodes, arguments.callee);
+		bt.map(elem.childNodes, findIDsInElement);
 	})(element);
 	return element;
 };
@@ -42,7 +42,7 @@ DOM.remove = function(elem) {
 DOM.fill = function(elem, child1, child2, etc) {
 	var i;
 	if(!elem) return;
-	while(elem.hasChildNodes()) elem.removeChild(elem.firstChild);
+	elem.innerHTML = "";
 	for(i = 1; i < arguments.length; ++i) if(arguments[i]) elem.appendChild(DOM.toElement(arguments[i]));
 };
 DOM.changeClass = function(elem, classString, add) {
