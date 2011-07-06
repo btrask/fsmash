@@ -18,7 +18,7 @@ DOM.id = function(id) {
 };
 DOM.clone = function(id, childByID) {
 	var element = document.getElementById(id).cloneNode(true);
-	delete element.id;
+	element.id = "";
 	if(childByID) (function findIDsInElement(elem) {
 		var children = elem.childNodes, length = children.length, dataID, i;
 		if(elem.getAttribute) dataID = elem.getAttribute("data-id");
