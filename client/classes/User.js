@@ -112,8 +112,8 @@ var User = function(session, userID) {
 	user.event.administrator = bt.dispatch(function(body) {
 		if(user.administrator) return;
 		user.administrator = new Administrator(session, user, body.signupAllowed);
-		DOM.changeClass(DOM.id("body"), "administrator", true);
-		DOM.changeClass(DOM.id("body"), "notAdministrator", false);
+		DOM.classify(DOM.id("body"), "administrator", true);
+		DOM.classify(DOM.id("body"), "notAdministrator", false);
 	}, null, function(body) {
 		return user.administrator.event;
 	});
@@ -128,7 +128,7 @@ var User = function(session, userID) {
 		} else {
 			if(!subscribeItem.selected) DOM.fill(subscribeItem.counter, "!");
 		}
-		DOM.changeClass(subscribeElems.subscriberPane, "invisible", !body.expireTime);
+		DOM.classify(subscribeElems.subscriberPane, "invisible", !body.expireTime);
 	});
 
 	user.request = function(path, properties, callback) {

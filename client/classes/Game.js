@@ -21,8 +21,8 @@ var Game = function(session, user, channel) {
 		if(channel.userIsMember) user.setBroadcasting(game.broadcasting);
 	};
 	var updateIsBroadcasting = function() {
-		DOM.changeClass(channel.sidebarItem.row, "notice", game.broadcasting);
-		DOM.changeClass(game.groups.applicants.element, "invisible", !game.broadcasting);
+		DOM.classify(channel.sidebarItem.row, "notice", game.broadcasting);
+		DOM.classify(game.groups.applicants.element, "invisible", !game.broadcasting);
 		game.update();
 	};
 
@@ -58,10 +58,10 @@ var Game = function(session, user, channel) {
 		};
 
 		game.groups.applicants.onadd = function(item) {
-			DOM.changeClass(item.element, "notice", true);
+			DOM.classify(item.element, "notice", true);
 		};
 		game.groups.applicants.onremove = function(item) {
-			DOM.changeClass(item.element, "notice", false);
+			DOM.classify(item.element, "notice", false);
 		};
 	})();
 
@@ -90,7 +90,7 @@ var Game = function(session, user, channel) {
 			};
 
 			var canBroadcast = game.info.playersNeeded > 0 && (game.broadcasting || !user.broadcastCount);
-			DOM.changeClass(game.action, "notice", canBroadcast && game.broadcasting != channel.userIsMember);
+			DOM.classify(game.action, "notice", canBroadcast && game.broadcasting != channel.userIsMember);
 			DOM.input.enable(game.action, canBroadcast);
 			DOM.input.enable(game.cancel, game.broadcasting);
 		} else {
@@ -103,7 +103,7 @@ var Game = function(session, user, channel) {
 				user.request("/broadcastChannel/application/stop/", {channelID: channel.info.channelID});
 			};
 
-			DOM.changeClass(game.action, "notice", !userIsApplicant);
+			DOM.classify(game.action, "notice", !userIsApplicant);
 			DOM.input.enable(game.action, true);
 			DOM.input.enable(game.cancel, userIsApplicant);
 		}
@@ -229,7 +229,7 @@ var Game = function(session, user, channel) {
 		game.removeApplicant(applicantUserID);
 	});
 
-	DOM.changeClass(channel.element, "game");
+	DOM.classify(channel.element, "game");
 	channel.groups.members.setShowsBrawlInfo(true);
 	channel.groups.formerMembers.setShowsBrawlInfo(true);
 	game.element = DOM.clone("game", game);

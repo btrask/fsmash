@@ -36,15 +36,15 @@ var Person = function(session, user, userID) {
 		};
 		item.setTeamID = function(teamID) {
 			if(!brawl.teams.colors.hasOwnProperty(teamID)) teamID = 0;
-			DOM.changeClass(item.element, brawl.teams.colors[item.teamID], false);
+			DOM.classify(item.element, brawl.teams.colors[item.teamID], false);
 			item.teamID = teamID;
-			DOM.changeClass(item.element, brawl.teams.colors[item.teamID], true);
+			DOM.classify(item.element, brawl.teams.colors[item.teamID], true);
 		};
 
 		item.person = person;
 		allItems.push(item);
 		item.element = DOM.clone("person", item);
-		DOM.changeClass(item.element, "idle", item.person.info.idle);
+		DOM.classify(item.element, "idle", item.person.info.idle);
 		item.setTeamID();
 		for(var component in Person.keysByComponent) if(Person.keysByComponent.hasOwnProperty(component)) DOM.fill(item[component], DOM.inputify(stringForComponent(component)));
 	};
@@ -77,7 +77,7 @@ var Person = function(session, user, userID) {
 		if(undefined !== info.friendCode) info.friendCode = brawl.friendCode(info.friendCode) || "(no friend code specified in profile)";
 		if(undefined !== info.idle) {
 			person.info.idle = Boolean(info.idle);
-			for(i = 0; i < allItems.length; ++i) DOM.changeClass(allItems[i].element, "idle", person.info.idle);
+			for(i = 0; i < allItems.length; ++i) DOM.classify(allItems[i].element, "idle", person.info.idle);
 		}
 		if(undefined !== info.rank) info.rank = "Rank "+info.rank;
 		if(undefined !== info.subscriber) {
@@ -115,7 +115,7 @@ var Person = function(session, user, userID) {
 			if(flag == person[prop]) return;
 			person[prop] = Boolean(flag);
 			applyToElements(function(elems) {
-				DOM.changeClass(elems.element, prop, flag);
+				DOM.classify(elems.element, prop, flag);
 			});
 		};
 		person.trackMessageElement = function(elem, name, channelID) {
@@ -124,9 +124,9 @@ var Person = function(session, user, userID) {
 				element: elem,
 				name: name
 			});
-			DOM.changeClass(elem, "offline", person.offline);
-			DOM.changeClass(elem, "subscriber", person.subscriber);
-			DOM.changeClass(elem, "ignored", person.ignored);
+			DOM.classify(elem, "offline", person.offline);
+			DOM.classify(elem, "subscriber", person.subscriber);
+			DOM.classify(elem, "ignored", person.ignored);
 			name.style.color = person.color;
 		};
 		person.stopTrackingMessages = function(channelID) {

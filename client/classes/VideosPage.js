@@ -48,7 +48,7 @@ var VideosPage = function(session) {
 	};
 
 	videosPage.allowSubmissions = function() {
-		DOM.changeClass(videosElems.submitPane, "invisible", false);
+		DOM.classify(videosElems.submitPane, "invisible", false);
 	};
 	videosPage.add = function(body) {
 		if(!body.videos) return;

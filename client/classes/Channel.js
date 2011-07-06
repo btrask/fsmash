@@ -74,11 +74,11 @@ var Channel = function(session, user, channelID, parentID) {
 			var button = this;
 			if(validate) {
 				this.value = "Rate…";
-				DOM.changeClass(button, "notice", false);
+				DOM.classify(button, "notice", false);
 				if(!channel.game) return false;
 				if(!channel.userIsMember) return false;
 				if(item.person === user.person) return false;
-				DOM.changeClass(button, "notice", !item.person.rated);
+				DOM.classify(button, "notice", !item.person.rated);
 				return true;
 			}
 			var elems = {};
@@ -89,7 +89,7 @@ var Channel = function(session, user, channelID, parentID) {
 					DOM.input.enable(elems.down, elems.neutral, elems.up, true);
 					if(!result) return;
 					item.person.rated = true;
-					DOM.changeClass(button, "notice", false);
+					DOM.classify(button, "notice", false);
 					DOM.remove(ratePanel);
 				});
 			};
@@ -199,8 +199,8 @@ var Channel = function(session, user, channelID, parentID) {
 	channel.setModerator = function(flag) {
 		if(channel.isModerator === flag) return;
 		channel.isModerator = Boolean(flag);
-		DOM.changeClass(channel.element, "moderator", Boolean(flag));
-		DOM.changeClass(channel.element, "notModerator", !flag);
+		DOM.classify(channel.element, "moderator", Boolean(flag));
+		DOM.classify(channel.element, "notModerator", !flag);
 		bt.map(channel.channelByID, function(subchannel) {
 			subchannel.setModerator(flag);
 		});
@@ -261,13 +261,13 @@ var Channel = function(session, user, channelID, parentID) {
 					if(!censorText || !replacementText) return;
 					if(censorText !== info.text) return;
 					DOM.fill(msgElems.text, DOM.inputify(replacementText));
-					DOM.changeClass(msgElems.text, "censored");
+					DOM.classify(msgElems.text, "censored");
 					censored = true;
 				};
 				censorHistory.push(censor);
 				while(censorHistory.length > 50) censorHistory.shift(); // FIXME: We should somehow get this number from the server config.
 				if(info.censored) {
-					DOM.changeClass(msgElems.text, "censored");
+					DOM.classify(msgElems.text, "censored");
 					censored = true;
 				}
 				msgElems.censor.onclick = function() {
@@ -284,7 +284,7 @@ var Channel = function(session, user, channelID, parentID) {
 			if(incoming) channel.alert("message");
 			DOM.scroll.preserve(channel.scrollBox, function() {
 				var msgElement = incomingMessage(body);
-				if(!incoming) DOM.changeClass(msgElement, "light");
+				if(!incoming) DOM.classify(msgElement, "light");
 				chatElems.messages.appendChild(msgElement);
 			});
 		});
@@ -366,20 +366,20 @@ var Channel = function(session, user, channelID, parentID) {
 		channel.setModerator(channel.parent.isModerator);
 	} else {
 		user.rootChannelByID[channelID] = channel;
-		DOM.changeClass(channel.groups.nonMembers.element, "invisible");
-		DOM.changeClass(channel.groups.formerMembers.element, "invisible");
+		DOM.classify(channel.groups.nonMembers.element, "invisible");
+		DOM.classify(channel.groups.formerMembers.element, "invisible");
 		channel.setModerator(false);
 	}
 
 	chnlElems.info.onclick = function() {
-		DOM.changeClass(chnlElems.chat, "selected", false);
-		DOM.changeClass(chnlElems.info, "selected", true);
+		DOM.classify(chnlElems.chat, "selected", false);
+		DOM.classify(chnlElems.info, "selected", true);
 		DOM.fill(chnlElems.content, infoPane);
 		channel.resetUnreadCounter("challenge");
 	};
 	chnlElems.chat.onclick = function() {
-		DOM.changeClass(chnlElems.info, "selected", false);
-		DOM.changeClass(chnlElems.chat, "selected", true);
+		DOM.classify(chnlElems.info, "selected", false);
+		DOM.classify(chnlElems.chat, "selected", true);
 		DOM.fill(chnlElems.content, chatPane);
 		channel.resetUnreadCounter("message");
 		DOM.scroll.toBottom(channel.scrollBox);

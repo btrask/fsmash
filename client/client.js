@@ -63,5 +63,5 @@ window.onload = function() {
 		});
 	}, 1000); // Wait for the browser to realize that we're done loading the main page. I wish I knew a better way to do this. window.onload by itself doesn't cut it.
 };
-DOM.changeClass(DOM.id("body"), "invisible", false);
+DOM.classify(DOM.id("body"), "invisible", false);
 new Session();

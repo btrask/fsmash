@@ -16,48 +16,47 @@ var DOM = {};
 DOM.id = function(id) {
 	return document.getElementById(id);
 };
+
 DOM.clone = function(id, childByID) {
 	var element = document.getElementById(id).cloneNode(true);
 	element.id = "";
 	if(childByID) (function findIDsInElement(elem) {
-		var children = elem.childNodes, length = children.length, dataID, i;
+		var children = elem.childNodes, length = children.length, i = 0, dataID;
 		if(elem.getAttribute) dataID = elem.getAttribute("data-id");
 		if(dataID) childByID[dataID] = elem;
-		for(i = 0; i < length; ++i) findIDsInElement(children[i]);
+		for(; i < length; ++i) findIDsInElement(children[i]);
 	})(element);
 	return element;
 };
-DOM.toElement = function(obj) {
-	if(null === obj || undefined === obj) obj = "";
-	switch(obj.constructor) {
-		case String:
-		case Number:
-			return document.createTextNode(obj.toString());
-	}
-	return obj;
-};
 DOM.remove = function(elem) {
-	if(elem && elem.parentNode) elem.parentNode.removeChild(elem);
+	if(elem.parentNode) elem.parentNode.removeChild(elem);
 };
 DOM.fill = function(elem, child1, child2, etc) {
-	var i;
-	if(!elem) return;
+	var i = 1, type;
 	while(elem.hasChildNodes()) elem.removeChild(elem.firstChild);
-	for(i = 1; i < arguments.length; ++i) if(arguments[i]) elem.appendChild(DOM.toElement(arguments[i]));
-};
-DOM.changeClass = function(elem, classString, add) {
-	var classes = elem.className ? elem.className.split(" ") : [];
-	var changedClasses = classString ? classString.toString().split(" ") : [];
-	bt.map(changedClasses, function(changedClass) {
-		var index = classes.indexOf(changedClass);
-		if(add || undefined === add) {
-			if(-1 === index) classes.push(changedClass);
+	for(; i < arguments.length; ++i) if(arguments[i]) {
+		type = typeof arguments[i];
+		if("string" === type || "number" === type) {
+			elem.appendChild(document.createTextNode(arguments[i]));
 		} else {
-			if(-1 !== index) classes.splice(index, 1);
+			elem.appendChild(arguments[i]);
 		}
-	});
+	}
+};
+DOM.classify = function(elem, className, add) {
+	var classes = (elem.className || "").split(" "),
+		changed = (className || "").split(" "),
+		length = changed.length, i = 0, index;
+	if(add || undefined === add) for(; i < length; ++i) {
+		index = classes.indexOf(changed[i]);
+		if(index < 0) classes.push(changed[i]);
+	} else for(; i < length; ++i) {
+		index = classes.indexOf(changed[i]);
+		if(index >= 0) classes.splice(index, 1);
+	}
 	elem.className = classes.join(" ");
 };
+
 DOM.linkify = function(string) {
 	var remainder = string;
 	var span = document.createElement("span");
@@ -75,11 +74,11 @@ DOM.linkify = function(string) {
 			if(emailRegExp.test(URL)) anchor.href = "mailto:" + URL;
 			else anchor.href = URL;
 		}
-		span.appendChild(DOM.toElement(remainder.slice(0, index)));
+		span.appendChild(document.createTextNode(remainder.slice(0, index)));
 		if(anchor) span.appendChild(anchor);
 		remainder = remainder.slice(index + URL.length);
 	}
-	span.appendChild(DOM.toElement(remainder));
+	span.appendChild(document.createTextNode(remainder));
 	return span;
 };
 DOM.inputify = function(string) {
@@ -87,7 +86,7 @@ DOM.inputify = function(string) {
 	if(!match) return DOM.linkify(string);
 	var quote = DOM.linkify(match[1]);
 	var comment = DOM.linkify(match[2]);
-	DOM.changeClass(quote, "quote");
+	DOM.classify(quote, "quote");
 	var span = document.createElement("span");
 	DOM.fill(span, quote, " <- ", comment);
 	return span;
@@ -99,7 +98,7 @@ DOM.input.enable = function(elem1, elem2, etc, flag) {
 	var flag = !args.pop();
 	bt.map(args, function(arg) {
 		arg.disabled = flag;
-		DOM.changeClass(arg, "disabled", flag);
+		DOM.classify(arg, "disabled", flag);
 	});
 };
 
@@ -129,16 +128,16 @@ DOM.field.onChange = function(elem1, elem2, etc, callback) {
 DOM.field.placeholder = function(elem1, elem2, etc) {
 	var elem, i;
 	bt.map(arguments, function(elem) {
-		DOM.changeClass(elem, "placeholder", elem.value === this.title);
+		DOM.classify(elem, "placeholder", elem.value === this.title);
 		elem.onfocus = function() {
 			if(this.value !== this.title) return;
 			this.value = "";
-			DOM.changeClass(this, "placeholder", false);
+			DOM.classify(this, "placeholder", false);
 		};
 		elem.onblur = function() {
 			if(this.value) return;
 			this.value = this.title;
-			DOM.changeClass(this, "placeholder");
+			DOM.classify(this, "placeholder");
 		};
 		elem.onblur();
 	});
@@ -150,15 +149,15 @@ DOM.button.confirm = function(button, action) {
 	var onclick = button.onclick;
 	var timeout = setTimeout(function() {
 		button.value = value;
-		DOM.changeClass(button, "confirm", false);
+		DOM.classify(button, "confirm", false);
 		button.onclick = onclick;
 	}, 1000 * 1);
 	button.value = "Confirm";
-	DOM.changeClass(button, "confirm");
+	DOM.classify(button, "confirm");
 	button.onclick = function(arg1, arg2, etc) {
 		clearTimeout(timeout);
 		button.value = value;
-		DOM.changeClass(button, "confirm", false);
+		DOM.classify(button, "confirm", false);
 		button.onclick = onclick;
 		return action.apply(this, arguments);
 	}

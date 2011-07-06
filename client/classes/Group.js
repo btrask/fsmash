@@ -30,7 +30,7 @@ var Group = function(title, actions) {
 		for(var i = 0; i < items.length; ++i) {
 			bt.map(actions, function(action, index) {
 				var button = items[i].buttons[index];
-				DOM.changeClass(button, "invisible", !action.call(button, true, items[i]));
+				DOM.classify(button, "invisible", !action.call(button, true, items[i]));
 			});
 			group.children.appendChild(items[i].element);
 		}
@@ -52,7 +52,7 @@ var Group = function(title, actions) {
 		group.itemByUserID[userID] = item;
 		item.group = group;
 		generateCommands();
-		DOM.changeClass(item.brawlInfo, "invisible", !group.showsBrawlInfo);
+		DOM.classify(item.brawlInfo, "invisible", !group.showsBrawlInfo);
 		if(group.onadd) group.onadd(item);
 		if(update) group.update();
 	};
@@ -71,7 +71,7 @@ var Group = function(title, actions) {
 	group.setShowsBrawlInfo = function(flag) {
 		group.showsBrawlInfo = flag;
 		bt.map(group.itemByUserID, function(item) {
-			DOM.changeClass(item.brawlInfo, "invisible", !group.showsBrawlInfo);
+			DOM.classify(item.brawlInfo, "invisible", !group.showsBrawlInfo);
 		});
 	};
 	group.moveAllToGroup = function(otherGroup) {

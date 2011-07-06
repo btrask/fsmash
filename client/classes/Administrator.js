@@ -24,13 +24,13 @@ var Administrator = function(session, user, signupAllowed) {
 
 	administrator.event = bt.dispatch();
 	administrator.event.reports = bt.dispatch(function(reports) {
-		administratorElems.reports.insertBefore(DOM.toElement(bt.map(reports, function(report) {
+		administratorElems.reports.insertBefore(document.createTextNode(bt.map(reports, function(report) {
 			return (report.topic || "(untitled)") + " / " + report.userName + " / " + new Date(report.time).toUTCString();
 		}).join("\n")+"\n"), administratorElems.reports.firstChild);
 		bump();
 	});
 	administrator.event.censored = bt.dispatch(function(censoredMessages) {
-		administratorElems.censored.insertBefore(DOM.toElement(bt.map(censoredMessages, function(censored) {
+		administratorElems.censored.insertBefore(document.createTextNode(bt.map(censoredMessages, function(censored) {
 			return (censored.topic || "(untitled)") + " / " + censored.modUserName + " / " + new Date(censored.time).toUTCString() +
 				"\n\t" + censored.censorText +
 				"\n\t"+censored.replacementText;
