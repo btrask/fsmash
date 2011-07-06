@@ -14,21 +14,24 @@ You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 #modal > .shield {
 	background: url("resources/modal-background.png");
-	background: -moz-radial-gradient(50% 50%, circle, rgba(0, 0, 0, 0.5) 0, rgba(0, 0, 0, 0.8) 200px);
-	background: -webkit-gradient(radial, 50% 50%, 0, 50% 50%, 200, from(rgba(0, 0, 0, 0.5)), to(rgba(0, 0, 0, 0.8)));
+	background: -moz-radial-gradient(50% 50%, circle, rgba(0, 0, 0, 0.7) 0, rgba(0, 0, 0, 1.0) 800px);
+	background: -webkit-gradient(radial, 50% 50%, 0, 50% 50%, 800, from(rgba(0, 0, 0, 0.7)), to(rgba(0, 0, 0, 0.95)));
 }
 #modal > .shield > .content {
 	background: #fff;
 	-moz-border-radius: 7px;
 	-webkit-border-radius: 7px;
 	border-radius: 7px;
+	-moz-box-shadow: 0 5px 30px #222;
+	-webkit-box-shadow: 0 5px 30px #222;
+	box-shadow: 0 5px 30px #222;
+	left: 50%;
+	top: 50%;
 }
 
 #modal > .rating > .content {
 	width: 200px;
 	height: 132px;
-	left: 50%;
-	top: 50%;
 	margin-left: -104px;
 	margin-top: -70px;
 }
@@ -48,8 +51,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 #modal > .discussion > .content {
 	height: 25px;
 	width: 331px;
-	left: 50%;
-	top: 50%;
 	margin-left: -169px;
 	margin-top: -15px;
 }
@@ -69,8 +70,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 #modal > .password > .content {
 	height: 165px;
 	width: 276px;
-	left: 50%;
-	top: 50%;
 	margin-left: -142px;
 	margin-top: -86px;
 }
