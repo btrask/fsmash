@@ -12,6 +12,8 @@ GNU Affero General Public License for more details.
 
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>. */
+
+/*globals bt: false, youtube: false */
 var DOM = {};
 DOM.id = function(id) {
 	return document.getElementById(id);
@@ -61,10 +63,10 @@ DOM.linkify = function(string) {
 	var remainder = string;
 	var span = document.createElement("span");
 	var URL, anchor, index;
-	var fullURLRegExp = /[\w-]+:\/\/?[\w\d\/!@#$%^&*?.=+-:~]+[\w\d\/&#*]/;
-	var emailRegExp = /[\w\d.-]+@[\w\d.-]+[.][\w\d.-]*[\w\d]/;
+	var fullURLRegExp = /[\w\-]+:\/\/?[\w\d\/!@#$%\^&*?.=+\-:~]+[\w\d\/&#*]/;
+	var emailRegExp = /[\w\d.\-]+@[\w\d.\-]+[.][\w\d.\-]*[\w\d]/;
 	var allRegExp = new RegExp(fullURLRegExp.source + "|" + emailRegExp.source);
-	while(URL = allRegExp.exec(remainder)) {
+	while((URL = allRegExp.exec(remainder))) {
 		URL = URL[0];
 		index = remainder.indexOf(URL);
 		anchor = youtube.anchorForVideoURL(URL);
@@ -95,7 +97,7 @@ DOM.inputify = function(string) {
 DOM.input = {};
 DOM.input.enable = function(elem1, elem2, etc, flag) {
 	var args = Array.prototype.slice.call(arguments);
-	var flag = !args.pop();
+	flag = !args.pop();
 	bt.map(args, function(arg) {
 		arg.disabled = flag;
 		DOM.classify(arg, "disabled", flag);
@@ -107,7 +109,7 @@ DOM.event.isReturn = function(event) {
 	if(!event) event = window.event;
 	if(!event) return false;
 	var keyCode = event.keyCode;
-	return 13 == keyCode || 10 == keyCode;
+	return 13 === parseInt(keyCode, 10) || 10 === parseInt(keyCode, 10);
 };
 
 DOM.field = {};
@@ -117,13 +119,13 @@ DOM.field.focus = function(field) {
 	field.focus();
 };
 DOM.field.onChange = function(elem1, elem2, etc, callback) {
-	var callback = arguments[arguments.length - 1], i;
-	for(var i = 0; i < arguments.length - 1; ++i) {
-		arguments[i].onchange = callback;
-		arguments[i].onkeypress = function(event) {
+	callback = arguments[arguments.length - 1];
+	bt.map(arguments, function(elem) {
+		elem.onchange = callback;
+		elem.onkeypress = function(event) {
 			if(DOM.event.isReturn(event)) this.blur();
 		};
-	}
+	});
 };
 DOM.field.placeholder = function(elem1, elem2, etc) {
 	var elem, i;
@@ -160,7 +162,7 @@ DOM.button.confirm = function(button, action) {
 		DOM.classify(button, "confirm", false);
 		button.onclick = onclick;
 		return action.apply(this, arguments);
-	}
+	};
 };
 
 DOM.select = {};
@@ -172,7 +174,7 @@ DOM.select.option = function(label, value) {
 };
 DOM.select.choose = function(select, value) {
 	for(var i = 0; i < select.options.length; ++i) {
-		if(value != select.options[i].value) continue;
+		if(String(value) !== String(select.options[i].value)) continue;
 		select.selectedIndex = i;
 		return true;
 	}

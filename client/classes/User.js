@@ -12,6 +12,8 @@ GNU Affero General Public License for more details.
 
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>. */
+
+/*globals cookie: false, bt: false, brawl: false, DOM: false, SidebarItem: false, Channel: false, Person: false, Administrator: false */
 var User = function(session, userID) {
 	var user = this;
 
@@ -242,7 +244,7 @@ var User = function(session, userID) {
 			return link.title && link.getAttribute("data-style-id");
 		};
 		var setStyleID = function(styleID) {
-			for(var i = 0; i < links.length; ++i) if(isCSSStyleElement(links[i])) links[i].disabled = links[i].getAttribute("data-style-id") != styleID;
+			for(var i = 0; i < links.length; ++i) if(isCSSStyleElement(links[i])) links[i].disabled = links[i].getAttribute("data-style-id") !== String(styleID);
 		};
 		user.setStyleID = function(styleID) {
 			setStyleID(styleID);
@@ -265,7 +267,7 @@ var User = function(session, userID) {
 		var setSoundsetID = function(soundsetID) {
 			if(!user.config.soundsets) return;
 			for(var i = 0; i < user.config.soundsets.length; ++i) {
-				if(soundsetID != user.config.soundsets[i].soundsetID) continue;
+				if(soundsetID !== user.config.soundsets[i].soundsetID) continue;
 				soundset = user.config.soundsets[i];
 				break;
 			}

@@ -12,12 +12,14 @@ GNU Affero General Public License for more details.
 
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>. */
+
+/*globals DOM: false */
 var youtube = {};
 youtube.dataByVideoID = {};
 youtube.callbackByUniqueID = {};
 youtube.uniqueID = 0;
 youtube.videoIDForURL = function(url) {
-	var result = /(youtube.*[\?&!#\/]v=|youtu.be\/)([\w\d-]{11})/.exec(url);
+	var result = /(youtube.*[\?&!#\/]v=|youtu.be\/)([\w\d\-]{11})/.exec(url);
 	return result && result[2];
 };
 youtube.infoForVideoID = function(videoID, callback/* (data) */) {

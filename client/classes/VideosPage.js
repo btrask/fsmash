@@ -12,6 +12,8 @@ GNU Affero General Public License for more details.
 
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>. */
+
+/*globals bt: false, DOM: false, youtube: false, SidebarItem: false */
 var VideosPage = function(session) {
 	var videosPage = this;
 
@@ -32,7 +34,7 @@ var VideosPage = function(session) {
 	DOM.field.placeholder(videosElems.videoURL);
 
 	videosElems.more.onclick = function() {
-		session.request("/videos/", {start: count.total})
+		session.request("/videos/", {start: count.total});
 	};
 	videosElems.submit.onclick = function() {
 		if(!session.user) throw new Error("Only users can submit videos");

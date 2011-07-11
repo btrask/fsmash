@@ -12,12 +12,15 @@ GNU Affero General Public License for more details.
 
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>. */
+
+/*globals bt: false, DOM: false, Channel: false, Group: false */
 var Game = function(session, user, channel) {
 	var game = this;
 
 	var setBroadcasting = function(flag) {
-		if(flag == game.broadcasting) return;
-		game.broadcasting = Boolean(flag);
+		flag = Boolean(flag);
+		if(flag === game.broadcasting) return;
+		game.broadcasting = flag;
 		if(channel.userIsMember) user.setBroadcasting(game.broadcasting);
 	};
 	var updateIsBroadcasting = function() {
@@ -71,7 +74,7 @@ var Game = function(session, user, channel) {
 	game.removeApplicant = function(applicantUserID) {
 		if(!game.applicantByUserID.hasOwnProperty(applicantUserID)) return;
 		delete game.applicantByUserID[applicantUserID];
-		if(applicantUserID == user.info.userID) {
+		if(applicantUserID === user.info.userID) {
 			userIsApplicant = false;
 			game.update();
 		}
@@ -90,7 +93,7 @@ var Game = function(session, user, channel) {
 			};
 
 			var canBroadcast = game.info.playersNeeded > 0 && (game.broadcasting || !user.broadcastCount);
-			DOM.classify(game.action, "notice", canBroadcast && game.broadcasting != channel.userIsMember);
+			DOM.classify(game.action, "notice", canBroadcast && game.broadcasting !== channel.userIsMember);
 			DOM.input.enable(game.action, canBroadcast);
 			DOM.input.enable(game.cancel, game.broadcasting);
 		} else {
@@ -158,7 +161,7 @@ var Game = function(session, user, channel) {
 		channel.title = labels.join(" / ") || "(game channel)";
 		if(channel.parent) Channel.updateSubchannels(channel.parent);
 		DOM.fill(channel.sidebarItem.title, channel.title);
-		if(announcement) DOM.scroll.preserve(channel.scrollBox, function() {
+		if(announcement && announcementElems.title) DOM.scroll.preserve(channel.scrollBox, function() {
 			DOM.fill(announcementElems.title, channel.title);
 		});
 	};

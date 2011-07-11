@@ -12,6 +12,8 @@ GNU Affero General Public License for more details.
 
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>. */
+
+/*globals bt: false, DOM: false */
 var Group = function(title, actions) {
 	var group = this;
 	group.itemByUserID = {};
@@ -27,13 +29,13 @@ var Group = function(title, actions) {
 			return (a.person.info.userName || "").localeCompare(b.person.info.userName || "");
 		});
 		DOM.fill(group.children);
-		for(var i = 0; i < items.length; ++i) {
+		bt.map(items, function(item) {
 			bt.map(actions, function(action, index) {
-				var button = items[i].buttons[index];
-				DOM.classify(button, "invisible", !action.call(button, true, items[i]));
+				var button = item.buttons[index];
+				DOM.classify(button, "invisible", !action.call(button, true, item));
 			});
-			group.children.appendChild(items[i].element);
-		}
+			group.children.appendChild(item.element);
+		});
 	};
 	group.addItem = function(item, update) {
 		var generateCommands = function() {

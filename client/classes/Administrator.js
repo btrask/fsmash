@@ -12,6 +12,8 @@ GNU Affero General Public License for more details.
 
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>. */
+
+/*globals DOM: false, bt: false, SidebarItem: false */
 var Administrator = function(session, user, signupAllowed) {
 	var administrator = this;
 

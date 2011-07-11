@@ -12,6 +12,8 @@ GNU Affero General Public License for more details.
 
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>. */
+
+/*globals cookie: false, bt: false, DOM: false, Session: false */
 (function() {
 	var resizer = DOM.id("resizer");
 	var sidebar = DOM.id("sidebar");
@@ -44,7 +46,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 })();
 document.onkeydown = document.onkeypress = function(event) {
 	if(!event) event = window.event;
-	if(8 != (event.keyCode || event.which)) return true;
+	if(8 !== parseInt(event.keyCode || event.which, 10)) return true;
 	var target = event.target || event.srcElement;
 	if(target && target.type && /password|text|file/i.test(target.type)) return true;
 	if(event.preventDefault) event.preventDefault();

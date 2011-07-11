@@ -12,6 +12,8 @@ GNU Affero General Public License for more details.
 
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>. */
+
+/*global ActiveXObject: false, cookie: false, bt: false, DOM: false, SidebarItem: false, User: false, AboutPage: false, VideosPage: false */
 var Session = function() {
 	var session = this;
 
@@ -173,10 +175,10 @@ var Session = function() {
 Session.request = function(path, properties, callback) {
 	var req = null;
 	if(window.XMLHttpRequest && !window.ActiveXObject) {
-		try { req = new XMLHttpRequest() } catch(e) {}
+		try { req = new XMLHttpRequest(); } catch(e) {}
 	} else if(window.ActiveXObject) {
-		try { req = new ActiveXObject("Msxml2.XMLHTTP") } catch(e) {
-			try { req = new ActiveXObject("Microsoft.XMLHTTP") } catch(e) {}
+		try { req = new ActiveXObject("Msxml2.XMLHTTP"); } catch(e1) {
+			try { req = new ActiveXObject("Microsoft.XMLHTTP"); } catch(e2) {}
 		}
 	}
 	req.open("POST", "/api" + path + "?r=" + new Date().getTime(), true);

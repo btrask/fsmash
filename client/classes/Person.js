@@ -12,6 +12,8 @@ GNU Affero General Public License for more details.
 
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>. */
+
+/*globals bt: false, DOM: false, brawl: false */
 var Person = function(session, user, userID) {
 	var person = this;
 
@@ -112,8 +114,9 @@ var Person = function(session, user, userID) {
 			});
 		};
 		var setProperty = function(prop, flag) {
-			if(flag == person[prop]) return;
-			person[prop] = Boolean(flag);
+			flag = Boolean(flag);
+			if(flag === person[prop]) return;
+			person[prop] = flag;
 			applyToElements(function(elems) {
 				DOM.classify(elems.element, prop, flag);
 			});

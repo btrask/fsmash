@@ -12,6 +12,8 @@ GNU Affero General Public License for more details.
 
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>. */
+
+/*globals DOM: false, SidebarItem: false, bt: false, brawl: false, Group: false, Game: false */
 var Channel = function(session, user, channelID, parentID) {
 	var channel = this;
 
@@ -280,7 +282,7 @@ var Channel = function(session, user, channelID, parentID) {
 		};
 		channel.event.message = bt.dispatch(function(body) {
 			if(!user.personByUserID.hasOwnProperty(body.userID)) return;
-			var incoming = body.userID != user.person.info.userID;
+			var incoming = body.userID !== user.person.info.userID;
 			if(incoming) channel.alert("message");
 			DOM.scroll.preserve(channel.scrollBox, function() {
 				var msgElement = incomingMessage(body);
@@ -339,7 +341,7 @@ var Channel = function(session, user, channelID, parentID) {
 			DOM.fill(channel.sidebarItem.counter, counter);
 		};
 		channel.alert = function(type) {
-			if("challenge" == type || channel.game || channel.sidebarItem.selected || (channel.userIsMember && memberCount <= 2)) user.playSound(type);
+			if("challenge" === type || channel.game || channel.sidebarItem.selected || (channel.userIsMember && memberCount <= 2)) user.playSound(type);
 			if(!pane.hasOwnProperty(type)) return;
 			if(channel.sidebarItem.selected && pane[type].parentNode) return;
 			if(!count.hasOwnProperty(type)) return;

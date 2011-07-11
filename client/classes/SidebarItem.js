@@ -12,6 +12,8 @@ GNU Affero General Public License for more details.
 
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>. */
+
+/*globals DOM: false */
 var SidebarItem = function(title) {
 	var item = this;
 	item.selected = false;
@@ -19,12 +21,13 @@ var SidebarItem = function(title) {
 	item.content = undefined;
 	DOM.fill(item.title, title);
 	item.select = function(flag) {
-		if(flag == item.selected) return;
+		flag = Boolean(flag);
+		if(flag === item.selected) return;
 		if(flag) {
 			if(SidebarItem.selected) SidebarItem.selected.select(false);
 			SidebarItem.selected = item;
 		}
-		item.selected = Boolean(flag);
+		item.selected = flag;
 		DOM.classify(item.row, "selected", flag);
 		DOM.fill(DOM.id("main"), (flag ? item.content : undefined));
 		if(flag && item.onshow) item.onshow();
