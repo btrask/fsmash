@@ -82,12 +82,12 @@ util.log("Starting " + process.title);
 
 var remoteAddressOfRequest = function(req) {
 	var remoteAddress = (config.server.remoteAddressField ? req.headers[config.server.remoteAddressField] : req.socket.remoteAddress) || null;
-	return "127.0.0.1" == remoteAddress ? null : remoteAddress;
+	return "127.0.0.1" === remoteAddress ? null : remoteAddress;
 };
 var fileHandler = (function() {
 	var handler = http.createFileHandler(__dirname+"/../public");
 	var wrapper = function(req, filename, write/* (status, header, data, encoding) */) {
-		db.query("INSERT INTO httpRequests (ipAddress, filename, header, referer, userAgent) VALUES (INET_ATON($), $, $, $, $)", [remoteAddressOfRequest(req), filename, JSON.stringify(req.headers), req.headers["referer"] || null, req.headers["user-agent"] || null]);
+		db.query("INSERT INTO httpRequests (ipAddress, filename, header, referer, userAgent) VALUES (INET_ATON($), $, $, $, $)", [remoteAddressOfRequest(req), filename, JSON.stringify(req.headers), req.headers.referer || null, req.headers["user-agent"] || null]);
 		return handler(req, filename, write);
 	};
 	wrapper.rescan = function() {
@@ -132,7 +132,7 @@ var configureSessions = (function configureSessions() {
 		function(err, matchTypesResult) {
 			Session.config.matchTypes = mysql.rows(matchTypesResult);
 			bt.map(Session.config.matchTypes, function(matchType) {
-				matchType.hasTeams = ("1" == matchType.hasTeams);
+				matchType.hasTeams = Boolean(parseInt(matchType.hasTeams, 10));
 			});
 		}
 	);
@@ -540,7 +540,7 @@ root.api.session.user.profile = bt.dispatch(function(query, session, user) {
 	});
 });
 root.api.session.user.idle = bt.dispatch(function(query, session, user) {
-	if(!query.idle === !user.info.idle) return true;
+	if(Boolean(query.idle) === Boolean(user.info.idle)) return true;
 	return session.promise(function(ticket) {
 		user.info.idle = Boolean(query.idle);
 		Group.users.sendEvent("/user/person/", user.info, ticket);
@@ -627,7 +627,7 @@ root.api.session.user.administrator.update.channelAncestors = bt.dispatch(functi
 			" WHERE ca2.ancestorID IS NOT NULL",
 			function(err, ancestorsResult) {
 				if(ancestorsResult.affectedRows) recursivelyAddAncestors();
-				else db.query("UNLOCK TABLES")
+				else db.query("UNLOCK TABLES");
 			}
 		);
 	})();
@@ -902,7 +902,7 @@ root.api.session.user.channel.game.broadcast = bt.dispatch(function(query, sessi
 	if(user.channelLimit()) return false;
 	if(!channel.parent) return {error: "Root channels cannot be broadcast"};
 	if(user.broadcastCount && !game.broadcasting) return {error: "User is already a member of a broadcasting channel"};
-	if(!(game.info.playersNeeded > 0)) return false;
+	if(game.info.playersNeeded <= 0) return false;
 	clearTimeout(game.broadcastTimeout);
 	game.broadcastTimeout = setTimeout(game.stopBroadcasting, config.Game.broadcast.timeout);
 	if(game.broadcasting) return true;
