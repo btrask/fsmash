@@ -79,11 +79,11 @@ var Channel = function(parentID, channelID) {
 		bt.map(channel.broadcastingSubchannelByID, function(subchannel) {
 			delete subchannel.game.applicantByUserID[user.info.userID];
 		});
-		if(channel.game && channel.game.broadcasting) user.broadcastCount--;
-		if(!bt.hasOwnProperties(channel.memberByUserID)) {
-			if(channel.game) channel.game.stopBroadcasting();
-			channel.uncache();
+		if(channel.game) {
+			if(channel.game.broadcasting) user.broadcastCount--;
+			channel.game.stopBroadcasting();
 		}
+		if(!bt.hasOwnProperties(channel.memberByUserID)) channel.uncache();
 	};
 	channel.removeAllUsers = function(ticket) {
 		bt.map(channel.memberByUserID, function(user) {
