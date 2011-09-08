@@ -100,6 +100,7 @@ var configureSessions = (function configureSessions() {
 		"SELECT soundsetID, label, path, challenge, `join`, `leave`, message"+
 		" FROM soundsets WHERE 1 ORDER BY sortOrder ASC",
 		function(err, soundsetsResult) {
+			if(err) throw err;
 			Session.config.soundsets = mysql.rows(soundsetsResult);
 		}
 	);
@@ -109,6 +110,7 @@ var configureSessions = (function configureSessions() {
 		" LEFT JOIN channels c ON (pc.channelID = c.channelID)"+
 		" WHERE 1 ORDER BY pc.sortOrder ASC",
 		function(err, channelsResult) {
+			if(err) throw err;
 			var channel;
 			var channelRows = mysql.rows(channelsResult).map(function(channelRow) {
 				channelRow.allowsGameChannels = Boolean(channelRow.allowsGameChannels);
@@ -130,6 +132,7 @@ var configureSessions = (function configureSessions() {
 		"SELECT matchTypeID, label, hasTeams, playerCount"+
 		" FROM matchTypes WHERE 1 ORDER BY sortOrder ASC",
 		function(err, matchTypesResult) {
+			if(err) throw err;
 			Session.config.matchTypes = mysql.rows(matchTypesResult);
 			bt.map(Session.config.matchTypes, function(matchType) {
 				matchType.hasTeams = Boolean(parseInt(matchType.hasTeams, 10));
@@ -140,6 +143,7 @@ var configureSessions = (function configureSessions() {
 		"SELECT ruleID, label"+
 		" FROM rules WHERE 1 ORDER BY sortOrder ASC",
 		function(err, rulesResult) {
+			if(err) throw err;
 			Session.config.rules = mysql.rows(rulesResult);
 			Group.users.sendEvent("/user/config/", Session.config);
 		}

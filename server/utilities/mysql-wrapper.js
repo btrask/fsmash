@@ -19,11 +19,10 @@ var util = require("util");
 
 var bt = require("../../shared/bt");
 
-var mysql = require("../external/mysql/");
+var mysql = require("mysql");
 
 wrapper.connect = function(conf) {
-	var connection = new mysql.Client(conf);
-	connection.connect();
+	var connection = mysql.createClient(conf);
 	connection.format = function(format, params) {
 		if(!Array.isArray(params)) params = Array.prototype.slice.call(arguments, 1);
 		return format.replace(/[$#]/g, function(type) { // $: Quoted value; #: Unquoted value

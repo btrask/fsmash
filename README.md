@@ -48,6 +48,7 @@ MySQL database configuration
 2. Create some `channels` and add them to `publicChannels`
 3. Add `matchTypes`, `rules`, and `soundsets`
 4. Configure your account as an `administrator`
+5. Install node-mysql using `npm install mysql`
 
 Installing node-crypt
 ---------------------
