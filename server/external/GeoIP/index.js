@@ -142,7 +142,7 @@ var GeoIP = function(path) {
 			position++;
 		};
 		var readString = function() {
-			var string = "", prefix;
+			var string = "", prefix, char;
 			while((char = buf[position++])) {
 				if(char & (1 << 8)) {
 					prefix = 0xc2;
