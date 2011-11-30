@@ -213,8 +213,8 @@ var User = function(session, userID) {
 				user.request("/remember/", {}, function(result) {
 					DOM.input.enable(acctElems.remember, true);
 					if(!result) return;
-					cookie.set("userName", user.info.userName, 14);
-					cookie.set("userToken", result.token, 14);
+					cookie.set("userName", user.info.userName, 30);
+					cookie.set("userToken", result.token, 30);
 					acctElems.remember.value = "Forget Me";
 				});
 			}

@@ -38,7 +38,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 		document.onmouseup = function() {
 			document.onmousemove = null;
 			document.onmouseup = null;
-			if(undefined !== newWidth) cookie.set("SidebarWidth", newWidth);
+			if(undefined !== newWidth) cookie.set("SidebarWidth", newWidth, 365);
 			return false;
 		};
 		return false;
