@@ -28,7 +28,7 @@ var MIMEForExtension = function(ext, charset) {
 	if(charset && "text/" === type.slice(0, 5)) type += "; charset=" + charset;
 	return type;
 };
-var writeError = function(status, message, res) {
+var writeError = function(req, res, status, message) {
 	var msg = new Buffer("" + status + " " + message, "utf8");
 	res.writeHead(status, {
 		"Content-Type": "text/plain; charset=UTF-8",
@@ -51,7 +51,7 @@ wrapper.createServer = function(dispatcher, unknown/* (req, res, filename) */) {
 				if("function" === typeof result) result(req, res, filename);
 				else wrapper.writeJSON(req, res, result);
 			} catch(err) {
-				writeError(500, "Internal Server Error", res);
+				writeError(req, res, 500, "Internal Server Error");
 				util.log(err.stack);
 			}
 		});
@@ -108,7 +108,7 @@ wrapper.createFileHandler = function(rootdir) {
 				res.writeHead(cache.status, cache.header);
 				res.end(cache.body, cache.encoding);
 			} else {
-				writeError(404, "File Not Found", res);
+				writeError(req, res, 404, "File Not Found");
 			}
 		};
 		if(null === pendingLookups) lookup();
