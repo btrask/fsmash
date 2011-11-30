@@ -28,14 +28,6 @@ var MIMEForExtension = function(ext, charset) {
 	if(charset && "text/" === type.slice(0, 5)) type += "; charset=" + charset;
 	return type;
 };
-var writeError = function(req, res, status, message) {
-	var msg = new Buffer("" + status + " " + message, "utf8");
-	res.writeHead(status, {
-		"Content-Type": "text/plain; charset=UTF-8",
-		"Content-Length": msg.length,
-	});
-	res.end(msg);
-};
 
 wrapper.createServer = function(dispatcher, unknown/* (req, res, filename) */) {
 	return http.createServer(function(req, res) {
@@ -51,7 +43,7 @@ wrapper.createServer = function(dispatcher, unknown/* (req, res, filename) */) {
 				if("function" === typeof result) result(req, res, filename);
 				else wrapper.writeJSON(req, res, result);
 			} catch(err) {
-				writeError(req, res, 500, "Internal Server Error");
+				wrapper.writeError(req, res, 500, "Internal Server Error");
 				util.log(err.stack);
 			}
 		});
@@ -105,10 +97,9 @@ wrapper.createFileHandler = function(rootdir) {
 		var lookup = function() {
 			if(cacheByDisplayName.hasOwnProperty(filename)) {
 				var cache = cacheByDisplayName[filename];
-				res.writeHead(cache.status, cache.header);
-				res.end(cache.body, cache.encoding);
+				wrapper.write(req, res, cache.status, cache.header, cache.body, cache.encoding);
 			} else {
-				writeError(req, res, 404, "File Not Found");
+				wrapper.writeError(req, res, 404, "File Not Found");
 			}
 		};
 		if(null === pendingLookups) lookup();
@@ -128,12 +119,23 @@ wrapper.createFileHandler = function(rootdir) {
 	fileHandler.rescan();
 	return fileHandler;
 };
+
+wrapper.write = function(req, res, status, header, body, encoding) {
+	res.writeHead(status, header);
+	if("HEAD" === req.method) res.end();
+	else res.end(body, encoding);
+};
 wrapper.writeJSON = function(req, res, value) {
-	var body = new Buffer(JSON.stringify(value/*, undefined, "\t"*/) || "", "utf8");
-	if(!body) body = "";
-	res.writeHead(200, {
+	var body = new Buffer(JSON.stringify(value/*, undefined, "\t"*/) || "", "utf8") || new Buffer("");
+	wrapper.write(req, res, 200, {
 		"Content-Type": "text/json; charset=UTF-8",
 		"Content-Length": body.length,
-	});
-	res.end(body);
+	}, body);
+};
+wrapper.writeError = function(req, res, status, message) {
+	var msg = new Buffer("" + status + " " + message, "utf8");
+	wrapper.write(req, res, status, {
+		"Content-Type": "text/plain; charset=UTF-8",
+		"Content-Length": msg.length,
+	}, msg);
 };
