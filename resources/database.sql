@@ -1,14 +1,5 @@
 SET SQL_MODE="NO_AUTO_VALUE_ON_ZERO";
-
---
--- Database: `fsmash`
---
-
--- --------------------------------------------------------
-
---
--- Table structure for table `administrators`
---
+SET time_zone = "+00:00";
 
 CREATE TABLE `administrators` (
   `administratorID` int(11) NOT NULL auto_increment,
@@ -17,12 +8,6 @@ CREATE TABLE `administrators` (
   PRIMARY KEY  (`administratorID`),
   UNIQUE KEY `userID` (`administratorUserID`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
-
--- --------------------------------------------------------
-
---
--- Table structure for table `bannedIPs`
---
 
 CREATE TABLE `bannedIPs` (
   `bannedIPID` int(11) NOT NULL auto_increment,
@@ -36,12 +21,6 @@ CREATE TABLE `bannedIPs` (
   KEY `maxIPAddress` (`maxIPAddress`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
--- --------------------------------------------------------
-
---
--- Table structure for table `bannedSessions`
---
-
 CREATE TABLE `bannedSessions` (
   `bannedSessionID` int(11) NOT NULL auto_increment,
   `sessionID` int(11) NOT NULL,
@@ -54,12 +33,6 @@ CREATE TABLE `bannedSessions` (
   KEY `modUserID` (`modUserID`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
--- --------------------------------------------------------
-
---
--- Table structure for table `censoredMessages`
---
-
 CREATE TABLE `censoredMessages` (
   `censoredMessageID` int(11) NOT NULL auto_increment,
   `modUserID` int(11) NOT NULL,
@@ -70,12 +43,6 @@ CREATE TABLE `censoredMessages` (
   PRIMARY KEY  (`censoredMessageID`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
--- --------------------------------------------------------
-
---
--- Table structure for table `channelAncestors`
---
-
 CREATE TABLE `channelAncestors` (
   `channelAncestorID` int(11) NOT NULL auto_increment,
   `channelID` int(11) NOT NULL,
@@ -83,12 +50,6 @@ CREATE TABLE `channelAncestors` (
   PRIMARY KEY  (`channelAncestorID`),
   UNIQUE KEY `channelID` (`channelID`,`ancestorID`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
-
--- --------------------------------------------------------
-
---
--- Table structure for table `channelMembers`
---
 
 CREATE TABLE `channelMembers` (
   `channelMemberID` int(11) NOT NULL auto_increment,
@@ -102,12 +63,6 @@ CREATE TABLE `channelMembers` (
   KEY `invitedByUserID` (`invitedByUserID`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
--- --------------------------------------------------------
-
---
--- Table structure for table `channelModerators`
---
-
 CREATE TABLE `channelModerators` (
   `channelModeratorID` int(11) NOT NULL auto_increment,
   `channelID` int(11) NOT NULL,
@@ -116,12 +71,6 @@ CREATE TABLE `channelModerators` (
   PRIMARY KEY  (`channelModeratorID`),
   UNIQUE KEY `channelID` (`channelID`,`moderatorUserID`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
-
--- --------------------------------------------------------
-
---
--- Table structure for table `channels`
---
 
 CREATE TABLE `channels` (
   `channelID` int(11) NOT NULL auto_increment,
@@ -133,24 +82,12 @@ CREATE TABLE `channels` (
   PRIMARY KEY  (`channelID`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
--- --------------------------------------------------------
-
---
--- Table structure for table `donationAttempts`
---
-
 CREATE TABLE `donationAttempts` (
   `donationAttemptID` int(11) NOT NULL auto_increment,
   `query` text collate utf8_unicode_ci NOT NULL,
   `attemptTime` timestamp NOT NULL default CURRENT_TIMESTAMP,
   PRIMARY KEY  (`donationAttemptID`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
-
--- --------------------------------------------------------
-
---
--- Table structure for table `donations`
---
 
 CREATE TABLE `donations` (
   `donationID` int(11) NOT NULL auto_increment,
@@ -165,12 +102,6 @@ CREATE TABLE `donations` (
   KEY `expireTime` (`expireTime`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
--- --------------------------------------------------------
-
---
--- Table structure for table `games`
---
-
 CREATE TABLE `games` (
   `gameID` int(11) NOT NULL auto_increment,
   `channelID` int(11) NOT NULL,
@@ -179,12 +110,6 @@ CREATE TABLE `games` (
   PRIMARY KEY  (`gameID`),
   UNIQUE KEY `channelID` (`channelID`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
-
--- --------------------------------------------------------
-
---
--- Table structure for table `httpRequests`
---
 
 CREATE TABLE `httpRequests` (
   `requestID` int(11) NOT NULL auto_increment,
@@ -199,12 +124,6 @@ CREATE TABLE `httpRequests` (
   KEY `filename` (`filename`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
--- --------------------------------------------------------
-
---
--- Table structure for table `ignores`
---
-
 CREATE TABLE `ignores` (
   `ignoreID` int(11) NOT NULL auto_increment,
   `userID` int(11) NOT NULL,
@@ -213,12 +132,6 @@ CREATE TABLE `ignores` (
   PRIMARY KEY  (`ignoreID`),
   UNIQUE KEY `userID` (`userID`,`ignoredUserID`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
-
--- --------------------------------------------------------
-
---
--- Table structure for table `matchTypes`
---
 
 CREATE TABLE `matchTypes` (
   `matchTypeID` int(11) NOT NULL auto_increment,
@@ -229,12 +142,6 @@ CREATE TABLE `matchTypes` (
   PRIMARY KEY  (`matchTypeID`),
   UNIQUE KEY `sortOrder` (`sortOrder`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
-
--- --------------------------------------------------------
-
---
--- Table structure for table `profiles`
---
 
 CREATE TABLE `profiles` (
   `userProfileID` int(11) NOT NULL auto_increment,
@@ -247,12 +154,6 @@ CREATE TABLE `profiles` (
   UNIQUE KEY `userID` (`userID`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
--- --------------------------------------------------------
-
---
--- Table structure for table `publicChannels`
---
-
 CREATE TABLE `publicChannels` (
   `publicChannelID` int(11) NOT NULL auto_increment,
   `channelID` int(11) NOT NULL,
@@ -262,12 +163,6 @@ CREATE TABLE `publicChannels` (
   UNIQUE KEY `channelID` (`channelID`),
   UNIQUE KEY `sortOrder` (`sortOrder`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
-
--- --------------------------------------------------------
-
---
--- Table structure for table `rankings`
---
 
 CREATE TABLE `rankings` (
   `rankingID` int(11) NOT NULL auto_increment,
@@ -279,12 +174,6 @@ CREATE TABLE `rankings` (
   UNIQUE KEY `userID` (`userID`),
   KEY `totalPoints` (`totalPoints`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
-
--- --------------------------------------------------------
-
---
--- Table structure for table `ratings`
---
 
 CREATE TABLE `ratings` (
   `ratingID` int(11) NOT NULL auto_increment,
@@ -300,12 +189,6 @@ CREATE TABLE `ratings` (
   KEY `isContradicted` (`isContradicted`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
--- --------------------------------------------------------
-
---
--- Table structure for table `reportMessages`
---
-
 CREATE TABLE `reportMessages` (
   `reportMessageID` int(11) NOT NULL auto_increment,
   `reportID` int(11) NOT NULL,
@@ -316,12 +199,6 @@ CREATE TABLE `reportMessages` (
   KEY `reportID` (`reportID`),
   KEY `messageUserID` (`messageUserID`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
-
--- --------------------------------------------------------
-
---
--- Table structure for table `reports`
---
 
 CREATE TABLE `reports` (
   `reportID` int(11) NOT NULL auto_increment,
@@ -336,12 +213,6 @@ CREATE TABLE `reports` (
   KEY `reportTime` (`reportTime`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
--- --------------------------------------------------------
-
---
--- Table structure for table `rules`
---
-
 CREATE TABLE `rules` (
   `ruleID` int(11) NOT NULL auto_increment,
   `label` varchar(255) collate utf8_unicode_ci NOT NULL,
@@ -349,12 +220,6 @@ CREATE TABLE `rules` (
   PRIMARY KEY  (`ruleID`),
   UNIQUE KEY `sortOrder` (`sortOrder`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
-
--- --------------------------------------------------------
-
---
--- Table structure for table `sessions`
---
 
 CREATE TABLE `sessions` (
   `sessionID` int(11) NOT NULL auto_increment,
@@ -366,12 +231,6 @@ CREATE TABLE `sessions` (
   KEY `ipAddress` (`ipAddress`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
--- --------------------------------------------------------
-
---
--- Table structure for table `settings`
---
-
 CREATE TABLE `settings` (
   `settingsID` int(11) NOT NULL auto_increment,
   `userID` int(11) NOT NULL,
@@ -380,12 +239,6 @@ CREATE TABLE `settings` (
   PRIMARY KEY  (`settingsID`),
   UNIQUE KEY `userID` (`userID`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
-
--- --------------------------------------------------------
-
---
--- Table structure for table `soundsets`
---
 
 CREATE TABLE `soundsets` (
   `soundsetID` int(11) NOT NULL auto_increment,
@@ -400,12 +253,6 @@ CREATE TABLE `soundsets` (
   UNIQUE KEY `sortOrder` (`sortOrder`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
--- --------------------------------------------------------
-
---
--- Table structure for table `tokens`
---
-
 CREATE TABLE `tokens` (
   `tokenID` int(11) NOT NULL auto_increment,
   `userID` int(11) NOT NULL,
@@ -414,12 +261,6 @@ CREATE TABLE `tokens` (
   UNIQUE KEY `userID` (`userID`),
   KEY `token` (`token`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
-
--- --------------------------------------------------------
-
---
--- Table structure for table `users`
---
 
 CREATE TABLE `users` (
   `userID` int(11) NOT NULL auto_increment,
@@ -430,12 +271,6 @@ CREATE TABLE `users` (
   PRIMARY KEY  (`userID`),
   UNIQUE KEY `name` (`userName`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
-
--- --------------------------------------------------------
-
---
--- Table structure for table `videos`
---
 
 CREATE TABLE `videos` (
   `videoID` int(11) NOT NULL auto_increment,
@@ -448,12 +283,6 @@ CREATE TABLE `videos` (
   KEY `submitTime` (`submitTime`),
   KEY `deleteTime` (`deleteTime`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
-
--- --------------------------------------------------------
-
---
--- Table structure for table `whitelist`
---
 
 CREATE TABLE `whitelist` (
   `whitelistID` int(11) NOT NULL auto_increment,
