@@ -14,7 +14,6 @@ You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 var wrapper = exports;
 
-var constants = require("constants");
 var fs = require("fs");
 var http = require("http");
 var path = require("path");
@@ -64,7 +63,7 @@ wrapper.createFileHandler = function(rootdir) {
 	var scandir = function(dirname, callback) {
 		fs.readdir(dirname, function(err, filenames) {
 			if(err) {
-				if(err.errno != constants.ENOTDIR) return callback();
+				if("ENOTDIR" != err.code) return callback();
 				return scanfile(dirname, callback);
 			}
 			(function recurseOverFilenames(i) {
