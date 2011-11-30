@@ -29,15 +29,16 @@ var MIMEForExtension = function(ext, charset) {
 	if(charset && "text/" === type.slice(0, 5)) type += "; charset=" + charset;
 	return type;
 };
-var writeError = function(status, message, write/* (status, header, data, encoding) */) {
+var writeError = function(status, message, res) {
 	var msg = new Buffer("" + status + " " + message, "utf8");
-	write(status, {
+	res.writeHead(status, {
 		"Content-Type": "text/plain; charset=UTF-8",
 		"Content-Length": msg.length,
-	}, msg);
+	});
+	res.end(msg);
 };
 
-wrapper.createServer = function(dispatcher, unknownHandler/* (req, filename, write (status, header, data, encoding)) */) {
+wrapper.createServer = function(dispatcher, unknown/* (req, res, filename) */) {
 	return http.createServer(function(req, res) {
 		var data = "";
 		req.setEncoding("utf8");
@@ -46,19 +47,12 @@ wrapper.createServer = function(dispatcher, unknownHandler/* (req, filename, wri
 		});
 		req.addListener("end", function() {
 			var filename = url.parse(req.url).pathname;
-			var write = function(status, header, data, encoding) {
-				res.writeHead(status, header);
-				res.end(data, encoding);
-			};
-			var unknown = function(req, res, filename) {
-				return unknownHandler(req, filename, write);
-			};
 			try {
 				var result = dispatcher(unknown, bt.components(filename), req, data);
 				if("function" === typeof result) result(req, res, filename);
 				else wrapper.writeJSON(req, res, result);
 			} catch(err) {
-				writeError(500, "Internal Server Error", write);
+				writeError(500, "Internal Server Error", ress);
 				util.log(err.stack);
 			}
 		});
@@ -107,14 +101,15 @@ wrapper.createFileHandler = function(rootdir) {
 			callback();
 		});
 	};
-	var fileHandler = function(req, filename, write/* (status, header, data, encoding) */) {
+	var fileHandler = function(req, res, filename) {
 		if("/" === filename[filename.length - 1]) filename += "index.html";
 		var lookup = function() {
 			if(cacheByDisplayName.hasOwnProperty(filename)) {
 				var cache = cacheByDisplayName[filename];
-				write(cache.status, cache.header, cache.body, cache.encoding);
+				res.writeHead(cache.status, cache.header);
+				res.end(cache.body, cache.encoding);
 			} else {
-				writeError(404, "File Not Found", write);
+				writeError(404, "File Not Found", res);
 			}
 		};
 		if(null === pendingLookups) lookup();
