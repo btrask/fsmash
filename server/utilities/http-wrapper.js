@@ -51,7 +51,7 @@ wrapper.createServer = function(dispatcher, unknown/* (req, res, filename) */) {
 				if("function" === typeof result) result(req, res, filename);
 				else wrapper.writeJSON(req, res, result);
 			} catch(err) {
-				writeError(500, "Internal Server Error", ress);
+				writeError(500, "Internal Server Error", res);
 				util.log(err.stack);
 			}
 		});
