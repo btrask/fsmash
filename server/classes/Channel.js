@@ -28,7 +28,7 @@ var Channel = function(parentID, channelID) {
 	var channel = this;
 
 	Channel.byID[channelID] = channel;
-	Channel.count.active++;
+	Channel.count++;
 	channel.info = {
 		channelID: channelID,
 		parentID: parentID,
@@ -122,18 +122,20 @@ var Channel = function(parentID, channelID) {
 		});
 	};
 	channel.uncache = function() {
-		if(channel.parent) (function forgetSubchannels(c) {
+		var isBaseChannel = !channel.parent;
+		var canUncache = !isBaseChannel;
+		if(canUncache) (function forgetSubchannels(c) {
 			bt.map(c.subchannelByID, forgetSubchannels);
+			c.memberByUserID = {};
+			c.privateGroup.objects = [];
 			delete Channel.byID[c.info.channelID];
-			Channel.count.active--;
+			Channel.count--;
 		})(channel);
 	};
 	channel.autosaveLimit = bt.limit(config.Channel.autosave.rate);
 };
 Channel.byID = {};
 Channel.public = {byID: {}};
-Channel.count = {
-	active: 0,
-};
+Channel.count = 0;
 
 module.exports = Channel;
