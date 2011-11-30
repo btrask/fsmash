@@ -64,9 +64,6 @@ wrapper.createServer = function(dispatcher, unknownHandler/* (req, filename, wri
 		});
 	});
 };
-wrapper.createClient = function(arg1, arg2, etc) {
-	return http.createClient.apply(http, arguments);
-};
 wrapper.createFileHandler = function(rootdir) {
 	var pendingLookups = null;
 	var cacheByDisplayName = {};
