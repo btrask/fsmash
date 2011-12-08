@@ -22,10 +22,7 @@
 			"timeout": 604800000
 		},
 		"autosave": {
-			"rate": {
-				"rise": 1,
-				"run": 10000
-			}
+			"delay": 10000
 		}
 	}
 }

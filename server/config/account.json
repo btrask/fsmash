@@ -1,8 +1,8 @@
 {
 	"signin": {
 		"rate": {
-			"rise": 10,
-			"run": 300000
+			"rise": 60,
+			"run": 21600000
 		}
 	},
 	"signup": {

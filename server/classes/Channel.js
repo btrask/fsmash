@@ -132,7 +132,6 @@ var Channel = function(parentID, channelID) {
 			Channel.count--;
 		})(channel);
 	};
-	channel.autosaveLimit = bt.limit(config.Channel.autosave.rate);
 };
 Channel.byID = {};
 Channel.public = {byID: {}};

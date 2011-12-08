@@ -14,6 +14,7 @@ You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 var bt = require("../../shared/bt");
 var config = require("../config/");
+var limiter = require("../external/limiter");
 
 var Group = require("./Group");
 
@@ -30,10 +31,10 @@ var User = function(session, userID) {
 	user.ignoringByUserID = {};
 	user.broadcastCount = 0;
 
-	user.messageLimit = bt.limit(config.User.message.rate);
-	user.inviteLimit = bt.limit(config.User.invite.rate);
-	user.channelLimit = bt.limit(config.User.channel.rate);
-	user.videoLimit = bt.limit(config.User.video.rate);
+	user.messageLimit = limiter.throttle(config.User.message.rate);
+	user.inviteLimit = limiter.throttle(config.User.invite.rate);
+	user.channelLimit = limiter.throttle(config.User.channel.rate);
+	user.videoLimit = limiter.throttle(config.User.video.rate);
 
 	session.user = user;
 	session.constructor.byUserID[user.info.userID] = session;

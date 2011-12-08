@@ -67,21 +67,6 @@ bt.dispatch = function(leaf/* (args...) */, branch/* (func, args...) */, lookup/
 		return unknown;
 	};
 };
-bt.limit = function(rate/* {rise, run} */, onzero, onlimit) {
-	var count = 0;
-	return function bump(ondecrease, onincrease) {
-		if(count > rate.rise) return true;
-		count++;
-		if(onincrease) onincrease();
-		if(count > rate.rise && onlimit) onlimit();
-		setTimeout(function() {
-			count--;
-			if(ondecrease) ondecrease();
-			if(!count && onzero) onzero();
-		}, rate.run);
-		return count > rate.rise;
-	};
-};
 
 bt.map = function(obj, callback/* (value, key, obj) */) {
 	var result, i, key, value;

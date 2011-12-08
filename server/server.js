@@ -21,6 +21,7 @@ var url = require("url");
 var util = require("util");
 
 var GeoIP = require("./external/GeoIP/");
+var limiter = require("./external/limiter");
 
 var crypt = require("./utilities/crypt-wrapper");
 var crypto = require("./utilities/crypto-wrapper");
@@ -235,7 +236,7 @@ root.api.session.user = bt.dispatch(function(query, session) {
 		var signin = function() {
 			if(query.remoteAddress) {
 				if(!signinLimitForIP.hasOwnProperty(query.remoteAddress)) {
-					signinLimitForIP[query.remoteAddress] = bt.limit(config.signin.rate, function() {
+					signinLimitForIP[query.remoteAddress] = limiter.throttle(config.signin.rate, true, function onClear() {
 						delete signinLimitForIP[query.remoteAddress];
 					});
 				}
@@ -787,12 +788,14 @@ root.api.session.user.channel.message = bt.dispatch(function(query, session, use
 	if(!text.length) return {error: "Message text has zero length (whitespace trimmed)"};
 	return session.promise(function(ticket) {
 		channel.sendMessage(user, text, ticket);
-		channel.autosaveLimit(function() {
+		// TODO: channel.autosave should be defined when the channel is created, but 1. the channel itself doesn't have access to the DB, and 2. channels are instantiated from several places.
+		if(!channel.autosave) channel.autosave = limiter.batch(function() {
 			db.query(
 				"UPDATE channels SET historyJSON = $ WHERE channelID = $ LIMIT 1",
 				[JSON.stringify(channel.history), channel.info.channelID]
 			);
-		});
+		}, config.Channel.autosave.delay);
+		channel.autosave();
 	});
 });
 root.api.session.user.channel.leave = bt.dispatch(function(query, session, user, channel) {

@@ -8,26 +8,26 @@
 		},
 		"message": {
 			"rate": {
-				"rise": 4,
-				"run": 20000
+				"rise": 30,
+				"run": 1800000
 			}
 		},
 		"invite": {
 			"rate": {
-				"rise": 4,
-				"run": 240000
+				"rise": 60,
+				"run": 3600000
 			}
 		},
 		"channel": {
 			"rate": {
-				"rise": 3,
-				"run": 30000
+				"rise": 20,
+				"run": 3600000
 			}
 		},
 		"video": {
 			"rate": {
-				"rise": 5,
-				"run": 600000
+				"rise": 20,
+				"run": 3600000
 			}
 		}
 	}
