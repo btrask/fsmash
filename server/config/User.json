@@ -9,7 +9,7 @@
 		"message": {
 			"rate": {
 				"rise": 30,
-				"run": 1800000
+				"run": 600000
 			}
 		},
 		"invite": {
