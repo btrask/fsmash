@@ -21,8 +21,9 @@ wrapper.hash = function(password, prefix, count, input) {
 wrapper.check = function(password, hash) {
 	return crypt.crypt(password, hash) === hash;
 };
-wrapper.randomString = function(length) {
-	var str = "";
-	while(str.length < length) str += Math.random().toString(36).slice(2);
-	return str.substring(0, length);
+wrapper.randomString = function(length, charset) {
+	var chars = [], i;
+	charset = charset || "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_";
+	for(i = 0; i < length; ++i) chars.push(charset[Math.floor(Math.random() * charset.length)]);
+	return chars.join("");
 };
