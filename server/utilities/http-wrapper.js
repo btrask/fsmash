@@ -39,7 +39,7 @@ wrapper.createServer = function(dispatcher, unknown/* (req, res, filename) */) {
 		req.addListener("end", function() {
 			var filename = url.parse(req.url).pathname;
 			try {
-				var result = dispatcher(unknown, bt.components(filename), req, data);
+				var result = dispatcher(unknown, bt.components(filename), req, res, data);
 				if("function" === typeof result) result(req, res, filename);
 				else wrapper.writeJSON(req, res, result);
 			} catch(err) {

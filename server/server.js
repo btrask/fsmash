@@ -171,7 +171,7 @@ var updateRankings = function() {
 setInterval(updateRankings, config.rankings.update.interval);
 
 var root = bt.dispatch();
-root.api = bt.dispatch(null, function(func, req, data) {
+root.api = bt.dispatch(null, function(func, req, res, data) {
 	var query = bt.union((data ? JSON.parse(data) : {}), {remoteAddress: remoteAddressOfRequest(req)});
 	return func(query);
 });
@@ -1032,7 +1032,7 @@ root.api.session.videos = bt.dispatch(function(query, session) {
 	});
 });
 
-root.paypal = bt.dispatch(function(req, data) {
+root.paypal = bt.dispatch(function(req, res, data) {
 	db.query(
 		"INSERT INTO donationAttempts (query)"+
 		" VALUES ($)",
