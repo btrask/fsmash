@@ -121,6 +121,12 @@ var Channel = function(parentID, channelID) {
 			broadcastingSubchannel.sendInfoToTarget(target, false);
 		});
 	};
+	channel.isCompletelyIgnoringUser = function(user) {
+		for(var memberUserID in channel.memberByUserID) if(channel.memberByUserID.hasOwnProperty(memberUserID)) {
+			if(!channel.memberByUserID[memberUserID].ignoringByUserID[user.info.userID]) return false;
+		}
+		return true;
+	};
 	channel.uncache = function() {
 		var isBaseChannel = !channel.parent;
 		var canUncache = !isBaseChannel;

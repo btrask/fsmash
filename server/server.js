@@ -985,6 +985,7 @@ root.api.session.user.broadcastChannel = bt.dispatch(null, function(func, query,
 });
 root.api.session.user.broadcastChannel.application = bt.dispatch(function(query, session, user, channel, game) {
 	if(user.channelLimit()) return false;
+	if(channel.isCompletelyIgnoringUser(user)) return false;
 	return session.promise(function(ticket) {
 		game.applicantByUserID[user.info.userID] = user;
 		channel.group.sendEvent("/user/channel/game/broadcast/application/", {channelID: channel.info.channelID, applicantUserID: user.info.userID, time: new Date().getTime()}, ticket);
