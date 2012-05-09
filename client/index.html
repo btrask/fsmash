@@ -1,343 +1,321 @@
-<!DOCTYPE HTML>
-<html>
-	<head>
-		<meta charset="utf-8">
-		<title>Brawl Faux Finder @ fsmash.org</title>
-		<meta name="apple-mobile-web-app-capable" content="yes">
-		<meta name="format-detection" content="telephone=no">
-		<meta name="apple-mobile-web-app-status-bar-style" content="default">
-		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no">
+<!doctype html>
+<meta charset="utf-8">
+<title>Brawl Faux Finder @ fsmash.org</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="format-detection" content="telephone=no">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no">
 
-		<style type="text/css">.invisible{display:none;}</style>
-		<link rel="stylesheet" href="styles/base/index.css" type="text/css">
-		<link title="Dark" data-style-id="2" rel="alternate stylesheet" href="styles/dark/index.css" type="text/css">
-		<link title="Greenscreen" data-style-id="3" rel="alternate stylesheet" href="styles/greenscreen/index.css" type="text/css">
-	</head>
-	<body>
-		<div id="audio"></div>
-		<div id="body" class="absolute full invisible notAdministrator">
-			<div id="sidebar" class="absolute scroll"></div>
-			<div id="main" class="absolute">
-			</div>
-			<div id="resizer" class="absolute">
-				<div class="line absolute"></div>
-			</div>
-			<div id="modal"></div>
-			<div id="connectionError" class="panel absolute padding invisible"><a href=".">Connection error</a></div>
-		</div>
-		<noscript class="absolute center"><a href="http://www.google.com/search?q=enable+javascript" rel="nofollow" target="_blank">This site requires JavaScript</a></noscript>
-		<div class="storage invisible">
-			<!-- These items are loaded using DOM.clone(). -->
+<style type="text/css">.invisible{display:none;}</style>
+<link rel="stylesheet" href="styles/base/index.css" type="text/css">
+<link title="Dark" data-style-id="2" rel="alternate stylesheet" href="styles/dark/index.css" type="text/css">
+<link title="Greenscreen" data-style-id="3" rel="alternate stylesheet" href="styles/greenscreen/index.css" type="text/css">
 
-			<a id="anchor" target="_blank"></a>
-			<input id="button" type="button" class="button" value="(unset)">
-			<div id="loading" class="loading absolute"></div>
+<div id="audio"></div>
+<div id="body" class="absolute full invisible notAdministrator">
+	<div id="sidebar" class="absolute scroll"></div>
+	<div id="main" class="absolute">
+	</div>
+	<div id="resizer" class="absolute">
+		<div class="line absolute"></div>
+	</div>
+	<div id="modal"></div>
+	<div id="connectionError" class="panel absolute padding invisible"><a href=".">Connection error</a></div>
+</div>
+<noscript class="absolute center"><a href="http://www.google.com/search?q=enable+javascript" rel="nofollow" target="_blank">This site requires JavaScript</a></noscript>
+<div class="storage invisible">
+	<!-- These items are loaded using DOM.clone(). -->
 
-			<ul id="sidebarList">
-			</ul>
-			<ul class="storage">
-				<li id="sidebarItem">
-					<div class="nowrap row" data-id="row">
-						<div class="counter floatRight" data-id="counter"></div>
-						<div class="title" data-id="title"></div>
-					</div>
-					<ul data-id="children"></ul>
-				</li>
-			</ul>
+	<a id="anchor" target="_blank"></a>
+	<input id="button" type="button" class="button" value="(unset)">
+	<div id="loading" class="loading absolute"></div>
 
-			<div id="videos" class="videos absolute full">
-				<div class="submit panel absolute invisible" data-id="submitPane">
-					<div class="wrapper absolute"><input type="text" class="text padding" title="YouTube Video URL" data-id="videoURL"></div>
-					<input type="button" class="button absolute" value="Submit Video" data-id="submit">
-				</div>
-				<div class="content absolute scroll">
-					<div data-id="videos"></div>
-					<div class="center padding"><input type="button" class="button padding" value="Show More" data-id="more"></div>
-				</div>
-			</div>
-			<div id="video" class="video padding">
-				<img src="thumbnail.gif" alt="Thumbnail" width="120" class="floatLeft" data-id="thumbnail">
-				<div class="padding">
-					<div class="title nowrap"><a target="_blank" data-id="anchor">Loading video…</a></div>
-					<div class="nowrap"><b>Duration:</b> <span data-id="duration">--:--</span></div>
-					<div class="nowrap"><b>Uploaded by:</b> <a target="_blank" data-id="uploaderName">Loading…</a></div>
-					<div class="nowrap"><b>Upload date:</b> <span data-id="uploadDate">Loading…</span></div>
-					<div class="nowrap"><b>Submitted by:</b> <span data-id="submitterName"></span></div>
-				</div>
-			</div>
-
-			<div id="about" class="about static absolute full scroll">
-				<div class="header">About</div>
-				<p>This website, <i>fsmash.org</i>, is a simple Wi-Fi friend finder for the game Super Smash Bros. Brawl.</p>
-				<div class="header">Links</div>
-				<ol>
-					<li><a href="http://www.smashboards.com/showthread.php?t=208726" target="_blank">Smash World Forums thread + how-to</a></li>
-					<li><a href="http://www.smashboards.com/group.php?groupid=1056" target="_blank">Smash World Forums group</a></li>
-					<li><a href="http://allisbrawl.com/group.aspx?id=7485" target="_blank">All is Brawl group</a></li>
-					<li><a href="http://www.smashmods.com/" target="_blank">Smash Mods</a></li>
-				</ol>
-				<div class="header">Rules</div>
-				<ol>
-					<li>Be friendly and welcoming to new members.</li>
-					<li>Keep discussions on topic for the channel you are in.</li>
-					<li>Limit one account per person and per IP address (unless you get special permission).</li>
-					<li>Don’t try to cheat the rating system.</li>
-					<li>Don’t ask your opponents to rate you after you play. (Asking before you play is fine.)</li>
-					<li>Don’t spam.</li>
-				</ol>
-				<p>I’m trying to keep this list as minimal as possible. Don’t make me expand it.</p>
-				<p>Trolling is allowed as long as it follows the other rules. However, trolling new members is only allowed in limited moderation. Please don't tell them to leave or direct them to other sites.</p>
-				<p><b>If you believe someone has broken the rules</b>, please press the Report… button in the channel where it happened. No action will be taken immediately, but the last 50 messages in the channel will be saved for review. Please don’t abuse this feature.</p>
-				<p>If you submit a video that isn’t related to Brawl (or one that’s really bad), it will probably get deleted. No machinima.</p>
-				<p>If you need a second user account for a legitimate reason (e.g. for a sibling), please contact me.</p>
-				<div class="header">Bans</div>
-				<p>All bans are permanent by default. However, if you believe you were unjustly banned, please contact me on SWF with a full explanation.</p>
-				<p>If you repeatedly violate the rules in a specific channel, you may be kicked or permanently blocked from that channel.</p>
-				<p>Proxies are not allowed. You may be banned for using one. If you have a legitimate reason for needing one, please contact me.</p>
-				<div class="header">Legal Information</div>
-				<p>Messages and account information are the property of the User.</p>
-				<p>All characters appearing on this site are fictitious. Any resemblance to real persons, living or dead, is purely coincidental.</p>
-				<p>Minors should use this site with parent approval/supervision.</p>
-				<p>This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License.</p>
-				<p><a rel="nofollow" href="http://github.com/btrask/fsmash" target="_blank">Source code</a></p>
-			</div>
-
-			<div id="subscribe" class="subscribe static absolute full scroll">
-				<div class="subscriber panel overflow invisible" data-id="subscriberPane">
-					<div>Name color in chat: <input data-id="color" type="text" class="text" value="" size="10" maxlength="7"> (hexadecimal, like #ff0000)</div>
-					<div>Your subscription will run out on <span data-id="expireTime">(not subscribed)</span>.</div>
-				</div>
-				<div class="header">Subscribe</div>
-				<p>This website has an ongoing cost of time and money to run. In order to keep the quality of the site high, please consider contributing.</p>
-				<p>I've put together a new subscription system. A $4 donation earns a 3 month subscription. You can donate any amount you wish <strong>($4 minimum)</strong>, with a proportional subscription length.</p>
-				<form name="paypalSubscribe" action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_blank">
-					<input type="hidden" name="cmd" value="_s-xclick">
-					<input type="hidden" name="hosted_button_id" value="KFKZNUEBV6PJ8">
-					<input type="hidden" name="currency_code" value="USD">
-					<input type="hidden" name="custom" value="" data-id="custom">
-					<input type="image" src="https://www.paypal.com/en_US/i/btn/btn_donateCC_LG.gif" border="0" name="submit" alt="PayPal">
-					<img alt="" border="0" src="https://www.paypal.com/en_US/i/scr/pixel.gif" width="1" height="1">
-				</form>
-				<p><strong>Thank you!</strong> to everyone who helps out. <span class="signature nowrap">--Ben</span></p>
-				<div class="header">Benefits</div>
-				<div>
-					<p>Subscribers are thanked with the "Subscriber" title, and may choose a custom color for their name in chat messages, in addition to a small <span class="subscriber demo">icon</span> that is also added for them.</p>
-					<p>Subscribers may ask to have their usernames changed. Name changes will be granted infrequently (about once per year per person) and on a case-by-case basis. Usernames will no longer be changed for non-subscribers.</p>
-					<p>In the future, subscribers will be able to host tournaments using online bracket software that is currently in development. (This feature is not yet complete and subject to change.)</p>
-				</div>
-				<div class="header">Fine Print</div>
-				<div class="light">
-					<p>Subscribing does not grant any special rights or privileges. You must still follow all of the site rules. If you are banned, your subscription fee will not be refunded.</p>
-					<p>If you have donated at any time in the past, your donation will automatically be credited at a rate of $5/mo. If you donated, but for some reason you weren’t credited, please contact me.</p>
-					<p>The <strong>minimum donation</strong> is $4. Smaller amounts are appreciated, but will not earn subscriber status.</p>
-				</div>
-			</div>
-
-			<div id="authenticate" class="authenticate absolute">
-				<div class="step">
-					<div class="label center absolute">1</div>
-					<div class="content userNameAndPassword absolute">
-						<div class="name field">
-							<label class="absolute right">Name:</label>
-							<input class="text padding absolute" type="text" data-id="userNameField">
-						</div>
-						<div class="pass field">
-							<label class="absolute right">Password:</label>
-							<input class="text padding absolute" type="password" data-id="passwordField">
-						</div>
-					</div>
-				</div>
-				<div class="step">
-					<div class="label center absolute">2</div>
-					<div class="content signinOrSignup center absolute">
-						<input type="button" class="button signin" value="Sign In" data-id="signinButton">
-						or
-						<input type="button" class="button signup" value="Sign Up" data-id="signupButton">
-					</div>
-				</div>
-				<div class="error center" data-id="error"></div>
-			</div>
-
-			<div id="account" class="account absolute full scroll">
-				<div class="profile panel wrap overflow">
-					<div class="line">
-						<div class="bio wrapper"><input type="text" class="text padding" maxlength="141" title="Player Bio" data-id="bio"></div>
-					</div>
-					<div class="line alignTop overflow">
-						<input type="text" class="brawlName text padding" maxlength="5" title="Name" data-id="brawlName"><input type="text" class="friendCode text padding" maxlength="14" title="Friend Code" data-id="friendCode"><select class="style" title="Style"><optgroup label="Style" data-id="styles"><option>Default</option></optgroup></select><select class="sound" title="Soundset"><optgroup label="Soundset" data-id="soundsets"><option>Default</option></optgroup></select><input type="button" class="button padding password" value="Change Password" data-id="password"><input type="button" class="button padding remember" data-id="remember"><input type="button" class="button padding signout" value="Sign Out" data-id="signout">
-					</div>
-				</div>
-				<div class="header">Channels</div>
-				<div class="channels" data-id="publicChannels"></div>
-			</div>
-			<div id="publicChannel" class="channel padding overflow">
-				<div class="commands floatRight"><input type="button" class="padding button" value="Join" data-id="join"></div>
-				<b data-id="title"></b>
-				<div class="padding light" data-id="description"></div>
-			</div>
-
-			<div id="channel" class="channel">
-				<div class="commands panel absolute">
-					<table class="table">
-						<tbody>
-							<tr>
-								<td><input type="button" class="button" value="New Game" data-id="newGame"></td>
-								<td><input type="button" class="button" value="New Discussion…" data-id="newDiscussion"></td>
-								<td><input type="button" class="button" value="Leave Channel…" data-id="leave"></td>
-							</tr>
-						</tbody>
-					</table>
-					<table class="table tabs">
-						<tbody>
-							<tr>
-								<td><input type="button" class="button" value="Info" data-id="info"></td>
-								<td><input type="button" class="button" value="Chat" data-id="chat"></td>
-							</tr>
-						</tbody>
-					</table>
-				</div>
-				<div class="content absolute" data-id="content"></div>
-			</div>
-
-			<div id="info" class="info absolute full scroll">
-				<div class="panels" data-id="panels">
-					<div class="administrator panel wrap administratorOnly" data-id="administrator">
-						<div class="line">
-							<input type="button" class="button padding" value="Empty…" data-id="empty">
-						</div>
-					</div>
-				</div>
-				<div class="groups" data-id="groups"></div>
-			</div>
-			<div id="game" class="game panel">
-				<table class="table settings">
-					<tbody>
-						<tr>
-							<td><select title="Match Type"><optgroup label="Match Type" data-id="matchType"></optgroup></select></td>
-							<td><select title="Rules"><optgroup label="Rules" data-id="rule"></optgroup></select></td>
-							<td><select title="Players needed"><optgroup label="Players needed" data-id="playersNeeded"></optgroup></select></td>
-						</tr>
-					</tbody>
-				</table>
-				<table class="table commands">
-					<tbody>
-						<tr>
-							<td><input type="button" class="button padding" value="" data-id="action"></td>
-							<td><input type="button" class="button padding" value="" data-id="cancel"></td>
-						</tr>
-					</tbody>
-				</table>
-			</div>
-			<div id="group" class="group">
-				<div class="header" data-id="title"></div>
-				<div class="children" data-id="children"></div>
-			</div>
-			<div id="person" class="person padding clear overflow">
-				<div class="commands floatRight" data-id="commands"></div>
-				<div class="title" data-id="title"></div>
-				<div class="light padding">
-					<div data-id="brawlInfo"><strong>Brawl Info:</strong> <span data-id="brawlInfoContent"></span></div>
-					<div data-id="bio"></div>
-				</div>
-			</div>
-
-			<div id="chat" class="chat absolute full">
-				<div class="content absolute scroll" data-id="scrollBox">
-					<div class="messages padding" data-id="messages"></div>
-					<div class="announcements" data-id="announcements"></div>
-				</div>
-				<input class="button absolute report" type="button" value="Report…" data-id="report">
-				<input class="button absolute clear" type="button" value="Clear…" data-id="clear">
-				<div class="input panel absolute">
-					<div class="wrapper absolute"><input class="text padding" type="text" maxlength="400" data-id="input"></div>
-					<input class="button send absolute" type="button" value="Send" data-id="send">
-				</div>
-			</div>
-			<div id="message" class="message hover">
-				<span class="light">(<span data-id="date"></span>) <span class="name offline" data-id="name"></span>: </span><span class="messageText" data-id="text"></span> <span class="censor moderatorOnly hoverOnly inline" data-id="censor">X</span>
-			</div>
-			<div id="notification" class="center">
-				<span data-id="message"></span><span class="light"> (<span data-id="date"></span>)</span>
-			</div>
-			<div id="history" class="history"></div>
-			<div id="announcement" class="announcement notice overflow padding">
-				<div class="commands floatRight">
-					<input type="button" class="button padding" value="Details" data-id="details"><input type="button" class="button padding" value="Hide" data-id="hide">
-				</div>
+	<ul id="sidebarList">
+	</ul>
+	<ul class="storage">
+		<li id="sidebarItem">
+			<div class="nowrap row" data-id="row">
+				<div class="counter floatRight" data-id="counter"></div>
 				<div class="title" data-id="title"></div>
 			</div>
+			<ul data-id="children"></ul>
+	</ul>
 
-			<div id="administrator" class="absolute full scroll administrator">
-				<div class="panel wrap alignTop">
-					<div class="line">
-						<input type="button" class="button padding" data-id="signupAllowed">
-					</div>
-					<div class="line">
-						<input type="button" class="button padding" value="Update files" data-id="updateFiles"><input type="button" class="button padding" value="Update config" data-id="updateConfig"><input type="button" class="button padding" value="Update database" data-id="updateDatabase"><input type="button" class="button padding" value="Update rankings" data-id="updateRankings"><input type="button" class="button padding" value="Update channel ancestors" data-id="updateChannelAncestors">
-					</div>
-				</div>
-				<div class="header">Statistics</div>
-				<div class="padding">
-					<input type="button" class="button padding" value="Update statistics" data-id="updateStatistics">
-					<pre data-id="statistics"></pre>
-				</div>
-				<div class="header">Reports</div>
-				<div class="padding">
-					<pre data-id="reports"></pre>
-				</div>
-				<div class="header">Censored Messages</div>
-				<div class="padding">
-					<pre data-id="censored"></pre>
-				</div>
-			</div>
-
-			<div id="discussion" class="absolute full shield discussion">
-				<div class="absolute padding content">
-					<label class="absolute padding right">Topic:</label>
-					<input type="text" class="text padding absolute" data-id="topic">
-					<input type="button" class="button padding absolute" data-id="confirm">
-				</div>
-			</div>
-			<div id="rating" class="absolute full shield rating">
-				<div class="absolute padding content">
-					<div class="center nowrap title" data-id="title"></div>
-					<input type="button" class="button" value="I won almost every game" data-id="up">
-					<input type="button" class="button" value="I won a lot of games" data-id="neutral">
-					<input type="button" class="button" value="I won a few games" data-id="down">
-					<input type="button" class="button cancel" value="Cancel" data-id="cancel">
-				</div>
-			</div>
-			<div id="password" class="absolute full shield password">
-				<div class="absolute padding content">
-					<div class="title center" data-id="title"></div>
-					<div class="step">
-						<div class="line">
-							<label class="padding right absolute">Old password:</label>
-							<input type="password" class="text padding absolute" data-id="oldPassword">
-						</div>
-					</div>
-					<div class="step">
-						<div class="line">
-							<label class="padding right absolute">New password:</label>
-							<input type="password" class="text padding absolute" data-id="newPassword1">
-						</div>
-						<div class="line">
-							<label class="padding right absolute">Confirm:</label>
-							<input type="password" class="text padding absolute" data-id="newPassword2">
-						</div>
-					</div>
-					<div class="step">
-						<div class="line">
-							<input type="button" class="button absolute" value="Save" data-id="save">
-						</div>
-						<div class="line">
-							<input type="button" class="button cancel absolute" value="Cancel" data-id="cancel">
-						</div>
-					</div>
-				</div>
-			</div>
-
+	<div id="videos" class="videos absolute full">
+		<div class="submit panel absolute invisible" data-id="submitPane">
+			<div class="wrapper absolute"><input type="text" class="text padding" title="YouTube Video URL" data-id="videoURL"></div>
+			<input type="button" class="button absolute" value="Submit Video" data-id="submit">
 		</div>
-		<script type="text/javascript" src="compiled.js" charset="utf-8"></script>
-	</body>
-</html>
+		<div class="content absolute scroll">
+			<div data-id="videos"></div>
+			<div class="center padding"><input type="button" class="button padding" value="Show More" data-id="more"></div>
+		</div>
+	</div>
+	<div id="video" class="video padding">
+		<img src="thumbnail.gif" alt="Thumbnail" width="120" class="floatLeft" data-id="thumbnail">
+		<div class="padding">
+			<div class="title nowrap"><a target="_blank" data-id="anchor">Loading video…</a></div>
+			<div class="nowrap"><b>Duration:</b> <span data-id="duration">--:--</span></div>
+			<div class="nowrap"><b>Uploaded by:</b> <a target="_blank" data-id="uploaderName">Loading…</a></div>
+			<div class="nowrap"><b>Upload date:</b> <span data-id="uploadDate">Loading…</span></div>
+			<div class="nowrap"><b>Submitted by:</b> <span data-id="submitterName"></span></div>
+		</div>
+	</div>
+
+	<div id="about" class="about static absolute full scroll">
+		<div class="header">About</div>
+		<p>This website, <i>fsmash.org</i>, is a simple Wi-Fi friend finder for the game Super Smash Bros. Brawl.</p>
+		<div class="header">Links</div>
+		<ol>
+			<li><a href="http://www.smashboards.com/showthread.php?t=208726" target="_blank">Smash World Forums thread + how-to</a>
+			<li><a href="http://www.smashboards.com/group.php?groupid=1056" target="_blank">Smash World Forums group</a>
+			<li><a href="http://allisbrawl.com/group.aspx?id=7485" target="_blank">All is Brawl group</a>
+			<li><a href="http://www.smashmods.com/" target="_blank">Smash Mods</a>
+		</ol>
+		<div class="header">Rules</div>
+		<ol>
+			<li>Be friendly and welcoming to new members.
+			<li>Keep discussions on topic for the channel you are in.
+			<li>Limit one account per person and per IP address (unless you get special permission).
+			<li>Don’t try to cheat the rating system.
+			<li>Don’t ask your opponents to rate you after you play. (Asking before you play is fine.)
+			<li>Don’t spam.
+		</ol>
+		<p>I’m trying to keep this list as minimal as possible. Don’t make me expand it.</p>
+		<p>Trolling is allowed as long as it follows the other rules. However, trolling new members is only allowed in limited moderation. Please don't tell them to leave or direct them to other sites.</p>
+		<p><b>If you believe someone has broken the rules</b>, please press the Report… button in the channel where it happened. No action will be taken immediately, but the last 50 messages in the channel will be saved for review. Please don’t abuse this feature.</p>
+		<p>If you submit a video that isn’t related to Brawl (or one that’s really bad), it will probably get deleted. No machinima.</p>
+		<p>If you need a second user account for a legitimate reason (e.g. for a sibling), please contact me.</p>
+		<div class="header">Bans</div>
+		<p>All bans are permanent by default. However, if you believe you were unjustly banned, please contact me on SWF with a full explanation.</p>
+		<p>If you repeatedly violate the rules in a specific channel, you may be kicked or permanently blocked from that channel.</p>
+		<p>Proxies are not allowed. You may be banned for using one. If you have a legitimate reason for needing one, please contact me.</p>
+		<div class="header">Legal Information</div>
+		<p>Messages and account information are the property of the User.</p>
+		<p>All characters appearing on this site are fictitious. Any resemblance to real persons, living or dead, is purely coincidental.</p>
+		<p>Minors should use this site with parent approval/supervision.</p>
+		<p>This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License.</p>
+		<p><a rel="nofollow" href="http://github.com/btrask/fsmash" target="_blank">Source code</a></p>
+	</div>
+
+	<div id="subscribe" class="subscribe static absolute full scroll">
+		<div class="subscriber panel overflow invisible" data-id="subscriberPane">
+			<div>Name color in chat: <input data-id="color" type="text" class="text" value="" size="10" maxlength="7"> (hexadecimal, like #ff0000)</div>
+			<div>Your subscription will run out on <span data-id="expireTime">(not subscribed)</span>.</div>
+		</div>
+		<div class="header">Subscribe</div>
+		<p>This website has an ongoing cost of time and money to run. In order to keep the quality of the site high, please consider contributing.</p>
+		<p>I've put together a new subscription system. A $4 donation earns a 3 month subscription. You can donate any amount you wish <strong>($4 minimum)</strong>, with a proportional subscription length.</p>
+		<form name="paypalSubscribe" action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_blank">
+			<input type="hidden" name="cmd" value="_s-xclick">
+			<input type="hidden" name="hosted_button_id" value="KFKZNUEBV6PJ8">
+			<input type="hidden" name="currency_code" value="USD">
+			<input type="hidden" name="custom" value="" data-id="custom">
+			<input type="image" src="https://www.paypal.com/en_US/i/btn/btn_donateCC_LG.gif" name="submit" alt="PayPal">
+			<img alt="" src="https://www.paypal.com/en_US/i/scr/pixel.gif" width="1" height="1">
+		</form>
+		<p><strong>Thank you!</strong> to everyone who helps out. <span class="signature nowrap">--Ben</span></p>
+		<div class="header">Benefits</div>
+		<div>
+			<p>Subscribers are thanked with the "Subscriber" title, and may choose a custom color for their name in chat messages, in addition to a small <span class="subscriber demo">icon</span> that is also added for them.</p>
+			<p>Subscribers may ask to have their usernames changed. Name changes will be granted infrequently (about once per year per person) and on a case-by-case basis. Usernames will no longer be changed for non-subscribers.</p>
+			<p>In the future, subscribers will be able to host tournaments using online bracket software that is currently in development. (This feature is not yet complete and subject to change.)</p>
+		</div>
+		<div class="header">Fine Print</div>
+		<div class="light">
+			<p>Subscribing does not grant any special rights or privileges. You must still follow all of the site rules. If you are banned, your subscription fee will not be refunded.</p>
+			<p>If you have donated at any time in the past, your donation will automatically be credited at a rate of $5/mo. If you donated, but for some reason you weren’t credited, please contact me.</p>
+			<p>The <strong>minimum donation</strong> is $4. Smaller amounts are appreciated, but will not earn subscriber status.</p>
+		</div>
+	</div>
+
+	<div id="authenticate" class="authenticate absolute">
+		<div class="step">
+			<div class="label center absolute">1</div>
+			<div class="content userNameAndPassword absolute">
+				<div class="name field">
+					<label class="absolute right">Name:</label>
+					<input class="text padding absolute" type="text" data-id="userNameField">
+				</div>
+				<div class="pass field">
+					<label class="absolute right">Password:</label>
+					<input class="text padding absolute" type="password" data-id="passwordField">
+				</div>
+			</div>
+		</div>
+		<div class="step">
+			<div class="label center absolute">2</div>
+			<div class="content signinOrSignup center absolute">
+				<input type="button" class="button signin" value="Sign In" data-id="signinButton">
+				or
+				<input type="button" class="button signup" value="Sign Up" data-id="signupButton">
+			</div>
+		</div>
+		<div class="error center" data-id="error"></div>
+	</div>
+
+	<div id="account" class="account absolute full scroll">
+		<div class="profile panel wrap overflow">
+			<div class="line">
+				<div class="bio wrapper"><input type="text" class="text padding" maxlength="141" title="Player Bio" data-id="bio"></div>
+			</div>
+			<div class="line alignTop overflow">
+				<input type="text" class="brawlName text padding" maxlength="5" title="Name" data-id="brawlName"><input type="text" class="friendCode text padding" maxlength="14" title="Friend Code" data-id="friendCode"><select class="style" title="Style"><optgroup label="Style" data-id="styles"><option>Default</option></optgroup></select><select class="sound" title="Soundset"><optgroup label="Soundset" data-id="soundsets"><option>Default</option></optgroup></select><input type="button" class="button padding password" value="Change Password" data-id="password"><input type="button" class="button padding remember" data-id="remember"><input type="button" class="button padding signout" value="Sign Out" data-id="signout">
+			</div>
+		</div>
+		<div class="header">Channels</div>
+		<div class="channels" data-id="publicChannels"></div>
+	</div>
+	<div id="publicChannel" class="channel padding overflow">
+		<div class="commands floatRight"><input type="button" class="padding button" value="Join" data-id="join"></div>
+		<b data-id="title"></b>
+		<div class="padding light" data-id="description"></div>
+	</div>
+
+	<div id="channel" class="channel">
+		<div class="commands panel absolute">
+			<table class="table"><tr>
+				<td><input type="button" class="button" value="New Game" data-id="newGame">
+				<td><input type="button" class="button" value="New Discussion…" data-id="newDiscussion">
+				<td><input type="button" class="button" value="Leave Channel…" data-id="leave">
+			</table>
+			<table class="table tabs"><tr>
+				<td><input type="button" class="button" value="Info" data-id="info">
+				<td><input type="button" class="button" value="Chat" data-id="chat">
+			</table>
+		</div>
+		<div class="content absolute" data-id="content"></div>
+	</div>
+
+	<div id="info" class="info absolute full scroll">
+		<div class="panels" data-id="panels">
+			<div class="administrator panel wrap administratorOnly" data-id="administrator">
+				<div class="line">
+					<input type="button" class="button padding" value="Empty…" data-id="empty">
+				</div>
+			</div>
+		</div>
+		<div class="groups" data-id="groups"></div>
+	</div>
+	<div id="game" class="game panel">
+		<table class="table settings"><tr>
+			<td><select title="Match Type"><optgroup label="Match Type" data-id="matchType"></optgroup></select>
+			<td><select title="Rules"><optgroup label="Rules" data-id="rule"></optgroup></select>
+			<td><select title="Players needed"><optgroup label="Players needed" data-id="playersNeeded"></optgroup></select>
+		</table>
+		<table class="table commands"><tr>
+			<td><input type="button" class="button padding" value="" data-id="action">
+			<td><input type="button" class="button padding" value="" data-id="cancel">
+		</table>
+	</div>
+	<div id="group" class="group">
+		<div class="header" data-id="title"></div>
+		<div class="children" data-id="children"></div>
+	</div>
+	<div id="person" class="person padding clear overflow">
+		<div class="commands floatRight" data-id="commands"></div>
+		<div class="title" data-id="title"></div>
+		<div class="light padding">
+			<div data-id="brawlInfo"><strong>Brawl Info:</strong> <span data-id="brawlInfoContent"></span></div>
+			<div data-id="bio"></div>
+		</div>
+	</div>
+
+	<div id="chat" class="chat absolute full">
+		<div class="content absolute scroll" data-id="scrollBox">
+			<div class="messages padding" data-id="messages"></div>
+			<div class="announcements" data-id="announcements"></div>
+		</div>
+		<input class="button absolute report" type="button" value="Report…" data-id="report">
+		<input class="button absolute clear" type="button" value="Clear…" data-id="clear">
+		<div class="input panel absolute">
+			<div class="wrapper absolute"><input class="text padding" type="text" maxlength="400" data-id="input"></div>
+			<input class="button send absolute" type="button" value="Send" data-id="send">
+		</div>
+	</div>
+	<div id="message" class="message hover">
+		<span class="light">(<span data-id="date"></span>) <span class="name offline" data-id="name"></span>: </span><span class="messageText" data-id="text"></span> <span class="censor moderatorOnly hoverOnly inline" data-id="censor">X</span>
+	</div>
+	<div id="notification" class="center">
+		<span data-id="message"></span><span class="light"> (<span data-id="date"></span>)</span>
+	</div>
+	<div id="history" class="history"></div>
+	<div id="announcement" class="announcement notice overflow padding">
+		<div class="commands floatRight">
+			<input type="button" class="button padding" value="Details" data-id="details"><input type="button" class="button padding" value="Hide" data-id="hide">
+		</div>
+		<div class="title" data-id="title"></div>
+	</div>
+
+	<div id="administrator" class="absolute full scroll administrator">
+		<div class="panel wrap alignTop">
+			<div class="line">
+				<input type="button" class="button padding" data-id="signupAllowed">
+			</div>
+			<div class="line">
+				<input type="button" class="button padding" value="Update files" data-id="updateFiles"><input type="button" class="button padding" value="Update config" data-id="updateConfig"><input type="button" class="button padding" value="Update database" data-id="updateDatabase"><input type="button" class="button padding" value="Update rankings" data-id="updateRankings"><input type="button" class="button padding" value="Update channel ancestors" data-id="updateChannelAncestors">
+			</div>
+		</div>
+		<div class="header">Statistics</div>
+		<div class="padding">
+			<input type="button" class="button padding" value="Update statistics" data-id="updateStatistics">
+			<pre data-id="statistics"></pre>
+		</div>
+		<div class="header">Reports</div>
+		<div class="padding">
+			<pre data-id="reports"></pre>
+		</div>
+		<div class="header">Censored Messages</div>
+		<div class="padding">
+			<pre data-id="censored"></pre>
+		</div>
+	</div>
+
+	<div id="discussion" class="absolute full shield discussion">
+		<div class="absolute padding content">
+			<label class="absolute padding right">Topic:</label>
+			<input type="text" class="text padding absolute" data-id="topic">
+			<input type="button" class="button padding absolute" data-id="confirm">
+		</div>
+	</div>
+	<div id="rating" class="absolute full shield rating">
+		<div class="absolute padding content">
+			<div class="center nowrap title" data-id="title"></div>
+			<input type="button" class="button" value="I won almost every game" data-id="up">
+			<input type="button" class="button" value="I won a lot of games" data-id="neutral">
+			<input type="button" class="button" value="I won a few games" data-id="down">
+			<input type="button" class="button cancel" value="Cancel" data-id="cancel">
+		</div>
+	</div>
+	<div id="password" class="absolute full shield password">
+		<div class="absolute padding content">
+			<div class="title center" data-id="title"></div>
+			<div class="step">
+				<div class="line">
+					<label class="padding right absolute">Old password:</label>
+					<input type="password" class="text padding absolute" data-id="oldPassword">
+				</div>
+			</div>
+			<div class="step">
+				<div class="line">
+					<label class="padding right absolute">New password:</label>
+					<input type="password" class="text padding absolute" data-id="newPassword1">
+				</div>
+				<div class="line">
+					<label class="padding right absolute">Confirm:</label>
+					<input type="password" class="text padding absolute" data-id="newPassword2">
+				</div>
+			</div>
+			<div class="step">
+				<div class="line">
+					<input type="button" class="button absolute" value="Save" data-id="save">
+				</div>
+				<div class="line">
+					<input type="button" class="button cancel absolute" value="Cancel" data-id="cancel">
+				</div>
+			</div>
+		</div>
+	</div>
+
+</div>
+<script type="text/javascript" src="compiled.js" charset="utf-8"></script>
