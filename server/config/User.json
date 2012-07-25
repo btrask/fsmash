@@ -8,8 +8,8 @@
 		},
 		"message": {
 			"rate": {
-				"rise": 30,
-				"run": 600000
+				"rise": 60,
+				"run": 900000
 			}
 		},
 		"invite": {

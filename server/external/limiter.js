@@ -17,7 +17,8 @@ var limiter = exports;
 limiter.throttle = function(rate, penalize, onClear, onLimit) {
 	var attempts = [], timeout = null;
 	var minimum = function(index) {
-		return rate.run * Math.pow((index + 1) / rate.rise, 3);
+//		return rate.run * Math.pow((index + 1) / rate.rise, 3);
+		return Math.max(0, (rate.run / rate.rise) * (index - 4));
 	};
 	var bump = function(now) {
 		attempts.unshift(now);
@@ -27,13 +28,13 @@ limiter.throttle = function(rate, penalize, onClear, onLimit) {
 			timeout = null;
 			attempts = [];
 			if(onClear) onClear();
-		}, minimum(rate.rise - 1));
+		}, minimum(rate.rise));
 	};
 	return function() {
 		var now = new Date().getTime(), age, i;
 		for(i = 0; i < attempts.length; ++i) {
 			age = now - attempts[i];
-			if(age >= minimum(i)) continue;
+			if(age >= minimum(i + 1)) continue;
 			if(penalize) bump(now);
 			if(onLimit) onLimit();
 			return true;
