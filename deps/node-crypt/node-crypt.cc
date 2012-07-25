@@ -22,6 +22,7 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #include <node.h>
+#include <v8.h>
 
 extern "C" {
 #include "crypt_blowfish-1.0.4/ow-crypt.h"
@@ -29,7 +30,7 @@ extern "C" {
 
 using namespace v8;
 
-static Handle<Value> BTCrypt(const Arguments& args) {
+Handle<Value> BTCrypt(const Arguments& args) {
 	HandleScope scope;
 	if(2 != args.Length()) return ThrowException(Exception::Error(String::New("Expected args key, setting")));
 	if(!args[0]->IsString()) return ThrowException(Exception::Error(String::New("Arg key is not a string")));
@@ -39,7 +40,7 @@ static Handle<Value> BTCrypt(const Arguments& args) {
 	char *const result = crypt(*key, *setting);
 	return scope.Close(result ? String::New(result) : Null());
 }
-static Handle<Value> BTGensalt(const Arguments& args) {
+Handle<Value> BTGensalt(const Arguments& args) {
 	HandleScope scope;
 	if(3 != args.Length()) return ThrowException(Exception::Error(String::New("Expected args prefix, count, input")));
 	if(!args[0]->IsString()) return ThrowException(Exception::Error(String::New("Arg prefix is not a string")));
@@ -54,12 +55,12 @@ static Handle<Value> BTGensalt(const Arguments& args) {
 	return scope.Close(result ? String::New(result) : Null());
 }
 
-extern "C" void init(Handle<Object> target) 
+void BTInitialize(Handle<Object> target) 
 {
-	HandleScope scope;
-	NODE_SET_METHOD(target, "crypt", BTCrypt);
-	NODE_SET_METHOD(target, "gensalt", BTGensalt);
+	target->Set(String::NewSymbol("crypt"), FunctionTemplate::New(BTCrypt)->GetFunction());
+	target->Set(String::NewSymbol("gensalt"), FunctionTemplate::New(BTGensalt)->GetFunction());
 	target->Set(String::NewSymbol("BLOWFISH"), String::New("$2a$"));
 	target->Set(String::NewSymbol("MD5"), String::New("$1$"));
 	target->Set(String::NewSymbol("EXTENDED"), String::New("_"));
 }
+NODE_MODULE(crypt, BTInitialize)
