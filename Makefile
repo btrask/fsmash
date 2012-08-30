@@ -30,7 +30,7 @@ public: public/robots.txt public/favicon.ico public/thumbnail.gif public/index.h
 
 public/compiled.js: $(CLIENT_SCRIPTS)
 	-mkdir -p $(dir $@)
-	java -jar deps/compiler-latest/compiler.jar $(addprefix --js=,$+) --js_output_file=$@ #--compilation_level WHITESPACE_ONLY --formatting PRETTY_PRINT
+	java -jar deps/compiler-latest/compiler.jar $(addprefix --js=,$+) --js_output_file=$@ --language_in=ECMASCRIPT5 #--compilation_level WHITESPACE_ONLY --formatting PRETTY_PRINT
 
 public/styles/base/index.css: $(addprefix client/styles/base/,$(STYLE_BASE_COMPONENTS))
 	-mkdir -p $(dir $@)
