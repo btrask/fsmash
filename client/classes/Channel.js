@@ -129,7 +129,7 @@ var Channel = function(session, user, channelID, parentID) {
 		};
 		var inviteAction = function(validate, item) {
 			if(validate) {
-				this.value = "Invite";
+				this.value = "Add";
 				return channel.userIsMember && item.person !== user.person;
 			}
 			channel.request("/invite/", {invitedUserID: item.person.info.userID});
