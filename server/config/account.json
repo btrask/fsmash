@@ -2,7 +2,7 @@
 	"signin": {
 		"rate": {
 			"rise": 60,
-			"run": 21600000
+			"run": 90000
 		}
 	},
 	"signup": {
