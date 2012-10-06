@@ -86,15 +86,7 @@ var remoteAddressOfRequest = function(req) {
 	return "127.0.0.1" === remoteAddress ? null : remoteAddress;
 };
 var fileHandler = (function() {
-	var handler = http.createFileHandler(__dirname+"/../public");
-	var wrapper = function(req, res, filename) {
-		db.query("INSERT INTO httpRequests (ipAddress, filename, header, referer, userAgent) VALUES (INET_ATON($), $, $, $, $)", [remoteAddressOfRequest(req), filename, JSON.stringify(req.headers), req.headers.referer || null, req.headers["user-agent"] || null]);
-		return handler(req, res, filename);
-	};
-	wrapper.rescan = function() {
-		handler.rescan();
-	};
-	return wrapper;
+	return http.createFileHandler(__dirname+"/../public");
 })();
 var configureSessions = (function configureSessions() {
 	db.query(
