@@ -16,7 +16,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 var assert = require("assert");
 var fs = require("fs");
 var https = require("https");
-var querystring = require("querystring");
 var url = require("url");
 var util = require("util");
 
@@ -27,6 +26,7 @@ var crypt = require("./utilities/crypt-wrapper");
 var crypto = require("./utilities/crypto-wrapper");
 var http = require("./utilities/http-wrapper");
 var mysql = require("./utilities/mysql-wrapper");
+var paypal = require("./utilities/paypal");
 
 var bt = require("../shared/bt");
 var brawl = require("../shared/brawl");
@@ -1033,74 +1033,44 @@ root.paypal = bt.dispatch(function(req, res, data) {
 		" VALUES ($)",
 		[data]
 	);
-	var outgoing = new Buffer("cmd=_notify-validate&" + data, "utf8");
-	var options = {
-		port: 443,
-		host: config.PayPal.host,
-		path: "/cgi-bin/webscr",
-		method: "POST",
-		headers: {
-			"content-length": outgoing.length,
-		},
-	};
-	var req = https.request(options, function(res) {
-		var confirm = "";
-		if(200 != res.statusCode) return;
-		res.setEncoding("utf8");
-		res.addListener("data", function(chunk) {
-			confirm += chunk;
-		});
-		res.addListener("end", function() {
-			function verify(good, unknown) {
-				for(var prop in good) if(good.hasOwnProperty(prop)) {
-					if(good[prop] != unknown[prop]) return false;
-				}
-				return true;
+	paypal.verify(true, data, function(err, query) {
+		if(err) return;
+		if(!query) return;
+		if(!paypal.verifyAttributes(query, config.PayPal.verify)) return;
+		var custom = JSON.parse(query["custom"]);
+		var userID = parseInt(custom.userID, 10);
+		if(!userID) return;
+		var pennies = paypal.pennies(query["mc_gross"] || query["mc_gross_1"]);
+		if(config.PayPal.payment.pennies.min > pennies) return;
+		if(config.PayPal.payment.pennies.max < pennies) return;
+		if("Completed" != query["payment_status"]) return;
+		// We shouldn't need to check the txn_type as long as the other conditions are met.
+		db.query(
+			"SELECT UNIX_TIMESTAMP(expireTime) * 1000 expireTime"+
+			" FROM donations WHERE userID = $ AND expireTime > NOW()"+
+			" ORDER BY expireTime DESC LIMIT 1",
+			[userID],
+			function(err, donationsResult) {
+				var startTime = donationsResult.length ? mysql.rows(donationsResult)[0].expireTime : new Date().getTime();
+				var additional = Math.ceil((((pennies / 4) * 3) * (1000 * 60 * 60 * 24 * (365.242199 / 12))) / 100);
+				db.query(
+					"INSERT IGNORE INTO donations (userID, payerID, transactionID, pennies, startTime, expireTime)"+
+					" VALUES ($, $, $, $, FROM_UNIXTIME($ / 1000), DATE_SUB(FROM_UNIXTIME($ / 1000), INTERVAL ($ / -1000) SECOND))",
+					[userID, query["payer_id"], query["txn_id"], pennies, startTime, startTime, additional],
+					function(err, donationResult) {
+						if(err && 1062 === err.number) return;
+						if(err) throw err;
+						if(!Session.byUserID.hasOwnProperty(userID)) return;
+						var user = Session.byUserID[userID].user;
+						if(user.info.subscriber) return;
+						user.info.subscriber = true;
+						Group.users.sendEvent("/user/person/", user.info);
+						user.sendEvent("/user/subscription/", {expireTime: startTime + additional});
+					}
+				);
 			}
-			function parsePennies(string) {
-				var match = /(\d+)\.(\d{2})/.exec(string);
-				if(!match) return 0;
-				return parseInt(match[1], 10) * 100 + parseInt(match[2], 10);
-			}
-			if("VERIFIED" != confirm) return;
-			var query = querystring.parse(data);
-			var custom = JSON.parse(query["custom"]);
-			var userID = parseInt(custom.userID, 10);
-			if(!userID) return;
-			if(!verify(config.PayPal.verify, query)) return;
-			var pennies = parsePennies(query["mc_gross"] || query["mc_gross_1"]);
-			if(config.PayPal.payment.pennies.min > pennies) return;
-			if(config.PayPal.payment.pennies.max < pennies) return;
-			if("Completed" != query["payment_status"]) return;
-			// We shouldn't need to check the txn_type as long as the other conditions are met.
-			db.query(
-				"SELECT UNIX_TIMESTAMP(expireTime) * 1000 expireTime"+
-				" FROM donations WHERE userID = $ AND expireTime > NOW()"+
-				" ORDER BY expireTime DESC LIMIT 1",
-				[userID],
-				function(err, donationsResult) {
-					var startTime = donationsResult.length ? mysql.rows(donationsResult)[0].expireTime : new Date().getTime();
-					var additional = Math.ceil((((pennies / 4) * 3) * (1000 * 60 * 60 * 24 * (365.242199 / 12))) / 100);
-					db.query(
-						"INSERT IGNORE INTO donations (userID, payerID, transactionID, pennies, startTime, expireTime)"+
-						" VALUES ($, $, $, $, FROM_UNIXTIME($ / 1000), DATE_SUB(FROM_UNIXTIME($ / 1000), INTERVAL ($ / -1000) SECOND))",
-						[userID, query["payer_id"], query["txn_id"], pennies, startTime, startTime, additional],
-						function(err, donationResult) {
-							if(err && 1062 === err.number) return;
-							if(err) throw err;
-							if(!Session.byUserID.hasOwnProperty(userID)) return;
-							var user = Session.byUserID[userID].user;
-							if(user.info.subscriber) return;
-							user.info.subscriber = true;
-							Group.users.sendEvent("/user/person/", user.info);
-							user.sendEvent("/user/subscription/", {expireTime: startTime + additional});
-						}
-					);
-				}
-			);
-		});
+		);
 	});
-	req.end(outgoing);
 });
 
 http.createServer(root, fileHandler).listen(config.server.port, config.server.host);
