@@ -236,7 +236,7 @@ var Channel = function(session, user, channelID, parentID) {
 		if(channel.userIsMember && body.time) {
 			channel.alert("join");
 			if(user.personByUserID.hasOwnProperty(body.invitingUserID)) invitingPerson = user.personByUserID[body.invitingUserID];
-			if(invitingPerson) channel.postNotification(member.info.userName+" was invited by "+invitingPerson.info.userName, new Date(body.time));
+			if(invitingPerson) channel.postNotification(member.info.userName+" was added by "+invitingPerson.info.userName, new Date(body.time));
 			else channel.postNotification(member.info.userName+" joined", new Date(body.time));
 		}
 	}, function(func, body) {
