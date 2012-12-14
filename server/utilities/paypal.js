@@ -16,6 +16,8 @@ var qs = require("querystring");
 var https = require("https");
 var http = require("http");
 
+var bt = require("../../shared/bt");
+
 var paypal = exports;
 paypal.verify = function(real, body, callback/* (err, attrs) */) {
 	var outgoing = new Buffer("cmd=_notify-validate&"+body, "utf8");
