@@ -53,26 +53,29 @@ util.log("Starting " + process.title);
 		"SIGFPE",
 		"SIGHUP",
 		"SIGILL",
-		"SIGINT",
-		"SIGKILL",
-		"SIGQUIT",
+//		"SIGINT",
+//		"SIGKILL",
+//		"SIGQUIT",
 		"SIGSEGV",
-		"SIGTERM",
+//		"SIGTERM",
 		"SIGUSR1",
 		"SIGUSR2",
 		"SIGCHLD",
-		"SIGCONT",
-		"SIGSTOP",
+//		"SIGCONT",
+//		"SIGSTOP",
 		"SIGTSTP",
 		"SIGTTIN",
 		"SIGTTOU",
 		"SIGBUS",
 		"SIGPOLL",
 		"SIGSYS",
-		"SIGTRAP",
+//		"SIGTRAP",
 		// Ignore SIGPROF, it is used by Crankshaft in V8.
 	];
-	for(var i = 0; i < signals.length; ++i) process.addListener(signals[i], bt.curry(util.log, signals[i]));
+	for(var i = 0; i < signals.length; ++i) {
+//		console.log(signals[i]);
+		process.addListener(signals[i], bt.curry(util.log, signals[i]));
+	}
 	process.addListener("SIGPIPE", function() {
 		// Ignore silently.
 	});
