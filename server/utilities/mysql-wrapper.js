@@ -22,7 +22,7 @@ var bt = require("../../shared/bt");
 var mysql = require("mysql");
 
 wrapper.connect = function(conf) {
-	var connection = mysql.createClient(conf);
+	var connection = mysql.createConnection(conf);
 	connection.format = function(format, params) {
 		if(!Array.isArray(params)) params = Array.prototype.slice.call(arguments, 1);
 		return format.replace(/[$#]/g, function(type) { // $: Quoted value; #: Unquoted value
