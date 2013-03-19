@@ -13,13 +13,13 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 var wrapper = exports;
-var crypt = require("crypt");
+var bcrypt = require("bcrypt");
 
 wrapper.hash = function(password, prefix, count, input) {
-	return crypt.crypt(password, crypt.gensalt((prefix || crypt.BLOWFISH), (count || 8), (input || wrapper.randomString(16))));
+	return bcrypt.hashSync(password, 8);
 };
 wrapper.check = function(password, hash) {
-	return crypt.crypt(password, hash) === hash;
+	return bcrypt.compareSync(password, hash);
 };
 wrapper.randomString = function(length, charset) {
 	var chars = [], i;
