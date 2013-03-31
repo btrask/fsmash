@@ -43,7 +43,7 @@ youtube.infoForVideoID = function(videoID, callback/* (data) */) {
 		DOM.remove(script);
 	};
 	script.type = "text/javascript";
-	script.src = "http://gdata.youtube.com/feeds/api/videos/"+encodeURIComponent(videoID)+"?v=2&alt=jsonc&callback=youtube.callbackByUniqueID["+encodeURIComponent(uniqueID)+"]";
+	script.src = "https://gdata.youtube.com/feeds/api/videos/"+encodeURIComponent(videoID)+"?v=2&alt=jsonc&callback=youtube.callbackByUniqueID["+encodeURIComponent(uniqueID)+"]";
 	document.body.appendChild(script);
 };
 youtube.anchorForVideoURL = function(url) {

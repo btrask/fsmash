@@ -61,7 +61,8 @@ var VideosPage = function(session) {
 			videoElems.anchor.href = "http://www.youtube.com/watch?v=" + videoInfo.youtubeID;
 			DOM.fill(videoElems.submitterName, videoInfo.userName);
 			youtube.infoForVideoID(videoInfo.youtubeID, function(data) {
-				videoElems.thumbnail.src = (data.thumbnail || {}).sqDefault;
+				videoElems.thumbnail.src = ((data.thumbnail || {}).sqDefault || "").
+					replace(/^http:/, "https:");
 				DOM.fill(videoElems.anchor, data.title || "Unknown video");
 				DOM.fill(videoElems.uploaderName, data.uploader || "Unknown");
 				DOM.fill(videoElems.uploadDate, data.uploaded ? youtube.parseDate(data.uploaded).toLocaleDateString() : "Unknown");

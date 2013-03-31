@@ -1077,14 +1077,26 @@ root.paypal = bt.dispatch(function(req, res, data) {
 	});
 });
 
-var listener = httpx.listener(root, fileHandler);
-http.createServer(listener).listen(config.server.port, config.server.host);
+http.createServer(function(req, res) {
+	if(config.server.secureURL) {
+		res.writeHead(301, {
+			"Location": config.server.secureURL+req.path,
+		});
+		res.end();
+	} else {
+		res.writeHead(400, "Bad Request", {
+			"Content-Type": "text/plain; charset=utf-8",
+		});
+		res.end("Bad Request", "utf8");
+	}
+}).listen(config.server.port, config.server.host);
 try {
 	var certOpts = {
 		key: fs.readFileSync(__dirname+"/../server.key"),
 		cert: fs.readFileSync(__dirname+"/../server.crt"),
 		honorCipherOrder: true,
 	};
+	var listener = httpx.listener(root, fileHandler);
 	https.createServer(certOpts, listener).listen(config.server.securePort, config.server.host);
 } catch(e) {
 	util.log("Not running HTTPS");
