@@ -13,8 +13,8 @@ Installation
 5. Install the IP geolocation database from <http://www.maxmind.com/app/geolitecity>
 6. Configure the server (see below)
 7. Configure the MySQL database (see below)
-8. Install `node-crypt` (see below)
-9. Run `./server/server.js`
+8. Run `npm install bcrypt mysql`
+9. Run `./server/index.js`
 
 Configuring the server
 ----------------------
@@ -48,14 +48,3 @@ MySQL database configuration
 2. Create some `channels` and add them to `publicChannels`
 3. Add `matchTypes`, `rules`, and `soundsets`
 4. Configure your account as an `administrator`
-5. Install node-mysql using `npm install mysql`
-
-Installing node-crypt
----------------------
-
-`node-crypt` is include with (and required for) fsmash. It is a module that adds support for password hashing using bcrypt to node. It is distinct from `node-crypto` or the node `crypto` module.
-
-1. Upload `/deps/node-crypt` to the server
-2. On the server:
-3. `cd` to the `node-crypt` directory
-4. Run `node-waf configure build install`
