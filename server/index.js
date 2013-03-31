@@ -15,6 +15,7 @@ You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 var assert = require("assert");
 var fs = require("fs");
+var http = require("http");
 var https = require("https");
 var url = require("url");
 var util = require("util");
@@ -24,7 +25,7 @@ var limiter = require("./external/limiter");
 
 var crypt = require("./utilities/crypt-wrapper");
 var crypto = require("./utilities/crypto-wrapper");
-var http = require("./utilities/http-wrapper");
+var httpx = require("./utilities/http-wrapper");
 var mysql = require("./utilities/mysql-wrapper");
 var paypal = require("./utilities/paypal");
 
@@ -89,7 +90,7 @@ var remoteAddressOfRequest = function(req) {
 	return "127.0.0.1" === remoteAddress ? null : remoteAddress;
 };
 var fileHandler = (function() {
-	return http.createFileHandler(__dirname+"/../public");
+	return httpx.createFileHandler(__dirname+"/../public");
 })();
 var configureSessions = (function configureSessions() {
 	db.query(
@@ -190,7 +191,7 @@ root.api.session.terminate = bt.dispatch(function(query, session) {
 root.api.session.watch = bt.dispatch(function(query, session) {
 	return function(req, res) {
 		session.setEventCallback(function(events) {
-			http.writeJSON(req, res, events);
+			httpx.writeJSON(req, res, events);
 		});
 	};
 });
@@ -1076,4 +1077,5 @@ root.paypal = bt.dispatch(function(req, res, data) {
 	});
 });
 
-http.createServer(root, fileHandler).listen(config.server.port, config.server.host);
+var listener = httpx.listener(root, fileHandler);
+http.createServer(listener).listen(config.server.port, config.server.host);

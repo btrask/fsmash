@@ -29,8 +29,8 @@ var MIMEForExtension = function(ext, charset) {
 	return type;
 };
 
-wrapper.createServer = function(dispatcher, unknown/* (req, res, filename) */) {
-	return http.createServer(function(req, res) {
+wrapper.listener = function(dispatcher, unknown/* (req, res, filename) */) {
+	return function(req, res) {
 		var data = "";
 		req.setEncoding("utf8");
 		req.addListener("data", function(chunk) {
@@ -47,7 +47,7 @@ wrapper.createServer = function(dispatcher, unknown/* (req, res, filename) */) {
 				util.log(err.stack);
 			}
 		});
-	});
+	};
 };
 wrapper.createFileHandler = function(rootdir) {
 	var pendingLookups = null;
