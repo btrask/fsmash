@@ -1080,7 +1080,7 @@ root.paypal = bt.dispatch(function(req, res, data) {
 http.createServer(function(req, res) {
 	if(config.server.secureURL) {
 		res.writeHead(301, {
-			"Location": config.server.secureURL+req.path,
+			"Location": config.server.secureURL+req.url,
 		});
 		res.end();
 	} else {
