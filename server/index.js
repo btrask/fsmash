@@ -1079,3 +1079,13 @@ root.paypal = bt.dispatch(function(req, res, data) {
 
 var listener = httpx.listener(root, fileHandler);
 http.createServer(listener).listen(config.server.port, config.server.host);
+try {
+	var certOpts = {
+		key: fs.readFileSync(__dirname+"/../server.key"),
+		cert: fs.readFileSync(__dirname+"/../server.crt"),
+		honorCipherOrder: true,
+	};
+	https.createServer(certOpts, listener).listen(config.server.securePort, config.server.host);
+} catch(e) {
+	util.log("Not running HTTPS");
+}

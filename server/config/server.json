@@ -1,6 +1,7 @@
 {
 	"server": {
 		"port": 80,
+		"securePort": 443,
 		"host": null,
 		"remoteAddressField": null
 	}
