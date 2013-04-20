@@ -1007,7 +1007,7 @@ root.api.session.user.video = bt.dispatch(function(query, session, user) {
 			"INSERT INTO videos (userID, youtubeID) VALUES ($, $)",
 			[user.info.userID, youtubeID],
 			function(err, result) {
-				if(err && 1062 === err.number) return user.sendEvent("/videos/", {videoError: "Duplicate video"}, ticket);
+				if(err && "ER_DUP_ENTRY" === err.code) return user.sendEvent("/videos/", {videoError: "Duplicate video"}, ticket);
 				Group.sessions.sendEvent("/videos/", {old: false, videos: [{youtubeID: youtubeID, userName: user.info.userName, time: new Date().getTime()}]}, ticket);
 			}
 		);
@@ -1062,7 +1062,7 @@ root.paypal = bt.dispatch(function(req, res, data) {
 					" VALUES ($, $, $, $, FROM_UNIXTIME($ / 1000), DATE_SUB(FROM_UNIXTIME($ / 1000), INTERVAL ($ / -1000) SECOND))",
 					[userID, query["payer_id"], query["txn_id"], pennies, startTime, startTime, additional],
 					function(err, donationResult) {
-						if(err && 1062 === err.number) return;
+						if(err && "ER_DUP_ENTRY" === err.code) return;
 						if(err) throw err;
 						if(!Session.byUserID.hasOwnProperty(userID)) return;
 						var user = Session.byUserID[userID].user;
