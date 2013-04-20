@@ -222,7 +222,7 @@ root.api.session.user = bt.dispatch(function(query, session) {
 						"INSERT INTO users (userName, passHash2) VALUES ($, $)",
 						[query.userName, crypt.hash(query.password)],
 						function(err, userResult) {
-							if(err && 1062 === err.number) return accountError("Username already in use");
+							if(err && "ER_DUP_ENTRY" === err.code) return accountError("Username already in use");
 							var userID = userResult.insertId;
 							db.query("INSERT IGNORE INTO settings (userID) VALUES ($)", [userID]);
 							loadUser(userID, query.userName);
