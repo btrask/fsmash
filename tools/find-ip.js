@@ -29,7 +29,7 @@ db.query(
 	' FROM sessions s'+
 	' LEFT JOIN users u ON (s.userID = u.userID)'+
 	' WHERE ipAddress = inet_aton(?)'+
-	' ORDER BY logins DESC LIMIT 10'
+	' ORDER BY logins DESC LIMIT 10',
 	["%"+ipAddress+"%"],
 	function(err, results) {
 		if(err) console.error(err);
