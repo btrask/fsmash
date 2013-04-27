@@ -14,7 +14,7 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 if(process.argv.length < 3) {
-	console.error("Usage: find-user <username>");
+	console.error("Usage: find-ip <ip address>");
 	process.exit();
 }
 
@@ -23,12 +23,14 @@ var mysql = require("mysql");
 var config = require("../server/config/");
 var db = mysql.createConnection(config.database);
 
-var username = process.argv[2];
+var ipAddress = process.argv[2];
 db.query(
-	'SELECT `userID`, `userName` FROM `users`'+
-	' WHERE `userName` LIKE ?'+
-	' ORDER BY `userID` DESC LIMIT 10',
-	["%"+username+"%"],
+	'SELECT s.userID, u.userName, u.registerTime, count(s.userID) logins'+
+	' FROM sessions s'+
+	' LEFT JOIN users u ON (s.userID = u.userID)'+
+	' WHERE ipAddress = inet_aton(?)'+
+	' ORDER BY logins DESC LIMIT 10'
+	["%"+ipAddress+"%"],
 	function(err, results) {
 		if(err) console.error(err);
 		console.log(results);
