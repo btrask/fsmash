@@ -28,9 +28,9 @@ db.query(
 	'SELECT s.userID, u.userName, u.registerTime, count(s.userID) logins'+
 	' FROM sessions s'+
 	' LEFT JOIN users u ON (s.userID = u.userID)'+
-	' WHERE ipAddress = inet_aton(?)'+
+	' WHERE ipAddress = INET_ATON(?)'+
 	' ORDER BY logins DESC LIMIT 10',
-	["%"+ipAddress+"%"],
+	[ipAddress],
 	function(err, results) {
 		if(err) console.error(err);
 		console.log(results);
