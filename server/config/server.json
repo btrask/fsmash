@@ -2,7 +2,7 @@
 	"server": {
 		"port": 80,
 		"securePort": 443,
-		"secureURL": "https://fsmash.org",
+		"secureURL": null,
 		"host": null,
 		"remoteAddressField": null
 	}
