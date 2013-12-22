@@ -24,12 +24,33 @@ var User = function(session, userID) {
 	};
 	var subscribeElems = {};
 	subscribeItem.setContent(DOM.clone("subscribe", subscribeElems));
-	subscribeElems.custom.value = JSON.stringify({userID: userID});
 	DOM.field.onChange(subscribeElems.color, function() {
 		var match = /[0-9a-fA-F]{6}/.exec(subscribeElems.color.value);
 		var color = match ? match[0] : null;
 		user.request("/subscription/color/", {color: color});
 	});
+	DOM.field.onChange(subscribeElems.targetUsername, verifySubscriptionTarget);
+	subscribeElems.verifyTargetUsername.onclick = verifySubscriptionTarget;
+	function verifySubscriptionTarget() {
+		var username = subscribeElems.targetUsername.value;
+		DOM.fill(subscribeElems.verificationStatus, "Verifying...");
+		user.request("/getUser/", {"username": username}, updateSubscriptionTarget);
+	}
+	function updateSubscriptionTarget(obj) {
+		var valid = obj && obj.userID && obj.username;
+		if(valid) {
+			DOM.fill(subscribeElems.verificationStatus, "Recipient: "+obj.username);
+		} else if("" !== subscribeElems.targetUsername.value) {
+			DOM.fill(subscribeElems.verificationStatus, "Unknown username");
+		} else {
+			DOM.fill(subscribeElems.verificationStatus, "Recipient: you");
+		}
+		subscribeElems.custom.value = JSON.stringify({
+			sourceUserID: userID,
+			targetUserID: valid ? obj.userID : userID, // TODO: Interface for configuration.
+		});
+	}
+	updateSubscriptionTarget(null);
 
 	var channelsItem = new SidebarItem("Channels");
 	var acctElems = {};
@@ -131,6 +152,9 @@ var User = function(session, userID) {
 			if(!subscribeItem.selected) DOM.fill(subscribeItem.counter, "!");
 		}
 		DOM.classify(subscribeElems.subscriberPane, "invisible", !body.expireTime);
+	});
+	user.event.getUser = bt.dispatch(function(body) {
+		return body;
 	});
 
 	user.request = function(path, properties, callback) {

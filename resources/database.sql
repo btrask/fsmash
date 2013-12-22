@@ -154,7 +154,8 @@ CREATE TABLE `donationAttempts` (
 
 CREATE TABLE `donations` (
   `donationID` int(11) NOT NULL AUTO_INCREMENT,
-  `userID` int(11) NOT NULL,
+  `sourceUserID` int(11) NOT NULL,
+  `targetUserID` int(11) NOT NULL,
   `payerID` varchar(13) COLLATE utf8_unicode_ci NOT NULL,
   `transactionID` varchar(19) COLLATE utf8_unicode_ci DEFAULT NULL,
   `pennies` int(11) NOT NULL DEFAULT '0',

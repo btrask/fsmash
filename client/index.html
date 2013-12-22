@@ -106,6 +106,12 @@
 		<div class="header">Subscribe</div>
 		<p>This website has an ongoing cost of time and money to run. In order to keep the quality of the site high, please consider contributing.</p>
 		<p>I've put together a new subscription system. A $4 donation earns a 3 month subscription. You can donate any amount you wish <strong>($4 minimum)</strong>, with a proportional subscription length.</p>
+		<div class="padding" style="border-width: 1px; display: inline-block;">
+			Subscription gifting<br>
+			User name (case insensitive): <input data-id="targetUsername" type="text" class="text padding">
+			<input data-id="verifyTargetUsername" type="button" class="button padding" value="Confirm"> <span data-id="verificationStatus"></span>
+			<div>Gift subscriptions are anonymous.</div>
+		</div>
 		<form name="paypalSubscribe" action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_blank">
 			<input type="hidden" name="cmd" value="_s-xclick">
 			<input type="hidden" name="hosted_button_id" value="KFKZNUEBV6PJ8">

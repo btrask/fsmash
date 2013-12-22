@@ -340,7 +340,7 @@ root.api.session.user = bt.dispatch(function(query, session) {
 			);
 			db.query(
 				"SELECT UNIX_TIMESTAMP(expireTime) * 1000 expireTime"+
-				" FROM donations WHERE userID = $ AND expireTime > NOW()"+
+				" FROM donations WHERE targetUserID = $ AND expireTime > NOW()"+
 				" ORDER BY expireTime DESC LIMIT 1",
 				[user.info.userID],
 				function(err, donationResult) {
@@ -997,6 +997,22 @@ root.api.session.user.broadcastChannel.application.stop = bt.dispatch(function(q
 	});
 });
 
+root.api.session.user.getUser = bt.dispatch(function(query, session, user) {
+	var username = query["username"];
+	if(user.messageLimit()) return false;
+	return session.promise(function(ticket) {
+		db.query(
+			"SELECT userID, userName FROM users WHERE userName = $", [username],
+			function(err, results) {
+				if(err) throw err;
+				var rows = mysql.rows(results);
+				var row = rows.length ? rows[0] : {};
+				user.sendEvent("/user/getUser/", {userID: row.userID, username: row.userName}, ticket);
+			}
+		);
+	});
+});
+
 root.api.session.user.video = bt.dispatch(function(query, session, user) {
 	var youtubeID = query.youtubeID;
 	if(user.videoLimit()) return false;
@@ -1042,8 +1058,9 @@ root.paypal = bt.dispatch(function(req, res, data) {
 		if(!query) return;
 		if(!paypal.verifyAttributes(query, config.PayPal.verify)) return;
 		var custom = JSON.parse(query["custom"]);
-		var userID = parseInt(custom.userID, 10);
-		if(!userID) return;
+		var sourceUserID = parseInt(custom.targetUserID, 10);
+		var targetUserID = parseInt(custom.targetUserID, 10);
+		if(!sourceUserID || !targetUserID) return;
 		var pennies = paypal.pennies(query["mc_gross"] || query["mc_gross_1"]);
 		if(config.PayPal.payment.pennies.min > pennies) return;
 		if(config.PayPal.payment.pennies.max < pennies) return;
@@ -1053,19 +1070,19 @@ root.paypal = bt.dispatch(function(req, res, data) {
 			"SELECT UNIX_TIMESTAMP(expireTime) * 1000 expireTime"+
 			" FROM donations WHERE userID = $ AND expireTime > NOW()"+
 			" ORDER BY expireTime DESC LIMIT 1",
-			[userID],
+			[targetUserID],
 			function(err, donationsResult) {
 				var startTime = donationsResult.length ? mysql.rows(donationsResult)[0].expireTime : new Date().getTime();
 				var additional = Math.ceil((((pennies / 4) * 3) * (1000 * 60 * 60 * 24 * (365.242199 / 12))) / 100);
 				db.query(
-					"INSERT IGNORE INTO donations (userID, payerID, transactionID, pennies, startTime, expireTime)"+
+					"INSERT IGNORE INTO donations (sourceUserID, targetUserID, payerID, transactionID, pennies, startTime, expireTime)"+
 					" VALUES ($, $, $, $, FROM_UNIXTIME($ / 1000), DATE_SUB(FROM_UNIXTIME($ / 1000), INTERVAL ($ / -1000) SECOND))",
-					[userID, query["payer_id"], query["txn_id"], pennies, startTime, startTime, additional],
+					[sourceUserID, targetUserID, query["payer_id"], query["txn_id"], pennies, startTime, startTime, additional],
 					function(err, donationResult) {
 						if(err && "ER_DUP_ENTRY" === err.code) return;
 						if(err) throw err;
-						if(!Session.byUserID.hasOwnProperty(userID)) return;
-						var user = Session.byUserID[userID].user;
+						if(!Session.byUserID.hasOwnProperty(targetUserID)) return;
+						var user = Session.byUserID[targetUserID].user;
 						if(user.info.subscriber) return;
 						user.info.subscriber = true;
 						Group.users.sendEvent("/user/person/", user.info);
