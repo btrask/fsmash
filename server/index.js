@@ -1072,6 +1072,7 @@ root.paypal = bt.dispatch(function(req, res, data) {
 			" ORDER BY expireTime DESC LIMIT 1",
 			[targetUserID],
 			function(err, donationsResult) {
+				if(err) throw err;
 				var startTime = donationsResult.length ? mysql.rows(donationsResult)[0].expireTime : new Date().getTime();
 				var additional = Math.ceil((((pennies / 4) * 3) * (1000 * 60 * 60 * 24 * (365.242199 / 12))) / 100);
 				db.query(
