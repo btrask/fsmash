@@ -1058,7 +1058,7 @@ root.paypal = bt.dispatch(function(req, res, data) {
 		if(!query) return;
 		if(!paypal.verifyAttributes(query, config.PayPal.verify)) return;
 		var custom = JSON.parse(query["custom"]);
-		var sourceUserID = parseInt(custom.targetUserID, 10);
+		var sourceUserID = parseInt(custom.sourceUserID, 10);
 		var targetUserID = parseInt(custom.targetUserID, 10);
 		if(!sourceUserID || !targetUserID) return;
 		var pennies = paypal.pennies(query["mc_gross"] || query["mc_gross_1"]);
@@ -1068,7 +1068,7 @@ root.paypal = bt.dispatch(function(req, res, data) {
 		// We shouldn't need to check the txn_type as long as the other conditions are met.
 		db.query(
 			"SELECT UNIX_TIMESTAMP(expireTime) * 1000 expireTime"+
-			" FROM donations WHERE userID = $ AND expireTime > NOW()"+
+			" FROM donations WHERE targetUserID = $ AND expireTime > NOW()"+
 			" ORDER BY expireTime DESC LIMIT 1",
 			[targetUserID],
 			function(err, donationsResult) {
