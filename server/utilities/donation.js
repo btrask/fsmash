@@ -43,7 +43,7 @@ donation.process = function(db, data, callback/* (err) */) {
 				var startTime = donationsResult.length ? mysql.rows(donationsResult)[0].expireTime : new Date().getTime();
 				var additional = Math.ceil((((pennies / 4) * 3) * (1000 * 60 * 60 * 24 * (365.242199 / 12))) / 100);
 				db.query(
-					"INSERT IGNORE INTO donations (sourceUserID, targetUserID, payerID, transactionID, pennies, startTime, expireTime)"+
+					"INSERT INTO donations (sourceUserID, targetUserID, payerID, transactionID, pennies, startTime, expireTime)"+
 					" VALUES ($, $, $, $, $, FROM_UNIXTIME($ / 1000), DATE_SUB(FROM_UNIXTIME($ / 1000), INTERVAL ($ / -1000) SECOND))",
 					[sourceUserID, targetUserID, query["payer_id"], query["txn_id"], pennies, startTime, startTime, additional],
 					function(err, donationResult) {
