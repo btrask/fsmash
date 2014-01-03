@@ -27,7 +27,7 @@ var crypt = require("./utilities/crypt-wrapper");
 var crypto = require("./utilities/crypto-wrapper");
 var httpx = require("./utilities/http-wrapper");
 var mysql = require("./utilities/mysql-wrapper");
-var paypal = require("./utilities/paypal");
+var donationModule = require("./utilities/donation");
 
 var bt = require("../shared/bt");
 var brawl = require("../shared/brawl");
@@ -1053,45 +1053,14 @@ root.paypal = bt.dispatch(function(req, res, data) {
 		" VALUES ($)",
 		[data]
 	);
-	paypal.verify(true, data, function(err, query) {
-		if(err) return;
-		if(!query) return;
-		if(!paypal.verifyAttributes(query, config.PayPal.verify)) return;
-		var custom = JSON.parse(query["custom"]);
-		var sourceUserID = parseInt(custom.sourceUserID, 10);
-		var targetUserID = parseInt(custom.targetUserID, 10);
-		if(!sourceUserID || !targetUserID) return;
-		var pennies = paypal.pennies(query["mc_gross"] || query["mc_gross_1"]);
-		if(config.PayPal.payment.pennies.min > pennies) return;
-		if(config.PayPal.payment.pennies.max < pennies) return;
-		if("Completed" != query["payment_status"]) return;
-		// We shouldn't need to check the txn_type as long as the other conditions are met.
-		db.query(
-			"SELECT UNIX_TIMESTAMP(expireTime) * 1000 expireTime"+
-			" FROM donations WHERE targetUserID = $ AND expireTime > NOW()"+
-			" ORDER BY expireTime DESC LIMIT 1",
-			[targetUserID],
-			function(err, donationsResult) {
-				if(err) throw err;
-				var startTime = donationsResult.length ? mysql.rows(donationsResult)[0].expireTime : new Date().getTime();
-				var additional = Math.ceil((((pennies / 4) * 3) * (1000 * 60 * 60 * 24 * (365.242199 / 12))) / 100);
-				db.query(
-					"INSERT IGNORE INTO donations (sourceUserID, targetUserID, payerID, transactionID, pennies, startTime, expireTime)"+
-					" VALUES ($, $, $, $, FROM_UNIXTIME($ / 1000), DATE_SUB(FROM_UNIXTIME($ / 1000), INTERVAL ($ / -1000) SECOND))",
-					[sourceUserID, targetUserID, query["payer_id"], query["txn_id"], pennies, startTime, startTime, additional],
-					function(err, donationResult) {
-						if(err && "ER_DUP_ENTRY" === err.code) return;
-						if(err) throw err;
-						if(!Session.byUserID.hasOwnProperty(targetUserID)) return;
-						var user = Session.byUserID[targetUserID].user;
-						if(user.info.subscriber) return;
-						user.info.subscriber = true;
-						Group.users.sendEvent("/user/person/", user.info);
-						user.sendEvent("/user/subscription/", {expireTime: startTime + additional});
-					}
-				);
-			}
-		);
+	donationModule.process(db, data, function(err, obj) {
+		if(err) return console.log(err, obj);
+		if(!Session.byUserID.hasOwnProperty(obj.targetUserID)) return;
+		var user = Session.byUserID[obj.targetUserID].user;
+		if(user.info.subscriber) return;
+		user.info.subscriber = true;
+		Group.users.sendEvent("/user/person/", user.info);
+		user.sendEvent("/user/subscription/", {expireTime: obj.expireTime});
 	});
 });
 
