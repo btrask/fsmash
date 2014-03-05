@@ -253,7 +253,9 @@ var Channel = function(session, user, channelID, parentID) {
 			if(!channel.userIsMember) throw new Error("Non-members should not be able to receive messages");
 			var msgElems = {};
 			var elem = DOM.clone("message", msgElems);
-			DOM.fill(msgElems.date, new Date(info.time).toLocaleTimeString());
+			var date = new Date(info.time);
+			DOM.fill(msgElems.date, date.toLocaleTimeString());
+			msgElems.date.title = date.toLocaleDateString();
 			DOM.fill(msgElems.name, info.userName);
 			DOM.fill(msgElems.text, DOM.inputify(info.text));
 			user.getPerson(info.userID, info.userName).trackMessageElement(elem, msgElems.name);
