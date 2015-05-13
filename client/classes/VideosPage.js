@@ -59,7 +59,6 @@ var VideosPage = function(session) {
 			var videoElems = {};
 			var video = DOM.clone("video", videoElems);
 			videoElems.anchor.href =
-				videoElems.thumbnailAnchor.href =
 				"http://www.youtube.com/watch?v=" + videoInfo.youtubeID;
 			DOM.fill(videoElems.submitterName, videoInfo.userName);
 
