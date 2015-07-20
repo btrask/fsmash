@@ -1,0 +1,189 @@
+*{
+	border-color:#666; /* unchanged */
+}
+
+#resizer>.line{
+	background:#555; /* unchanged */
+}
+
+body{
+	background: #eeeeee;
+	color:#000000;
+}
+
+a{
+	color:#c800dc;
+}
+
+a:active{
+	color:#fa3296;
+}
+
+.selected{
+	color:#000; /* unchanged (idk what this is) */
+}
+
+.panel{
+	background:#0032fa; /* experiment later */
+}
+
+.text{
+	background:#fa5a00;
+	color:#fff;
+	border-color:#aadc00;
+}
+
+.text:focus{
+	outline:2px solid #00c8b4;
+}
+
+.button,select{
+	background:#c800dc;
+	color:#fff;
+	border-color:#aadc00;
+}
+
+.button{
+	background:-moz-linear-gradient(#0032fa,#6f8bfa);
+	background:-webkit-gradient(linear,left top,left bottom,from(#0032fa),to(#6f8bfa));
+	text-shadow:#000 0 1px 1px;
+}
+
+.button:active{
+	background:#6f8bfa;
+	background:-moz-linear-gradient(#6f8bfa,#0032fa);
+	background:-webkit-gradient(linear,left top,left bottom,from(#6f8bfa),to(#0032fa));
+	color:#d1f100;
+}
+
+.button.selected{
+	background:#fa5a00;
+	background:-moz-linear-gradient(#fa5a00,#fa965e);
+	background:-webkit-gradient(linear,left top,left bottom,from(#fa5a00),to(#fa965e));
+	border-color:#c800dc;
+	color:#fff;
+	text-shadow:#000 0 1px 1px;
+}
+
+.button.notice:active{
+	background:#080;
+	background:-moz-linear-gradient(#080,#0b0);
+	background:-webkit-gradient(linear,left top,left bottom,from(#080),to(#0b0));
+}
+
+.disabled,.disabled:active{
+	background:#6477c9;
+	color:#eeeeee;
+}
+
+.header{
+	background:#00c8b4;
+	background:-moz-linear-gradient(#b0e4ff,#4dc2ff);
+	background:-webkit-gradient(linear,left top,left bottom,from(#b0e4ff),to(#4dc2ff));
+	border:none;
+	color:#0032fa;
+	text-shadow:#b0e4ff 0 1px 1px;
+}
+
+.notice{
+	background:#00c8b4;
+	background:-moz-linear-gradient(#00c8b4,#00dac4);
+	background:-webkit-gradient(linear,left top,left bottom,from(#00c8b4),to(#00dac4));
+	border-color:#999;
+	color:#333;
+	text-shadow:#ddd 0 1px 1px;
+}
+
+.notice .light{
+	color:#fff; /* don't know what this is */
+}
+
+#sidebar>ul>li>.row>.title{
+	color:#fa5a00;
+	font-variant:normal;
+	font-weight:bold;
+	text-shadow:#333 0 1px 1px;
+}
+#sidebar,#sidebar>ul{
+	background: none;
+}
+#sidebar{
+	background-color: #b0e4ff;
+	background-image: url("top.png"), url("bottom.png");
+	background-position: left top, left bottom;
+	background-repeat: no-repeat no-repeat;
+}
+
+
+#sidebar .row.selected{
+	background:#bb0;
+	background:-moz-linear-gradient(#fdfdc6,#fdfd96);
+	background:-webkit-gradient(linear,left top,left bottom,from(#fdfdc6),to(#fdfd96));
+	border-color:#ccc;
+	color:#000;
+}
+
+#sidebar .row.selected>.title{
+	text-shadow:#ee6 0 1px 1px;
+}
+
+#sidebar .counter{
+	background:#fa3296; /* new message counter */
+}
+
+#main>.authenticate>.step>.label{
+	background:#666;
+}
+#main>.channel>.content>.info{
+	background-color: #056fa6;
+	color:#fff
+}
+#main>.channel>.content>.info a{
+	color:#d1f100;
+}
+#main>.channel>.content>.info a:active{
+	color:#fdfd4c;
+}
+#main>.channel>.content>.info>.groups>.group>.children>.person>.light{
+	color:#ccc;
+}
+#main>.channel>.content>.info>.groups>.group>.children>.person.idle{
+	background:#2b98d0;
+	color:#555;
+}
+#main>.channel>.content>.info>.groups>.group>.children>.person.idle>.light{
+	color:#555;
+}
+#main>.channel>.content>.info>.groups>.group>.children>.person.teamRed>.title{
+	color:#f55;
+}
+
+#main>.channel>.content>.info>.groups>.group>.children>.person.teamGreen>.title{
+	color:#5f5;
+}
+
+#main>.channel>.content>.info>.groups>.group>.children>.person.teamBlue>.title{
+	color:#77f;
+}
+#main>.channel>.content>.chat{
+	background: #eeeeee url("big.png") no-repeat bottom right
+}
+#main>.channel>.content>.chat>.input{
+	background:#0032fa;
+}
+
+.message>span>.name{
+	color:#000;
+}
+
+.message.subscriber>span>.name:after,.subscriber.demo:after{
+	color:#b33;
+}
+
+.message.ignored>.messageText{
+	color:#eeeeee;
+}
+
+#modal>.shield>.content{
+	background:#72be00;
+}
