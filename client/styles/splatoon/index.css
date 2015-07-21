@@ -109,7 +109,7 @@ a:active{
 }
 #sidebar{
 	background-color: #b0e4ff;
-	background-image: url("top.png"), url("bottom.png");
+	background-image: url("resources/top.png"), url("resources/bottom.png");
 	background-position: left top, left bottom;
 	background-repeat: no-repeat no-repeat;
 }
@@ -166,7 +166,7 @@ a:active{
 	color:#77f;
 }
 #main>.channel>.content>.chat{
-	background: #eeeeee url("big.png") no-repeat bottom right
+	background: #eeeeee url("resources/big.png") no-repeat bottom right
 }
 #main>.channel>.content>.chat>.input{
 	background:#0032fa;
