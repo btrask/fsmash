@@ -20,7 +20,7 @@ STYLE_BASE_COMPONENTS = global.css sidebar.css modal.css authenticate.css accoun
 STYLES += public/styles/base/index.css public/styles/base/resources
 STYLES += public/styles/dark/index.css public/styles/dark/resources
 STYLES += public/styles/greenscreen/index.css
-STYLES += public/styles/splatoon/index.css public/styles/splatoon/*.png
+STYLES += public/styles/splatoon/index.css public/styles/splatoon/resources
 
 all: gzip
 
